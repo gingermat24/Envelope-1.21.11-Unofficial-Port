@@ -62,6 +62,10 @@ Please support the original project and its creators:
 
 * [Original Envelope on Modrinth](https://modrinth.com/mod/envelope)
 * [Original Envelope on CurseForge](https://curseforge.com/minecraft/mc-mods/envelope)
+* [Support the creators on Patreon](https://www.patreon.com/mortuusars?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
+* [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=YTSFJQ8XTXZBW)
+* [Join their Discord](https://discord.com/invite/FzHKGDW2et)
+* [Original Wiki](https://moddedmc.wiki/en/project/envelope/latest)
 
 ## Disclaimer
 
@@ -69,7 +73,10 @@ This is an **unofficial port** and is not affiliated with or endorsed by the ori
 
 If you encounter an issue that is specific to the 1.21.11 port, please report it on this project's issue tracker. For issues with the original mod, please contact the original developers through the official project pages.
 
+If you want to contact me directly, you can reach me on Discord at **matteo_sb**.
+
 ---
+
 > The port is based on original mod v0.7.5 and corresponds to port v0.1.0, with dependency, version, and other changes made for compatibility.
 
 > As much as i am against AI in a lot of contexts, like daily life, school, art, and more, since i'm still a beginner i used it a little to ask questions, understand things, and check my code while learning. i still wrote and worked on the mod myself, and i mainly used AI as a learning tool. hope yall understand, especially since this is my first time porting a more complicated mod.
