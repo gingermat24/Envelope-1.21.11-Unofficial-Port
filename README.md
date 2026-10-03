@@ -32,7 +32,7 @@
 
   <br>
 
-  <a href="https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port">
+  <a href="https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port-">
     <img src="https://img.shields.io/badge/GitHub-Source-181717?logo=github&logoColor=white" alt="GitHub source code">
   </a>
 
@@ -52,10 +52,6 @@ The original mod was not available for this Minecraft version, so I ported it to
 
 This project is **not the original Envelope mod**. It is a community-made port intended to bring the original mod to a newer Minecraft version.
 
-## Changing the mod icon
-
-Replace `common/src/main/resources/icon.png` with the new image, keeping the filename `icon.png`. The Fabric metadata already points to this file.
-
 ## Credits
 
 Full credit goes to the original creators of **Envelope**.
@@ -71,9 +67,9 @@ Please support the original project and its creators:
 
 This is an **unofficial port** and is not affiliated with or endorsed by the original Envelope developers unless explicitly stated otherwise.
 
-If you encounter an issue that is specific to the 1.21.11 port, please report it on [this project's issue tracker](https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port/issues). For issues with the original mod, please contact the original developers through the official project pages.
+If you encounter an issue that is specific to the 1.21.11 port, please report it on this project's issue tracker. For issues with the original mod, please contact the original developers through the official project pages.
 
 ---
-> The port was based on original mod v0.7.5, which corresponds to port v0.1.0.
+> The port is based on original mod v0.7.5 and corresponds to port v0.1.0, with dependency, version, and other changes made for compatibility.
 
 > As much as i am against AI in a lot of contexts, like daily life, school, art, and more, since i'm still a beginner i used it a little to ask questions, understand things, and check my code while learning. i still wrote and worked on the mod myself, and i mainly used AI as a learning tool. hope yall understand, especially since this is my first time porting a more complicated mod.
