@@ -1,0 +1,9 @@
+{
+  "location": {
+    "type": "relative",
+    "distance": 1000
+  },
+  "name": {
+    "translate": "address.envelope.automated_supply_service"
+  }
+}

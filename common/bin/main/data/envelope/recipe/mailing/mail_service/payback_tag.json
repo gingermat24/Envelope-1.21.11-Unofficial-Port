@@ -1,0 +1,12 @@
+{
+  "type": "envelope:mail_crafting",
+  "address": "envelope:mail_service",
+  "ingredients": [
+    "envelope:address_tag",
+    "#c:dyes/red"
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:payback_tag"
+  }
+}

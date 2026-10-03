@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#minecraft:planks",
+    "S": "#minecraft:wooden_slabs",
+    "T": "envelope:address_tag"
+  },
+  "pattern": [
+    "SSS",
+    "PTP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:mailbox"
+  }
+}

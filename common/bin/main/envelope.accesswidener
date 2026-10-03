@@ -1,0 +1,8 @@
+accessWidener   v2  named
+
+accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftType I
+accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftStatus I
+accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftSlots Ljava/util/Set;
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen lastQuickMoved Lnet/minecraft/world/item/ItemStack;
+
+accessible field net/minecraft/world/entity/ai/goal/FollowMobGoal followingMob Lnet/minecraft/world/entity/Mob;

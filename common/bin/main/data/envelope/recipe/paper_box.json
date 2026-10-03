@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": "minecraft:honeycomb",
+    "P": "minecraft:paper"
+  },
+  "pattern": [
+    " P ",
+    "PHP",
+    " P "
+  ],
+  "result": {
+    "count": 3,
+    "id": "envelope:paper_box"
+  }
+}

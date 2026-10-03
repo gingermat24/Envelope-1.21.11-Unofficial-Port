@@ -1,0 +1,16 @@
+{
+  "type": "envelope:mail_crafting",
+  "address": "envelope:automated_supply_service",
+  "ingredients": [
+    "#c:ingots/iron",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:saddle"
+  }
+}

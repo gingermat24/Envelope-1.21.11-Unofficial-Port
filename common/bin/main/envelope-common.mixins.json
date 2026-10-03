@@ -1,0 +1,43 @@
+{
+  "required": true,
+  "package": "io.github.mortuusars.envelope.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "plugin": "io.github.mortuusars.envelope.mixin.EnvelopeMixinConfigPlugin",
+  "client": [
+    "EditBoxMixin",
+    "applicator_carrying_tooltip.AbstractContainerScreenMixin",
+    "bugger.EntityRendererMixin",
+    "bugger.EntityRenderStateMixin",
+    "bugger.KeyboardHandlerMixin",
+    "bugger.MouseHandlerMixin",
+    "bugger.ScreenOverlayMixin",
+    "bugger.ScreenRenderLinesInvoker",
+    "item_tint.ItemTintSourcesMixin",
+    "item_tint.SelectItemModelPropertiesMixin",
+    "tooltip.ClientTooltipComponentMixin"
+  ],
+  "mixins": [
+    "charred_pigeon_water.ThrownPotionMixin",
+    "dispenser_waste_scooping.DispenserBlockMixin",
+    "equine_assurance_bureau.TameAnimalTriggerMixin",
+    "event.ServerLevelMixin",
+    "fox_tatter.FoxMixin",
+    "injected.ServerLevelMixin",
+    "jei.BasicRecipeTransferHandlerMixin",
+    "jei.JeiKeyConflictContextMixin",
+    "paper_box_fall.EntityMixin",
+    "predators.CatMixin",
+    "predators.FoxMixin",
+    "predators.OcelotMixin",
+    "shears_clearing.ItemStackMixin",
+    "shears_clearing.ShearsItemMixin",
+    "spawners.MinecraftServerMixin",
+    "spawners.ServerLevelMixin",
+    "tooltip.ItemStackMixin",
+    "villager_feeds_pigeon.VillagerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "envelope:mail_crafting",
+  "address": "envelope:automated_supply_service",
+  "ingredients": [
+    "minecraft:andesite",
+    "minecraft:flint",
+    "minecraft:flint",
+    "minecraft:flint",
+    "minecraft:flint",
+    "minecraft:flint"
+  ],
+  "result": {
+    "count": 2,
+    "id": "minecraft:tuff"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "envelope:payback_tag_duration",
+    "cases": [
+      {"when": "short", "model": {"type": "minecraft:model", "model": "envelope:item/payback_tag_short"}},
+      {"when": "long", "model": {"type": "minecraft:model", "model": "envelope:item/payback_tag_long"}}
+    ],
+    "fallback": {"type": "minecraft:model", "model": "envelope:item/payback_tag_medium"}
+  }
+}

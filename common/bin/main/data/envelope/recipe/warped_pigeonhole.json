@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "pigeonhole",
+  "key": {
+    "H": "minecraft:hay_block",
+    "P": "minecraft:warped_planks"
+  },
+  "pattern": [
+    "PPP",
+    "PHP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:warped_pigeonhole"
+  }
+}

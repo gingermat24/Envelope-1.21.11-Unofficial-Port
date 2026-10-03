@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:ink_sac",
+    "minecraft:feather"
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:letter_and_quill"
+  }
+}
