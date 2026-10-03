@@ -3,12 +3,13 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class PackageScreen extends AbstractInHandContainerScreen<PackageMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/package.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/gui/package.png");
 
     public PackageScreen(PackageMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title, TEXTURE);
@@ -26,7 +27,8 @@ public class PackageScreen extends AbstractInHandContainerScreen<PackageMenu> {
         super.renderBg(guiGraphics, partialTick, mouseX, mouseY);
 
         if (getMenu().isDestroyedOnClose()) {
-            guiGraphics.blit(TEXTURE, leftPos + 45, topPos + 17, 0, 178, 86, 64);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos + 45, topPos + 17,
+                  0, 178, 86, 64, 256, 256);
         }
     }
 }

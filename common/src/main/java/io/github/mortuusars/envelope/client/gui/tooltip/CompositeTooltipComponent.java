@@ -3,9 +3,6 @@ package io.github.mortuusars.envelope.client.gui.tooltip;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.MultiBufferSource;
-import org.joml.Matrix4f;
-
 import java.util.List;
 
 public class CompositeTooltipComponent implements ClientTooltipComponent {
@@ -25,27 +22,28 @@ public class CompositeTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         int height = 0;
         for (ClientTooltipComponent component : components) {
-            height += component.getHeight();
+            height += component.getHeight(font);
         }
         return height;
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+    public void renderImage(Font font, int x, int y, int width, int height, GuiGraphics guiGraphics) {
         for (ClientTooltipComponent component : components) {
-            component.renderImage(font, x, y, guiGraphics);
-            y += component.getHeight();
+            int componentHeight = component.getHeight(font);
+            component.renderImage(font, x, y, component.getWidth(font), componentHeight, guiGraphics);
+            y += componentHeight;
         }
     }
 
     @Override
-    public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource) {
+    public void renderText(GuiGraphics guiGraphics, Font font, int x, int y) {
         for (ClientTooltipComponent component : components) {
-            component.renderText(font, mouseX, mouseY, matrix, bufferSource);
-            mouseY += component.getHeight();
+            component.renderText(guiGraphics, font, x, y);
+            y += component.getHeight(font);
         }
     }
 }

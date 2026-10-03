@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.mixin.equine_assurance_bureau;
 
 import io.github.mortuusars.envelope.world.mail.service.EquineAssuranceBureau;
-import net.minecraft.advancements.critereon.TameAnimalTrigger;
+import net.minecraft.advancements.criterion.TameAnimalTrigger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.animal.Animal;
 import org.spongepowered.asm.mixin.Mixin;

@@ -4,7 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
@@ -21,7 +21,7 @@ public abstract class MailRecipeBuilder {
 
     public abstract ItemStack getResult();
 
-    public abstract void save(RecipeOutput output, ResourceLocation id);
+    public abstract void save(RecipeOutput output, Identifier id);
 
     public void save(RecipeOutput output, String name) {
         save(output, Envelope.resource(getDefaultPath(getAddress(), name)));
@@ -43,7 +43,7 @@ public abstract class MailRecipeBuilder {
 
     public static String getDefaultPath(ServiceAddress address, String name) {
         String addressStr = address.getDefinitionHolder().unwrapKey()
-              .map(key -> key.location().getPath())
+              .map(key -> key.identifier().getPath())
               .orElseThrow();
         return "mailing/" + addressStr + "/" + name;
     }

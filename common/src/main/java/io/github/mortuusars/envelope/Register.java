@@ -3,17 +3,17 @@ package io.github.mortuusars.envelope;
 import com.mojang.brigadier.arguments.ArgumentType;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.advancements.critereon.ItemSubPredicate;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.predicates.DataComponentPredicate;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.world.entity.Entity;
@@ -121,7 +121,7 @@ public class Register {
     }
 
     @ExpectPlatform
-    public static <T extends ItemSubPredicate.Type<?>> Supplier<T> itemSubPredicate(String name, Supplier<T> supplier) {
+    public static <T extends DataComponentPredicate.Type<?>> Supplier<T> dataComponentPredicate(String name, Supplier<T> supplier) {
         throw new AssertionError();
     }
 
@@ -147,7 +147,7 @@ public class Register {
     }
 
     @ExpectPlatform
-    public static Supplier<ResourceLocation> stat(ResourceLocation location, StatFormatter formatter) {
+    public static Supplier<Identifier> stat(Identifier location, StatFormatter formatter) {
         throw new AssertionError();
     }
 }

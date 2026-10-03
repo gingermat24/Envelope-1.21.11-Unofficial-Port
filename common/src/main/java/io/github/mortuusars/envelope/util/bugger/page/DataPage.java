@@ -8,15 +8,16 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.bugger.JsonSyntaxHighlighter;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
@@ -62,7 +63,11 @@ public class DataPage implements BuggerPage {
             lines.add(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
             lines.add("");
 
-            CompoundTag nbt = Util.make(new CompoundTag(), entity::save);
+            TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, entity.registryAccess());
+            if (!entity.save(output)) {
+                return lines;
+            }
+            CompoundTag nbt = output.buildResult();
             lines.addAll(highlightAndSplitJson(CompoundTag.CODEC.encodeStart(JsonOps.INSTANCE, nbt)));
 
             return lines;

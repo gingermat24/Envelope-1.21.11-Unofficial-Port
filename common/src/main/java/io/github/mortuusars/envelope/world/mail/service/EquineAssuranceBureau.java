@@ -17,14 +17,16 @@ import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -33,9 +35,10 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class EquineAssuranceBureau {
-    private static final ResourceLocation RECIPE_ID = ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location()
-          .withPrefix("mailing/")
-          .withSuffix("/golden_horse_armor");
+    private static final ResourceKey<net.minecraft.world.item.crafting.Recipe<?>> RECIPE_ID =
+          ResourceKey.create(Registries.RECIPE, ServiceAddresses.EQUINE_ASSURANCE_BUREAU.identifier()
+                .withPrefix("mailing/")
+                .withSuffix("/golden_horse_armor"));
     private static final long MIN_SEND_INTERVAL = SharedConstants.TICKS_PER_GAME_DAY;
     private static final String DATA_LAST_SEND_TIME = "last_send_time";
     private static final String DATA_SENT_NOTICES_COUNT = "sent_notices_count";
@@ -51,7 +54,8 @@ public class EquineAssuranceBureau {
             return;
         }
 
-        Optional<RecipeHolder<MailRecipe>> recipe = Mailing.getAllRecipesOf(bureauAddress.get(), player.serverLevel())
+        ServerLevel level = (ServerLevel) player.level();
+        Optional<RecipeHolder<MailRecipe>> recipe = Mailing.getAllRecipesOf(bureauAddress.get(), level)
               .filter(recipeHolder -> recipeHolder.id().equals(RECIPE_ID))
               .findFirst();
         if (recipe.isEmpty()) {
@@ -62,7 +66,7 @@ public class EquineAssuranceBureau {
             return; // 1 in 5 chance of sending for animals other than horses.
         }
 
-        MailService service = MailService.of(player.serverLevel());
+        MailService service = MailService.of(level);
 
         PlayerAddress playerAddress = new PlayerAddress(player);
         Optional<BlockAddress> defaultAddress = service.getPlayerDefaultAddress(playerAddress);
@@ -70,24 +74,24 @@ public class EquineAssuranceBureau {
             return;
         }
 
-        CompoundTag data = service.getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location());
-        CompoundTag playerData = data.getCompound(player.getScoreboardName());
+        CompoundTag data = service.getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.identifier());
+        CompoundTag playerData = data.getCompound(player.getScoreboardName()).orElseGet(CompoundTag::new);
 
-        long lastSendTime = playerData.getLong(DATA_LAST_SEND_TIME);
+        long lastSendTime = playerData.getLong(DATA_LAST_SEND_TIME).orElse(0L);
         if (lastSendTime > 0 && service.getGameTime() - lastSendTime < MIN_SEND_INTERVAL) {
             return;
         }
 
-        int sentNoticesCount = playerData.getInt(DATA_SENT_NOTICES_COUNT);
-        int deliveriesCount = playerData.getInt(DATA_DELIVERIES_COUNT);
+        int sentNoticesCount = playerData.getInt(DATA_SENT_NOTICES_COUNT).orElse(0);
+        int deliveriesCount = playerData.getInt(DATA_DELIVERIES_COUNT).orElse(0);
         double chance = Math.max(0.02, 1.0 / (1 + ((sentNoticesCount + deliveriesCount) * 2)));
 
         if (service.getLevel().getRandom().nextDouble() < chance
-              && sendLetter(player.serverLevel(), playerAddress)) {
+              && sendLetter(level, playerAddress)) {
             playerData.putInt(DATA_SENT_NOTICES_COUNT, sentNoticesCount + 1);
             playerData.putLong(DATA_LAST_SEND_TIME, service.getGameTime());
             data.put(player.getScoreboardName(), playerData);
-            service.getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location(), data);
+            service.getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.identifier(), data);
         }
     }
 
@@ -114,22 +118,24 @@ public class EquineAssuranceBureau {
 
     public static void onCraft(MailDropOffContext context, ServiceAddress address, MailDropOffResult craftingResult) {
         context.getDelivery().getOwner()
-              .filter(owner -> isCarryingRecipeResult(context, craftingResult))
+              .filter(owner -> isCarryingRecipeResult(context, address, craftingResult))
               .flatMap(owner -> context.getService().getKnownPlayers().getDataOf(owner))
               .ifPresent(player -> {
-                  CompoundTag data = context.getService().getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location());
-                  CompoundTag playerData = data.getCompound(player.getProfile().getName());
+                  CompoundTag data = context.getService().getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.identifier());
+                  String playerName = player.getProfile().name();
+                  CompoundTag playerData = data.getCompound(playerName).orElseGet(CompoundTag::new);
 
-                  playerData.putInt(DATA_DELIVERIES_COUNT, playerData.getInt(DATA_DELIVERIES_COUNT) + 1);
-                  data.put(player.getProfile().getName(), playerData);
+                  playerData.putInt(DATA_DELIVERIES_COUNT, playerData.getInt(DATA_DELIVERIES_COUNT).orElse(0) + 1);
+                  data.put(playerName, playerData);
 
-                  context.getService().getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location(), data);
+                  context.getService().getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.identifier(), data);
               });
     }
 
-    private static boolean isCarryingRecipeResult(MailDropOffContext context, MailDropOffResult craftingResult) {
-        ItemStack expectedResult = context.getService().getLevel().getRecipeManager()
-              .byKey(RECIPE_ID)
+    private static boolean isCarryingRecipeResult(MailDropOffContext context, ServiceAddress address, MailDropOffResult craftingResult) {
+        ItemStack expectedResult = Mailing.getAllRecipesOf(address, context.getService().getLevel())
+              .filter(holder -> holder.id().equals(RECIPE_ID))
+              .findFirst()
               .map(holder -> holder.value().getResultItem(context.getService().getLevel().registryAccess()))
               .orElse(new ItemStack(Items.BARRIER));
 
@@ -153,7 +159,7 @@ public class EquineAssuranceBureau {
         SimpleContainer inputContainer = new SimpleContainer(PackageContents.SLOTS);
 
         recipe.get().value().getIngredients().stream()
-              .map(i -> Arrays.stream(i.getItems()).findFirst())
+              .map(i -> i.items().findFirst().map(ItemStack::new))
               .filter(Optional::isPresent)
               .forEach(item -> inputContainer.addItem(item.get()));
 
@@ -187,6 +193,6 @@ public class EquineAssuranceBureau {
         return Style.EMPTY
               .withColor(ChatFormatting.DARK_RED)
               .withUnderlined(true)
-              .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(stack)));
+              .withHoverEvent(new HoverEvent.ShowItem(stack));
     }
 }

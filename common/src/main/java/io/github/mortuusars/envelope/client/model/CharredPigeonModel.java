@@ -1,18 +1,14 @@
 package io.github.mortuusars.envelope.client.model;
 
-import com.google.common.collect.ImmutableList;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.EasingFunction;
-import io.github.mortuusars.envelope.world.entity.CharredPigeon;
-import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class CharredPigeonModel extends AgeableListModel<CharredPigeon> {
+public class CharredPigeonModel extends EntityModel<CharredPigeonModel.RenderState> {
     private final ModelPart root;
 
     private final ModelPart head;
@@ -29,9 +25,7 @@ public class CharredPigeonModel extends AgeableListModel<CharredPigeon> {
     private final ModelPart rightWing;
 
     public CharredPigeonModel(ModelPart root) {
-        // bodyYOffset = 24 * (babyBodyScale - 1)
-        // babyYHeadOffset = I have not been able to crack the code. so have a magic number instead.
-        super(true, 6.7F, 0, 1.75F, 2.1F, 24F * 1.1F);
+        super(root);
         this.root = root;
 
         head = root.getChild("head");
@@ -121,26 +115,24 @@ public class CharredPigeonModel extends AgeableListModel<CharredPigeon> {
         return LayerDefinition.create(mesh, 64, 64);
     }
 
-    public void setupAnim(CharredPigeon pigeon, float limbSwing, float limbSwingAmount, float bob, float netHeadYaw, float headPitch) {
-        root.getAllParts().forEach(ModelPart::resetPose);
+    public void setupAnim(RenderState state) {
+        super.setupAnim(state);
 
-        head.xRot = headPitch * (float) (Math.PI / 180.0);
-        head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
+        head.xRot = state.xRot * (float) (Math.PI / 180.0);
+        head.yRot = state.yRot * (float) (Math.PI / 180.0);
 
-        float partialTick = Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true);
-
-        switch (getState(pigeon)) {
+        switch (getState(state)) {
             case FLYING -> {
-                leftWing.zRot = -(bob + 0.3f);
-                rightWing.zRot = bob + 0.3f;
+                leftWing.zRot = -(state.flapBob + 0.3f);
+                rightWing.zRot = state.flapBob + 0.3f;
 
-                leftLeg.xRot = 0.75f * limbSwingAmount;
+                leftLeg.xRot = 0.75f * state.walkAnimationSpeed;
                 leftLeg.yRot = -0.15f;
-                rightLeg.xRot = 0.75f * limbSwingAmount;
+                rightLeg.xRot = 0.75f * state.walkAnimationSpeed;
                 rightLeg.yRot = 0.15f;
 
                 // Rock back and forth
-                float anim = ((pigeon.tickCount + partialTick) % 60) / 60;
+                float anim = (state.ageInTicks % 60) / 60;
                 anim *= 2;
                 if (anim > 1) {
                     anim = 2 - anim;
@@ -158,32 +150,35 @@ public class CharredPigeonModel extends AgeableListModel<CharredPigeon> {
                 rightWing.y -= 0.3F * (anim);
                 rightWing.z -= 0.5F * (anim);
 
-                tail.xRot += (limbSwingAmount * 0.5F) + (anim * 0.1f);
+                tail.xRot += (state.walkAnimationSpeed * 0.5F) + (anim * 0.1f);
                 tail.y -= 0.3F * (anim);
                 tail.z -= 0.4F * (anim);
             }
             case STANDING -> {
                 leftWing.zRot = -0.3927F;
                 rightWing.zRot = 0.3927F;
-                leftLeg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-                rightLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+                leftLeg.xRot = Mth.cos(state.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * state.walkAnimationSpeed;
+                rightLeg.xRot = Mth.cos(state.walkAnimationPos * 0.6662F) * 1.4F * state.walkAnimationSpeed;
             }
         }
     }
 
-    public CharredPigeonModel.State getState(@Nullable CharredPigeon pigeon) {
-        if (pigeon == null) return State.STANDING;
-        return pigeon.isFlying() ? State.FLYING : State.STANDING;
+    public State getState(RenderState state) {
+        return state.isFlying ? State.FLYING : State.STANDING;
     }
 
-    @Override
-    protected @NotNull Iterable<ModelPart> headParts() {
-        return ImmutableList.of(head);
+    public Iterable<ModelPart> headParts() {
+        return java.util.List.of(head);
     }
 
-    @Override
-    protected @NotNull Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of(body, rightLeg, leftLeg, rightWing, leftWing, tail);
+    public Iterable<ModelPart> bodyParts() {
+        return java.util.List.of(body, rightLeg, leftLeg, rightWing, leftWing, tail);
+    }
+
+    public static class RenderState extends LivingEntityRenderState {
+        public boolean isFlying;
+        public float flapBob;
+        public boolean hasMail;
     }
 
     public enum State {

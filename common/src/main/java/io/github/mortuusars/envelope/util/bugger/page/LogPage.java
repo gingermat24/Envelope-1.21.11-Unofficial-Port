@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope.util.bugger.page;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.Util;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -108,7 +108,7 @@ public class LogPage implements BuggerPage {
 
     @Override
     public boolean onKeyPress(int key, int scanCode, int modifiers) {
-        if (key == InputConstants.KEY_O && Screen.hasControlDown()) {
+        if (key == InputConstants.KEY_O && Minecraft.getInstance().hasControlDown()) {
             Util.getPlatform().openFile(logFile.toFile());
             return true;
         }

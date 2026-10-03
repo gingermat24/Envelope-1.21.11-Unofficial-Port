@@ -13,18 +13,26 @@ import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategor
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import java.util.List;
 
 public class PaybackTagApplicationRecipeExtension implements ICraftingCategoryExtension<PaybackTagApplicationRecipe> {
     @Override
+    public List<SlotDisplay> getIngredients(RecipeHolder<PaybackTagApplicationRecipe> recipeHolder) {
+        return List.of();
+    }
+
+    @Override
     public void setRecipe(RecipeHolder<PaybackTagApplicationRecipe> holder, IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
-        List<ItemStack> mailableItems = BuiltInRegistries.ITEM.getTag(Envelope.Tags.Items.MAILABLE)
-              .map(named -> named.stream().map(ItemStack::new).toList())
-              .orElse(List.of());
+        List<ItemStack> mailableItems = BuiltInRegistries.ITEM.stream()
+              .map(ItemStack::new)
+              .filter(stack -> stack.is(Envelope.Tags.Items.MAILABLE))
+              .toList();
 
         ItemStack tag = new ItemStack(Envelope.Items.PAYBACK_TAG.get());
-        tag.set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, new PaybackRequest(List.of(StackIngredient.createDefault())));
+        PaybackRequest request = new PaybackRequest(List.of(StackIngredient.createDefault()));
+        tag.set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, request);
         List<ItemStack> tagItems = List.of(tag);
 
         List<ItemStack> resultItems = mailableItems.stream()

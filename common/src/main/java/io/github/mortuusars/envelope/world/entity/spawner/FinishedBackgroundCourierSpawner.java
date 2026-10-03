@@ -7,11 +7,11 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.delivery.background.FinishedBackgroundCourier;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class FinishedBackgroundCourierSpawner extends Spawner {
     @Override
     public void spawn(ServerLevel level) {
         if (Config.Server.DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE.get()
-              && !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
+              && !level.getGameRules().get(GameRules.SPAWN_MOBS)) {
             return;
         }
 
@@ -52,7 +52,7 @@ public class FinishedBackgroundCourierSpawner extends Spawner {
             return;
         }
 
-        entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
+        entity.snapTo(spawnPos, entity.getYRot(), entity.getXRot());
         level.addFreshEntityWithPassengers(entity);
 
         if (entity instanceof Pigeon pigeon) {

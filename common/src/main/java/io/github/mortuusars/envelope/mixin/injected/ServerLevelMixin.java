@@ -7,8 +7,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level implements MailServiceHolder {
@@ -41,16 +39,16 @@ public abstract class ServerLevelMixin extends Level implements MailServiceHolde
 
     protected ServerLevelMixin(WritableLevelData levelData, ResourceKey<Level> dimension,
                                RegistryAccess registryAccess, Holder<DimensionType> dimensionTypeRegistration,
-                               Supplier<ProfilerFiller> profiler, boolean isClientSide, boolean isDebug,
+                               boolean isClientSide, boolean isDebug,
                                long biomeZoomSeed, int maxChainedNeighborUpdates) {
-        super(levelData, dimension, registryAccess, dimensionTypeRegistration, profiler,
+        super(levelData, dimension, registryAccess, dimensionTypeRegistration,
               isClientSide, isDebug, biomeZoomSeed, maxChainedNeighborUpdates);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(MinecraftServer server, Executor dispatcher, LevelStorageSource.LevelStorageAccess levelStorageAccess,
                         ServerLevelData serverLevelData, ResourceKey<Level> dimension, LevelStem levelStem,
-                        ChunkProgressListener progressListener, boolean isDebug, long biomeZoomSeed,
+                        boolean isDebug, long biomeZoomSeed,
                         List<CustomSpawner> customSpawners, boolean tickTime, RandomSequences randomSequences, CallbackInfo ci) {
         if (dimension() == OVERWORLD) { // Mail works only in overworld, hence why it's only instantiated on it.
             envelope$mailService = MailService.create((ServerLevel) (Object) this);
@@ -69,7 +67,7 @@ public abstract class ServerLevelMixin extends Level implements MailServiceHolde
     @Inject(method = "tick", at = @At(value = "RETURN"))
     private void onTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         if (envelope$mailService != null) {
-            getProfiler().popPush("envelope_mail_service");
+            Profiler.get().popPush("envelope_mail_service");
             envelope$mailService.tick();
         }
     }

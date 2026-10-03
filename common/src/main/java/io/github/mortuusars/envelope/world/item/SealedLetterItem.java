@@ -3,13 +3,13 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class SealedLetterItem extends Item implements Unsealable {
     public SealedLetterItem(Properties properties) {
-        super(properties);
+        super(Unsealable.withUnsealingConsumable(properties));
     }
 
     @Override
@@ -32,13 +32,8 @@ public class SealedLetterItem extends Item implements Unsealable {
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.EAT;
-    }
-
-    @Override
-    public @NotNull SoundEvent getEatingSound() {
-        return getUnsealingSound();
+    public @NotNull ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.EAT;
     }
 
     @Override
@@ -47,9 +42,9 @@ public class SealedLetterItem extends Item implements Unsealable {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand hand) {
         player.startUsingItem(hand);
-        return InteractionResultHolder.success(player.getItemInHand(hand));
+        return ItemUseResult.success(player.getItemInHand(hand));
     }
 
     @Override

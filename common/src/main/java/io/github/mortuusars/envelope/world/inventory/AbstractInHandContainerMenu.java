@@ -31,7 +31,7 @@ public abstract class AbstractInHandContainerMenu extends AbstractContainerMenu 
         this.player = playerInventory.player;
         this.hand = hand;
         this.usedItem = player.getItemInHand(hand).getItem();
-        this.usedSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : playerInventory.selected;
+        this.usedSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : playerInventory.getSelectedSlot();
         this.container = createContainer();
         init();
     }

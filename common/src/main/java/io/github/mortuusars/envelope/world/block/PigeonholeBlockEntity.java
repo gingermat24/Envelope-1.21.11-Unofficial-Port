@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +20,8 @@ import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -124,7 +127,7 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
     // -- Component
 
     @Override
-    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+    protected void applyImplicitComponents(DataComponentGetter componentInput) {
         super.applyImplicitComponents(componentInput);
         this.occupants.clear();
         List<Occupant> occupants = componentInput.getOrDefault(Envelope.DataComponents.PIGEONS, List.of());
@@ -139,21 +142,21 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
 
     @SuppressWarnings("deprecation")
     @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        super.removeComponentsFromTag(tag);
-        tag.remove(getSerializedOccupantsName());
+    public void removeComponentsFromTag(ValueOutput output) {
+        super.removeComponentsFromTag(output);
+        output.discard(getSerializedOccupantsName());
     }
 
     // -- Save/Load
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        loadOccupiable(tag, registries);
+    protected void loadAdditional(ValueInput input) {
+        loadOccupiable(input);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        saveOccupiable(tag, registries);
+    protected void saveAdditional(ValueOutput output) {
+        saveOccupiable(output);
     }
 
     // --

@@ -13,11 +13,12 @@ import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -144,12 +145,12 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
         if (cost <= 0) return;
 
         boolean hasEnough = player.experienceLevel >= cost;
-        ResourceLocation sprite = Envelope.resource("address_tag/experience" + (hasEnough ? "" : "_disabled"));
+        Identifier sprite = Envelope.resource("address_tag/experience" + (hasEnough ? "" : "_disabled"));
 
         int x = 159;
         int y = 4;
 
-        guiGraphics.blitSprite(sprite, leftPos + x, topPos + y, 11, 11);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, leftPos + x, topPos + y, 11, 11);
 
         // Below is rendering of a xp level number with outline
         // Mojang did this with texture, but in our case it needs to be dynamic (because it's configurable)

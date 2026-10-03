@@ -12,8 +12,8 @@ import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.behavior.EntityTracker;
 import net.minecraft.world.entity.ai.behavior.PositionTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,7 +31,7 @@ public class VillagerPigeonFeeding {
         }
 
         if (Config.Server.VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY.get()
-              && villager.getVillagerData().getProfession() != VillagerProfession.NITWIT) {
+              && villager.getVillagerData().profession() != VillagerProfession.NITWIT) {
             return false;
         }
 

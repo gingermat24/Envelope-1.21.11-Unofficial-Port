@@ -14,6 +14,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,16 +78,26 @@ public class PackageBlockEntity extends BlockEntity {
     // --
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (!item.isEmpty()) {
-            tag.put("Package", item.save(registries, new CompoundTag()));
-        }
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        if (!item.isEmpty()) output.store("Package", ItemStack.CODEC, item);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("Package", CompoundTag.TAG_COMPOUND)) {
-            item = ItemStack.parse(registries, tag.getCompound("Package")).orElse(ItemStack.EMPTY);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        item = input.read("Package", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level != null) {
+            if (unpackWhenBroken) {
+                level.playSound(null, pos, Envelope.SoundEvents.PAPER_TEAR.get(),
+                      net.minecraft.sounds.SoundSource.BLOCKS, 0.8f, 1);
+            }
+            dropContents(level, pos);
         }
     }
 }

@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
-import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +21,6 @@ public abstract class CatMixin extends TamableAnimal {
     @Inject(method = "registerGoals", at = @At("RETURN"))
     private void registerGoals(CallbackInfo ci) {
         this.targetSelector.addGoal(1, new NonTameRandomTargetGoal<>((Cat)(Object)this, Pigeon.class, false,
-              entity -> Config.Server.PIGEON_HUNTED_BY_CAT.get()));
+              (entity, serverLevel) -> Config.Server.PIGEON_HUNTED_BY_CAT.get()));
     }
 }

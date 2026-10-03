@@ -8,14 +8,15 @@ import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
-public class CharredPigeonRenderer extends MobRenderer<CharredPigeon, CharredPigeonModel> {
+public class CharredPigeonRenderer extends MobRenderer<CharredPigeon, CharredPigeonModel.RenderState, CharredPigeonModel> {
     public static final ModelLayerLocation MODEL_LAYER = new ModelLayerLocation(Envelope.resource("charred_pigeon"), "main");
 
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/charred_pigeon/charred_pigeon.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/entity/charred_pigeon/charred_pigeon.png");
 
     public CharredPigeonRenderer(EntityRendererProvider.Context context) {
         super(context, new CharredPigeonModel(context.bakeLayer(MODEL_LAYER)), 0.35f);
@@ -24,14 +25,23 @@ public class CharredPigeonRenderer extends MobRenderer<CharredPigeon, CharredPig
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(CharredPigeon entity) {
+    public @NotNull Identifier getTextureLocation(CharredPigeonModel.RenderState state) {
         return TEXTURE;
     }
 
     @Override
-    protected float getBob(CharredPigeon pigeon, float partialTick) {
-        float f = Mth.lerp(partialTick, pigeon.oFlap, pigeon.flap);
-        float g = Mth.lerp(partialTick, pigeon.oFlapSpeed, pigeon.flapSpeed);
-        return (Mth.sin(f) + 1.0F) * g;
+    public CharredPigeonModel.RenderState createRenderState() {
+        return new CharredPigeonModel.RenderState();
+    }
+
+    @Override
+    public void extractRenderState(CharredPigeon pigeon, CharredPigeonModel.RenderState state, float partialTick) {
+        super.extractRenderState(pigeon, state, partialTick);
+        state.isFlying = pigeon.isFlying();
+        state.hasMail = pigeon.hasMail();
+        state.ageInTicks = pigeon.tickCount + partialTick;
+        float flap = Mth.lerp(partialTick, pigeon.oFlap, pigeon.flap);
+        float flapSpeed = Mth.lerp(partialTick, pigeon.oFlapSpeed, pigeon.flapSpeed);
+        state.flapBob = (Mth.sin(flap) + 1.0F) * flapSpeed;
     }
 }

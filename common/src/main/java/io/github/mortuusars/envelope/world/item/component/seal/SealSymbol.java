@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item.component.seal;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -12,7 +12,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,11 +23,11 @@ import java.util.function.Function;
 
 public final class SealSymbol {
     public static final Codec<SealSymbol> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
-          ResourceLocation.CODEC.fieldOf("texture").forGetter(SealSymbol::textureId)
+          Identifier.CODEC.fieldOf("texture").forGetter(SealSymbol::textureId)
     ).apply(i, SealSymbol::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealSymbol> DIRECT_STREAM_CODEC = StreamCodec.composite(
-          ResourceLocation.STREAM_CODEC, SealSymbol::textureId,
+          Identifier.STREAM_CODEC, SealSymbol::textureId,
           SealSymbol::new
     );
 
@@ -72,19 +72,19 @@ public final class SealSymbol {
 
     // --
 
-    private final ResourceLocation texture;
-    private final ResourceLocation textureFull;
+    private final Identifier texture;
+    private final Identifier textureFull;
 
-    public SealSymbol(ResourceLocation texture) {
+    public SealSymbol(Identifier texture) {
         this.texture = texture;
         this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
     }
 
-    public ResourceLocation textureId() {
+    public Identifier textureId() {
         return texture;
     }
 
-    public ResourceLocation texture() {
+    public Identifier texture() {
         return textureFull;
     }
 
@@ -134,8 +134,8 @@ public final class SealSymbol {
     }
 
     public static void bootstrap(BootstrapContext<SealSymbol> context) {
-        Function<ResourceKey<SealSymbol>, ResourceLocation> keyToTexture = key ->
-              key.location().withPath(path -> "seal/symbol/" + path);
+        Function<ResourceKey<SealSymbol>, Identifier> keyToTexture = key ->
+              key.identifier().withPath(path -> "seal/symbol/" + path);
 
         NUMBERS.values().forEach(key -> context.register(key, new SealSymbol(keyToTexture.apply(key))));
         LETTERS.values().forEach(key -> context.register(key, new SealSymbol(keyToTexture.apply(key))));

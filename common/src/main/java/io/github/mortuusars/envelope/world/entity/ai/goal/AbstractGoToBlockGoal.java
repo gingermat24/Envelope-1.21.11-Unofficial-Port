@@ -36,7 +36,7 @@ public abstract class AbstractGoToBlockGoal extends Goal {
     public boolean canUse() {
         @Nullable BlockPos pos = getBlockPos();
         return pos != null
-              && !pigeon.hasRestriction()
+              && !pigeon.hasHome()
               && !pigeon.hasReachedTarget(pos)
               && !Position.isFireNearby(pigeon.level(), pos);
     }

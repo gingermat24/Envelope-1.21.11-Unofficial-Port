@@ -31,8 +31,8 @@ public class ServiceAddresses {
     }
 
     public Set<ServiceAddress> getAllAddresses() {
-        return getMailService().getLevel().registryAccess().registryOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION)
-              .holders()
+        return getMailService().getLevel().registryAccess().lookupOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION)
+              .listElements()
               .map(ServiceAddress::new)
               .collect(Collectors.toSet());
     }

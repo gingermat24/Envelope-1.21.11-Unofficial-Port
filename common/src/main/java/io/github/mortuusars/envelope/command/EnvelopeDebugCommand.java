@@ -16,7 +16,7 @@ import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.commands.CommandSourceStack;
@@ -30,7 +30,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.commands.LocateCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -142,11 +142,11 @@ public class EnvelopeDebugCommand {
 
 
 //        Component text = Component.literal("       Report to Chief\n\n  Patrol we sent to village not return. Unexpected danger possible.\n\n  Must know more. Asking reinforcements.")
-//              .setStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt")));
+//              .setStyle(Style.EMPTY.withFont(Identifier.withDefaultNamespace("illageralt")));
 //
 //        ItemStack letter = Mail.createLetter(text)
 //              .set(DataComponents.ITEM_NAME, Component.literal("Report")
-//                    .withStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt")))).get();
+//                    .withStyle(Style.EMPTY.withFont(Identifier.withDefaultNamespace("illageralt")))).get();
 //
 //        player.addItem(letter);
 
@@ -215,8 +215,8 @@ public class EnvelopeDebugCommand {
     }
 
     private static BlockPos locateStructure(CommandSourceStack source, ResourceKey<Structure> key) throws CommandSyntaxException {
-        Registry<Structure> registry = source.getLevel().registryAccess().registryOrThrow(Registries.STRUCTURE);
-        Holder.Reference<Structure> holder = registry.getHolderOrThrow(key);
+        Registry<Structure> registry = source.getLevel().registryAccess().lookupOrThrow(Registries.STRUCTURE);
+        Holder.Reference<Structure> holder = registry.get(key.identifier()).orElseThrow();
         HolderSet.Direct<Structure> holderSet = HolderSet.direct(holder);
         BlockPos blockPos = BlockPos.containing(source.getPosition());
         ServerLevel serverLevel = source.getLevel();
@@ -226,7 +226,7 @@ public class EnvelopeDebugCommand {
         stopwatch.stop();
 
         if (pair == null) {
-            source.sendFailure(Component.literal("Cannot find " + key.location()));
+            source.sendFailure(Component.literal("Cannot find " + key.identifier()));
             return BlockPos.ZERO;
         } else {
             BlockPos pos = pair.getFirst();
@@ -234,8 +234,8 @@ public class EnvelopeDebugCommand {
             Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ()))
                   .withStyle(
                         style -> style.withColor(ChatFormatting.GREEN)
-                              .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
-                              .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
+                              .withClickEvent(new ClickEvent.SuggestCommand("/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
+                              .withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.coordinates.tooltip")))
                   );
 
             source.sendSuccess(() -> component, true);

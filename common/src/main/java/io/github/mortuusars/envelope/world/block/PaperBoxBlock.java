@@ -9,8 +9,9 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -96,10 +98,12 @@ public class PaperBoxBlock extends Block {
     }
 
     @Override
-    protected @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected @NotNull BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess,
+                                               BlockPos pos, Direction direction, BlockPos neighborPos,
+                                               BlockState neighborState, RandomSource random) {
         return !state.canSurvive(level, pos)
               ? Blocks.AIR.defaultBlockState()
-              : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+              : super.updateShape(state, level, tickAccess, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -130,7 +134,7 @@ public class PaperBoxBlock extends Block {
     // --
 
     @Override
-    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
         float fallDistanceToBreak = getFallDistanceToBreak(state, pos, entity);
         if (fallDistanceToBreak > 0 && fallDistance > fallDistanceToBreak) {
             if (!level.isClientSide()) {
@@ -155,26 +159,26 @@ public class PaperBoxBlock extends Block {
     }
 
     @Override
-    public void updateEntityAfterFallOn(BlockGetter level, Entity entity) {
+    public void updateEntityMovementAfterFallOn(BlockGetter level, Entity entity) {
         if (entity.fallDistance <= 0) {
-            super.updateEntityAfterFallOn(level, entity);
+            super.updateEntityMovementAfterFallOn(level, entity);
         } else {
             entity.setDeltaMovement(entity.getDeltaMovement().multiply(1.0, 0.75f, 1.0));
         }
     }
 
-    public float reduceFallDistance(BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+    public double reduceFallDistance(BlockState state, BlockPos pos, Entity entity, double fallDistance) {
         int boxes = state.getValue(BOXES);
         if (boxes == MAX_BOXES) return 0;
-        return fallDistance * (0.5f - (0.05f * boxes));
+        return fallDistance * (0.5 - (0.05 * boxes));
     }
 
     // --
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!player.isSecondaryUseActive()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
         int newBoxes = state.getValue(BOXES) - 1;
@@ -201,6 +205,6 @@ public class PaperBoxBlock extends Block {
         level.playSound(player, pos, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.BLOCKS,
               0.9f, level.getRandom().nextFloat() * 0.1f + 0.85f + (newBoxes * 0.2f));
 
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }

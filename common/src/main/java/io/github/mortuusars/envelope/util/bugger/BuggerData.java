@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.util.bugger.network.BuggerDataS2CP;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -26,11 +26,11 @@ import java.util.function.Function;
  * but it simplifies data writing and reading (and allows sending arbitrary data), which is more important than performance for debug cases.
  */
 public class BuggerData {
-    public static final Map<ResourceLocation, Data<?>> DEFINITIONS = new HashMap<>();
-    public static final Map<ResourceLocation, Object> DATA = new HashMap<>();
+    public static final Map<Identifier, Data<?>> DEFINITIONS = new HashMap<>();
+    public static final Map<Identifier, Object> DATA = new HashMap<>();
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static <T> Optional<T> get(ResourceLocation id) {
+    public static <T> Optional<T> get(Identifier id) {
         if (!Bugger.isEnabled()) return Optional.empty();
         try {
             @SuppressWarnings("unchecked")
@@ -42,7 +42,7 @@ public class BuggerData {
         }
     }
 
-    public static void send(ResourceLocation id, Function<RegistryAccess, @Nullable Tag> dataSupplier) {
+    public static void send(Identifier id, Function<RegistryAccess, @Nullable Tag> dataSupplier) {
         Packets.sendToAllClients(registryAccess -> {
             CompoundTag tag = new CompoundTag();
             @Nullable Tag data = dataSupplier.apply(registryAccess);
@@ -51,7 +51,7 @@ public class BuggerData {
         });
     }
 
-    public static void receive(ResourceLocation id, CompoundTag tag, RegistryAccess registryAccess) {
+    public static void receive(Identifier id, CompoundTag tag, RegistryAccess registryAccess) {
         if (!Bugger.isEnabled()) return;
         Data<?> definition = Objects.requireNonNull(DEFINITIONS.get(id), "Definition '" + id + "' was not registered.");
         @Nullable Object newValue = tag.contains("data") ? definition.decode(tag.get("data"), registryAccess) : null;
@@ -64,7 +64,7 @@ public class BuggerData {
     }
 
     // Glorious generics magick
-    private static <T> void receiveInternal(Data<T> definition, ResourceLocation id, @NotNull Object newValueObj) {
+    private static <T> void receiveInternal(Data<T> definition, Identifier id, @NotNull Object newValueObj) {
         DATA.compute(id, (dataId, existingValueObj) -> {
             if (existingValueObj == null) return newValueObj;
             @SuppressWarnings("unchecked")

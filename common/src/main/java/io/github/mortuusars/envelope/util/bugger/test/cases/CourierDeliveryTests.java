@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.util.bugger.test.Test;
 import io.github.mortuusars.envelope.world.mail.delivery.*;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;

@@ -15,12 +15,15 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -113,27 +116,25 @@ public class LetterBlockEntity extends BlockEntity implements Nameable {
     // -- Save/Load
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (loot != null) {
-            SeededContainerLoot.CODEC.encodeStart(NbtOps.INSTANCE, loot)
-                  .resultOrPartial(LOGGER::error)
-                  .ifPresent(lootTag -> tag.put("Loot", lootTag));
-        }
-        if (!letter.isEmpty()) {
-            tag.put("Letter", letter.save(registries, new CompoundTag()));
-        }
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        if (loot != null) output.store("Loot", SeededContainerLoot.CODEC, loot);
+        if (!letter.isEmpty()) output.store("Letter", ItemStack.CODEC, letter);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("Loot", CompoundTag.TAG_COMPOUND)) {
-            loot = SeededContainerLoot.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("Loot"))
-                  .resultOrPartial(LOGGER::error)
-                  .orElse(null);
-        }
-        if (tag.contains("Letter", CompoundTag.TAG_COMPOUND)) {
-            letter = ItemStack.parse(registries, tag.getCompound("Letter"))
-                  .orElse(ItemStack.EMPTY);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        loot = input.read("Loot", SeededContainerLoot.CODEC).orElse(null);
+        letter = input.read("Letter", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level != null) {
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), getLetter(null));
+            letter = ItemStack.EMPTY;
         }
     }
 }

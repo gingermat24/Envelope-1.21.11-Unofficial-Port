@@ -13,7 +13,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -42,36 +42,37 @@ public class PaybackPackageItem extends Item {
         return Optional.ofNullable(stack.get(Envelope.DataComponents.PACKAGE_CONTENTS));
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
-        appendPaybackHoverText(stack, context, components, flag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                                java.util.function.Consumer<Component> components, TooltipFlag flag) {
+        appendPaybackHoverText(stack, context, display, components, flag);
     }
 
-    public static void appendPaybackHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
+    public static void appendPaybackHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                                              java.util.function.Consumer<Component> components, TooltipFlag flag) {
         appendPaybackSubjectHoverText(components, stack.get(Envelope.DataComponents.PAYBACK_SUBJECT));
     }
 
-    public static void appendPaybackSubjectHoverText(List<Component> components, @Nullable PaybackSubject subject) {
+    public static void appendPaybackSubjectHoverText(java.util.function.Consumer<Component> components, @Nullable PaybackSubject subject) {
         if (subject == null || subject.mail().isEmpty()) {
             return;
         }
 
         long remainingTicks = subject.expiresAt() - Minecrft.level().getGameTime();
         if (remainingTicks < 1) {
-            components.add(Component.translatable("gui.envelope.payback.expired").withColor(Colors.TOOLTIP_RED));
+            components.accept(Component.translatable("gui.envelope.payback.expired").withColor(Colors.TOOLTIP_RED));
         } else {
-            MutableComponent time = Screen.hasShiftDown()
+            MutableComponent time = net.minecraft.client.Minecraft.getInstance().hasShiftDown()
                   ? GameTime.format(remainingTicks, false)
                   : GameTime.formatLargest(remainingTicks, false);
 
-            components.add(Component.literal("⌛ ").append(time).withColor(Colors.TOOLTIP_RED));
+            components.accept(Component.literal("⌛ ").append(time).withColor(Colors.TOOLTIP_RED));
         }
     }
 
     // --
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (player instanceof ServerPlayer serverPlayer) {
@@ -81,6 +82,6 @@ public class PaybackPackageItem extends Item {
         }
 
         player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
-        return InteractionResultHolder.success(stack);
+        return ItemUseResult.success(stack);
     }
 }

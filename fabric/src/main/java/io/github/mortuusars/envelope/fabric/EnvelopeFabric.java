@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.fabric;
 
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.EnvelopeCommand;
@@ -29,11 +29,16 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -46,9 +51,9 @@ public class EnvelopeFabric implements ModInitializer {
     public void onInitialize() {
         Envelope.init();
 
-        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.SERVER, Config.Server.SPEC);
-        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.COMMON, Config.Common.SPEC);
-        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.CLIENT, Config.Client.SPEC);
+        ConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.SERVER, Config.Server.SPEC);
+        ConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.COMMON, Config.Common.SPEC);
+        ConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.CLIENT, Config.Client.SPEC);
 
         CommonEvents.commonSetup();
 
@@ -78,6 +83,29 @@ public class EnvelopeFabric implements ModInitializer {
             event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
             event.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
         });
+
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Envelope.resource("envelope"),
+                CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+                        .title(Component.translatable("itemGroup.envelope"))
+                        .icon(() -> new ItemStack(Envelope.Items.SEALED_LETTER.get()))
+                        .displayItems((parameters, output) -> {
+                            Envelope.Items.PIGEONHOLES.forEach(item -> output.accept(item.get()));
+                            output.accept(Envelope.Items.MAILBOX.get());
+                            output.accept(Envelope.Items.LETTER_AND_QUILL.get());
+                            output.accept(Envelope.Items.LETTER.get());
+                            output.accept(Envelope.Items.SEALED_LETTER.get());
+                            output.accept(Envelope.Items.PAPER_BOX.get());
+                            output.accept(Envelope.Items.PACKAGE.get());
+                            output.accept(Envelope.Items.SEALED_PACKAGE.get());
+                            output.accept(Envelope.Items.PAYBACK_TAG.get());
+                            output.accept(Envelope.Items.PAYBACK_BOX.get());
+                            output.accept(Envelope.Items.PAYBACK_PACKAGE.get());
+                            output.accept(Envelope.Items.ADDRESS_TAG.get());
+                            output.accept(Envelope.Items.SEAL_STAMP.get());
+                            output.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+                            output.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
+                        })
+                        .build());
 
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());

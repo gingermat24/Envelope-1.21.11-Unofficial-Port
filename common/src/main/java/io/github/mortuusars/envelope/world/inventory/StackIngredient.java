@@ -5,11 +5,11 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -32,7 +32,7 @@ import java.util.Optional;
 /**
  * Advanced ingredient to allow matching stacks of specific count and/or components.
  * <br>
- * Similar to {@link net.minecraft.advancements.critereon.ItemPredicate} but more suited for inventories and crafting.
+ * Similar to {@link net.minecraft.advancements.criterion.ItemPredicate} but more suited for inventories and crafting.
  * <br>
  * <br>
  * It is detached from all vanilla ingredient system, so logic for it has to be manually written.
@@ -46,8 +46,8 @@ public class StackIngredient {
           ExtraCodecs.intRange(1, 99)
                 .optionalFieldOf("count", 1)
                 .forGetter(StackIngredient::count),
-          DataComponentPredicate.CODEC
-                .optionalFieldOf("components", DataComponentPredicate.EMPTY)
+          DataComponentMap.CODEC
+                .optionalFieldOf("components", DataComponentMap.EMPTY)
                 .forGetter(StackIngredient::components),
           Codec.BOOL
                 .optionalFieldOf("strict", false)
@@ -57,18 +57,18 @@ public class StackIngredient {
     public static final StreamCodec<RegistryFriendlyByteBuf, StackIngredient> STREAM_CODEC = StreamCodec.composite(
           ByteBufCodecs.holderSet(Registries.ITEM), StackIngredient::items,
           ByteBufCodecs.INT, StackIngredient::count,
-          DataComponentPredicate.STREAM_CODEC, StackIngredient::components,
+          ByteBufCodecs.fromCodecWithRegistries(DataComponentMap.CODEC), StackIngredient::components,
           ByteBufCodecs.BOOL, StackIngredient::isStrict,
           StackIngredient::new
     );
 
     private final HolderSet<Item> items;
     private final int count;
-    private final DataComponentPredicate components;
+    private final DataComponentMap components;
     private final boolean strict;
     private @Nullable ItemStack[] stacks;
 
-    public StackIngredient(HolderSet<Item> items, int count, DataComponentPredicate components, boolean strict) {
+    public StackIngredient(HolderSet<Item> items, int count, DataComponentMap components, boolean strict) {
         Preconditions.checkArgument(count >= 1 && count <= 99, "Count must be in range 1-99.");
         this.items = items;
         this.count = count;
@@ -76,31 +76,31 @@ public class StackIngredient {
         this.strict = strict;
     }
 
-    public StackIngredient(Item item, int count, DataComponentPredicate components) {
+    public StackIngredient(Item item, int count, DataComponentMap components) {
         this(HolderSet.direct(item.builtInRegistryHolder()), count, components, false);
     }
 
     public StackIngredient(Item item, int count) {
-        this(item, count, DataComponentPredicate.EMPTY);
+        this(item, count, DataComponentMap.EMPTY);
     }
 
     public StackIngredient(Item item) {
         this(item, 1);
     }
 
-    public StackIngredient(TagKey<Item> tag, int count, DataComponentPredicate components) {
-        this(BuiltInRegistries.ITEM.getTag(tag)
+    public StackIngredient(TagKey<Item> tag, int count, DataComponentMap components) {
+        this(BuiltInRegistries.ITEM.get(tag)
               .or(() -> {
                   // This fallback is for datagen, where getting tag from registry fails.
                   LogUtils.getLogger().warn("Failed to get tag '#{}' from BuiltInRegistries.ITEM. Will use empty set.", tag.location());
-                  return Optional.of(HolderSet.emptyNamed(BuiltInRegistries.ITEM.holderOwner(), tag));
+                  return Optional.of(HolderSet.emptyNamed(BuiltInRegistries.ITEM, tag));
               })
               .orElseThrow(),
               count, components, false);
     }
 
     public StackIngredient(TagKey<Item> tag, int count) {
-        this(tag, count, DataComponentPredicate.EMPTY);
+        this(tag, count, DataComponentMap.EMPTY);
     }
 
     public StackIngredient(TagKey<Item> tag) {
@@ -111,7 +111,7 @@ public class StackIngredient {
 
     public static StackIngredient createDefault() {
         return new StackIngredient(HolderSet.direct(Items.EMERALD.builtInRegistryHolder()),
-              1, DataComponentPredicate.EMPTY, false);
+              1, DataComponentMap.EMPTY, false);
     }
 
     public static StackIngredient createFromStack(ItemStack stack) {
@@ -125,7 +125,7 @@ public class StackIngredient {
         DataComponentMap uniqueComponents = components.filter(type ->
               !Objects.equals(components.get(type), defaultComponents.get(type)));
         return new StackIngredient(HolderSet.direct(stack.getItemHolder()), stack.getCount(),
-              DataComponentPredicate.allOf(uniqueComponents), false);
+              uniqueComponents, false);
     }
 
     // --
@@ -138,7 +138,7 @@ public class StackIngredient {
         return count;
     }
 
-    public DataComponentPredicate components() {
+    public DataComponentMap components() {
         return components;
     }
 
@@ -149,7 +149,7 @@ public class StackIngredient {
     public @NotNull ItemStack[] stacks() {
         if (stacks == null) {
             stacks = items.stream()
-                  .map(item -> new ItemStack(item, count, components.asPatch()))
+                  .map(holder -> createStack(holder.value()))
                   .toArray(ItemStack[]::new);
             if (stacks.length == 0) {
                 ItemStack barrier = new ItemStack(Items.BARRIER, count);
@@ -185,9 +185,29 @@ public class StackIngredient {
     }
 
     public boolean componentsMatch(ItemStack stack) {
-        return strict
-              ? stacks().length != 0 && Objects.equals(stack.getComponents(), stacks()[0].getComponents())
-              : components().test(stack);
+        if (strict) {
+            return stacks().length != 0 && Objects.equals(stack.getComponents(), stacks()[0].getComponents());
+        }
+        for (TypedDataComponent<?> component : components) {
+            if (!matchesComponent(stack, component)) return false;
+        }
+        return true;
+    }
+
+    private ItemStack createStack(Item item) {
+        ItemStack stack = new ItemStack(item, count);
+        for (TypedDataComponent<?> component : components) {
+            copyComponent(stack, component);
+        }
+        return stack;
+    }
+
+    private static <T> void copyComponent(ItemStack stack, TypedDataComponent<T> component) {
+        stack.set(component.type(), component.value());
+    }
+
+    private static <T> boolean matchesComponent(ItemStack stack, TypedDataComponent<T> component) {
+        return Objects.equals(stack.get(component.type()), component.value());
     }
 
     // --

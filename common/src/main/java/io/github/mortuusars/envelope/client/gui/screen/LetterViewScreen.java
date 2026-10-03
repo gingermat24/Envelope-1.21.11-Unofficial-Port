@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
@@ -11,12 +10,17 @@ import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LetterViewScreen extends Screen {
-    public static final ResourceLocation REGULAR_TEXTURE = Envelope.resource("textures/gui/letter.png");
-    public static final ResourceLocation TATTERED_TEXTURE = Envelope.resource("textures/gui/letter_tattered.png");
-    public static final ResourceLocation TATTERED_OVERLAY = Envelope.resource("textures/gui/letter_tattered_overlay.png");
+    public static final Identifier REGULAR_TEXTURE = Envelope.resource("textures/gui/letter.png");
+    public static final Identifier TATTERED_TEXTURE = Envelope.resource("textures/gui/letter_tattered.png");
+    public static final Identifier TATTERED_OVERLAY = Envelope.resource("textures/gui/letter_tattered_overlay.png");
 
     protected final ItemAndStack<LetterItem> letter;
     protected final @Nullable InteractionHand hand;
@@ -92,12 +96,9 @@ public class LetterViewScreen extends Screen {
         }
 
         if (isTattered) {
-            RenderSystem.enableBlend();
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0, 0, 200);
-            guiGraphics.blit(TATTERED_OVERLAY, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-            guiGraphics.pose().popPose();
-            RenderSystem.disableBlend();
+            guiGraphics.nextStratum();
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TATTERED_OVERLAY, leftPos, topPos,
+                  0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
         }
 
         @Nullable Style style = getComponentStyleAt(mouseX, mouseY);
@@ -108,7 +109,7 @@ public class LetterViewScreen extends Screen {
                   && mouseX >= x && mouseX < x + maxTextWidth
                   && mouseY >= y && mouseY < y + maxTextHeight) {
                 List<FormattedCharSequence> leftovers = lines.stream().skip(maxTextLines).toList();
-                guiGraphics.renderTooltip(font, leftovers, mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(font, leftovers, mouseX, mouseY);
             }
         }
     }
@@ -116,8 +117,9 @@ public class LetterViewScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
-        ResourceLocation texture = isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
-        guiGraphics.blit(texture, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        Identifier texture = isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos, topPos,
+              0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
     }
 
     @Nullable
@@ -136,7 +138,11 @@ public class LetterViewScreen extends Screen {
             int clickedLine = y / font.lineHeight;
             if (clickedLine >= 0 && clickedLine < lines.size()) {
                 FormattedCharSequence text = lines.get(clickedLine);
-                return font.getSplitter().componentStyleAtWidth(text, x);
+                ActiveTextCollector.ClickableStyleFinder styleFinder =
+                      new ActiveTextCollector.ClickableStyleFinder(font, (int) mouseX, (int) mouseY);
+                styleFinder.accept(TextAlignment.LEFT, leftPos + 17, topPos + 21 + clickedLine * font.lineHeight,
+                      styleFinder.defaultParameters(), text);
+                return styleFinder.result();
             }
 
             return null;
@@ -149,7 +155,7 @@ public class LetterViewScreen extends Screen {
     public void onClose() {
         super.onClose();
         if (hand != null) {
-            int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
+            int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().getSelectedSlot() : Inventory.SLOT_OFFHAND;
             Packets.sendToServer(new LetterViewScreenClosedS2CP(slot));
         }
     }
@@ -157,23 +163,23 @@ public class LetterViewScreen extends Screen {
     // -- Input
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
+    public boolean keyPressed(KeyEvent event) {
+        if (Minecraft.getInstance().options.keyInventory.matches(event)) {
             this.onClose();
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
-    public boolean mouseClicked(double x, double y, int button) {
-        if (button == 0) {
-            @Nullable Style style = getComponentStyleAt(x, y);
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == 0) {
+            @Nullable Style style = getComponentStyleAt(event.x(), event.y());
             if (handleComponentClicked(style)) {
                 return true;
             }
         }
 
-        return super.mouseClicked(x, y, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     public boolean handleComponentClicked(@Nullable Style style) {
@@ -186,11 +192,10 @@ public class LetterViewScreen extends Screen {
             return false;
         }
 
-        boolean handled = super.handleComponentClicked(style);
-        if (handled && clickEvent.getAction() == ClickEvent.Action.RUN_COMMAND) {
+        Screen.defaultHandleGameClickEvent(clickEvent, Minecraft.getInstance(), this);
+        if (clickEvent instanceof ClickEvent.RunCommand) {
             onClose();
         }
-
-        return handled;
+        return true;
     }
 }

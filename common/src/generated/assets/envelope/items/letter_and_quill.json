@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "envelope:letter_and_quill_content",
+    "on_true": {"type": "minecraft:model", "model": "envelope:item/letter_and_quill_content"},
+    "on_false": {"type": "minecraft:model", "model": "envelope:item/letter_and_quill"}
+  }
+}

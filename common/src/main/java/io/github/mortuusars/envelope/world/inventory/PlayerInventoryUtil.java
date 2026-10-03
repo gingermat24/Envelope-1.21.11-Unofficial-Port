@@ -11,7 +11,7 @@ public class PlayerInventoryUtil {
         Inventory inventory = player.getInventory();
         ItemStack insertedStack = stack.copy();
 
-        for (int i = 0; i < inventory.items.size(); i++) {
+        for (int i = 0; i < inventory.getNonEquipmentItems().size(); i++) {
             ItemStack slotStack = inventory.getItem(i);
 
             if (slotStack.isEmpty()) {
@@ -38,7 +38,7 @@ public class PlayerInventoryUtil {
         Inventory inventory = player.getInventory();
         ItemStack insertedStack = stack.copy();
 
-        for (int i = 0; i < inventory.items.size(); i++) {
+        for (int i = 0; i < inventory.getNonEquipmentItems().size(); i++) {
             ItemStack slotStack = inventory.getItem(i);
 
             if (slotStack.isEmpty()) {
@@ -63,13 +63,12 @@ public class PlayerInventoryUtil {
     }
 
     public static ItemStack findFirstMatching(Player player, Predicate<ItemStack> predicate) {
-        for (ItemStack stack : player.getInventory().offhand) {
-            if (predicate.test(stack)) {
-                return stack;
-            }
+        ItemStack offhand = player.getInventory().getItem(Inventory.SLOT_OFFHAND);
+        if (predicate.test(offhand)) {
+            return offhand;
         }
 
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : player.getInventory().getNonEquipmentItems()) {
             if (predicate.test(stack)) {
                 return stack;
             }

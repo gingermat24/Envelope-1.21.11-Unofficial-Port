@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
@@ -20,14 +21,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -44,9 +42,12 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.util.AirRandomPos;
 import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.feline.Ocelot;
+import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -54,6 +55,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,7 +66,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant>>, FlyingAnimal, PhysicalCourier {
+public class Pigeon extends Animal implements FlyingAnimal, PhysicalCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -110,7 +114,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
           && Config.Server.VILLAGER_FEEDING_PIGEONS.get()
           && mob instanceof Villager villager
           && (!Config.Server.VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY.get()
-          || villager.getVillagerData().getProfession() == VillagerProfession.NITWIT)
+          || villager.getVillagerData().profession() == VillagerProfession.NITWIT)
           && mob.getRandom().nextInt(60) == 0;
 
     private static final EntityDataAccessor<Holder<PigeonVariant>> DATA_VARIANT = SynchedEntityData.defineId(Pigeon.class, Envelope.EntityDataSerializers.PIGEON_VARIANT.get());
@@ -150,14 +154,14 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     // -- Spawn
 
     public static boolean checkSpawnRules(EntityType<Pigeon> pigeon, LevelAccessor level,
-                                          MobSpawnType spawnType, BlockPos pos, RandomSource random) {
+                                          EntitySpawnReason spawnType, BlockPos pos, RandomSource random) {
         return Config.Server.PIGEON_SPAWNS_NATURALLY.get()
               && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEONS_SPAWNABLE_ON)
               && isBrightEnoughToSpawn(level, pos);
     }
 
     public static Pigeon createService(ServerLevel level) {
-        Pigeon pigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
+        Pigeon pigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level, EntitySpawnReason.MOB_SUMMONED),
               "Failed to create an entity. This should not happen.");
         pigeon.setVariant(PigeonVariant.getRandomServiceVariant(level.registryAccess(), level.getRandom()));
         pigeon.setOrigin(CourierOrigin.service());
@@ -172,14 +176,14 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
 
     @Override
     public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                 MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+                                                 EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
         setVariant(PigeonVariant.getRandomSpawnVariant(level.registryAccess(), level.getRandom(), level.getBiome(blockPosition())));
         getPigeonholeHandler().setRandomWantCooldownUpToDefault(level.getRandom());
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes()
+        return Animal.createAnimalAttributes()
               .add(Attributes.MAX_HEALTH, 8.0)
               .add(Attributes.FLYING_SPEED, 1F)
               .add(Attributes.MOVEMENT_SPEED, 0.2F)
@@ -238,7 +242,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         FlyingPathNavigation navigation = new PigeonFlyingPathNavigation(this, level);
         navigation.setCanOpenDoors(false);
         navigation.setCanFloat(true);
-        navigation.setCanPassDoors(true);
         return navigation;
     }
 
@@ -274,7 +277,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
                     serverLevel.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, mainHandItem),
                           position().x, position().y + 0.3, position().z, 5, 0.25, 0.25, 0.25, 0);
                 }
-                playSound(getEatingSound(mainHandItem), 0.5f, getRandom().nextFloat() * 0.2f + 0.9f);
+                playSound(getEatingSound(), 0.5f, getRandom().nextFloat() * 0.2f + 0.9f);
             }
 
             if (getEatingTicks() >= 10) {
@@ -299,20 +302,26 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     public boolean canConvert() {
-        return level().dimensionType().ultraWarm() && !isNoAi();
+        return level().environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, blockPosition()) && !isNoAi();
     }
 
     protected void convert(ServerLevel serverLevel) {
         ItemStack carriedMail = getCurrentDelivery().map(Delivery::getMail).orElse(ItemStack.EMPTY);
-        @Nullable CharredPigeon charredPigeon = convertTo(Envelope.EntityTypes.CHARRED_PIGEON.get(), true);
+        @Nullable CharredPigeon charredPigeon = convertTo(
+              Envelope.EntityTypes.CHARRED_PIGEON.get(),
+              ConversionParams.single(this, true, true),
+              EntitySpawnReason.CONVERSION,
+              targetPigeon -> {}
+        );
         if (charredPigeon != null) {
             charredPigeon.setCarriedMail(carriedMail);
             charredPigeon.setDeltaMovement(getDeltaMovement());
             charredPigeon.setXRot(getXRot());
             charredPigeon.setYHeadRot(getYHeadRot());
             charredPigeon.setYRot(getYRot());
-            if (getNavigation().getTargetPos() != null) {
-                charredPigeon.getNavigation().moveTo(charredPigeon.getNavigation().createPath(getNavigation().getTargetPos(), 1), 1);
+            @Nullable BlockPos targetPos = getNavigation().getTargetPos();
+            if (targetPos != null) {
+                charredPigeon.getNavigation().moveTo(charredPigeon.getNavigation().createPath(targetPos, 1), 1);
             }
 
             serverLevel.playSound(null, charredPigeon, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 0.6f, 1);
@@ -367,7 +376,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     @Override
-    public boolean wantsToPickUp(ItemStack stack) {
+    public boolean wantsToPickUp(ServerLevel serverLevel, ItemStack stack) {
         return Config.Server.PIGEON_EATS_SEEDS.get()
               && onGround()
               && getMainHandItem().isEmpty()
@@ -376,24 +385,23 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     @Override
-    public boolean canTakeItem(ItemStack stack) {
-        return wantsToPickUp(stack);
-    }
-
-    @Override
     public boolean canHoldItem(ItemStack stack) {
-        return wantsToPickUp(stack);
+        return Config.Server.PIGEON_EATS_SEEDS.get()
+              && onGround()
+              && getMainHandItem().isEmpty()
+              && isFood(stack)
+              && getEatingTicks() <= 0;
     }
 
     @Override
-    protected void pickUpItem(ItemEntity itemEntity) {
+    protected void pickUpItem(ServerLevel serverLevel, ItemEntity itemEntity) {
         if (getRandom().nextInt(10) != 0) {
             return;
         }
         ItemStack item = itemEntity.getItem();
         if (itemEntity.onGround() && distanceTo(itemEntity) < 1 && canHoldItem(item)) {
             if (item.getCount() > 1) {
-                spawnAtLocation(item.split(item.getCount() - 1));
+                spawnAtLocation(serverLevel, item.split(item.getCount() - 1));
             }
 
             onItemPickup(itemEntity);
@@ -405,8 +413,8 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     @Override
-    protected boolean shouldDropLoot() {
-        return super.shouldDropLoot() && (origin == null || !origin.isService());
+    protected boolean shouldDropLoot(ServerLevel serverLevel) {
+        return super.shouldDropLoot(serverLevel) && (origin == null || !origin.isService());
     }
 
     @Override
@@ -437,7 +445,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
             ItemStack mail = delivery.getPhase().isOnRecipientSide()
                   ? Mail.asDelivered(delivery.getMail())
                   : delivery.getMail();
-            spawnAtLocation(mail);
+            spawnAtLocation(level, mail);
             delivery.setMail(ItemStack.EMPTY);
         }
     }
@@ -510,7 +518,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        @Nullable Pigeon offspring = Envelope.EntityTypes.PIGEON.get().create(level);
+        @Nullable Pigeon offspring = Envelope.EntityTypes.PIGEON.get().create(level, EntitySpawnReason.BREEDING);
         if (offspring != null && otherParent instanceof Pigeon otherPigeon) {
             Holder<PigeonVariant> variant = getRandom().nextBoolean() ? this.getVariant() : otherPigeon.getVariant();
             if (!variant.value().inheritable()) {
@@ -528,23 +536,20 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide()) return false;
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
         if (isDeadOrDying()) return false;
 
         if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING.get()
               && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
 
-            if (level() instanceof ServerLevel level) {
-                level.sendParticles(ParticleTypes.POOF, position().x, position().y, position().z, 3, 0.3, 0.3, 0.3, 0);
-                level.playSound(null, this, SoundEvents.ALLAY_THROW, SoundSource.NEUTRAL, 1,
+            serverLevel.sendParticles(ParticleTypes.POOF, position().x, position().y, position().z, 3, 0.3, 0.3, 0.3, 0);
+            serverLevel.playSound(null, this, SoundEvents.ALLAY_THROW, SoundSource.NEUTRAL, 1,
                       getRandom().nextFloat() * 0.1f + 0.95f);
-            }
 
             return false;
         }
 
-        return super.hurt(source, amount);
+        return super.hurtServer(serverLevel, source, amount);
     }
 
     @Override
@@ -679,8 +684,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return Envelope.SoundEvents.PIGEON_AMBIENT.get();
     }
 
-    @Override
-    public @NotNull SoundEvent getEatingSound(ItemStack stack) {
+    protected SoundEvent getEatingSound() {
         return Envelope.SoundEvents.PIGEON_EAT.get();
     }
 
@@ -742,7 +746,8 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     // -- Courier
 
     public boolean canStartDelivery() {
-        return !isLeashed() && !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
+        return !isLeashed() && !isTired() && level().getDayTime() % 24000L < 13000L
+              && !level().isRaining() && !level().isThundering();
     }
 
     public Courier startDelivery(Delivery delivery) {
@@ -834,7 +839,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
         if (!delivery.getMail().isEmpty()) {
-            spawnAtLocation(delivery.getMail().copy());
+            spawnAtLocation(level, delivery.getMail().copy());
             Pigeon.LOGGER.info("{} has dropped undelivered mail on the ground.", getName().getString());
             delivery.setMail(ItemStack.EMPTY);
         }
@@ -863,70 +868,55 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     // -- Save / Load
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-        tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.store("PigeonholeHandler", PigeonholeHandler.CODEC, getPigeonholeHandler());
+        output.store("MailboxHandler", MailboxHandler.CODEC, getMailboxHandler());
         getVariant()
               .unwrapKey()
-              .ifPresent(key -> tag.putString("Variant", key.location().toString()));
-        if (isSitting()) tag.putBoolean("Sitting", true);
-        if (getTiredTicks() > 0) tag.putInt("TiredTicks", getTiredTicks());
-        if (getEatingTicks() > 0) tag.putInt("EatingTicks", getEatingTicks());
+              .ifPresent(key -> output.putString("Variant", key.identifier().toString()));
+        if (isSitting()) output.putBoolean("Sitting", true);
+        if (getTiredTicks() > 0) output.putInt("TiredTicks", getTiredTicks());
+        if (getEatingTicks() > 0) output.putInt("EatingTicks", getEatingTicks());
 
-        if (timeInUltraWarmDimension > 0) tag.putInt("TimeInUltraWarmDimension", timeInUltraWarmDimension);
+        if (timeInUltraWarmDimension > 0) output.putInt("TimeInUltraWarmDimension", timeInUltraWarmDimension);
 
         if (delivery != null) {
-            Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
-                  .resultOrPartial(LOGGER::error)
-                  .ifPresent(value -> tag.put("Delivery", value));
+            output.store("Delivery", Delivery.CODEC, delivery);
         }
         if (origin != null) {
-            CourierOrigin.CODEC.encodeStart(NbtOps.INSTANCE, origin)
-                  .resultOrPartial(LOGGER::error)
-                  .ifPresent(value -> tag.put("Origin", value));
+            output.store("Origin", CourierOrigin.CODEC, origin);
         }
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
 
-        PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler"))
-              .resultOrPartial(e -> LOGGER.error("Cannot parse PigeonholeHandler from tag '{}': {}", tag.getCompound("PigeonholeHandler"), e))
+        input.read("PigeonholeHandler", PigeonholeHandler.CODEC)
               .ifPresent(this::setPigeonholeHandler);
-        MailboxHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("MailboxHandler"))
-              .resultOrPartial(e -> LOGGER.error("Cannot parse MailboxHandler from tag '{}': {}", tag.getCompound("MailboxHandler"), e))
+        input.read("MailboxHandler", MailboxHandler.CODEC)
               .ifPresent(this::setMailboxHandler);
 
-        String variant = tag.contains("Variant", Tag.TAG_INT)
-              ? PigeonVariant.fromLegacyId(tag.getInt("Variant"))
-              : tag.getString("Variant");
+        String variant = input.read("Variant", Codec.either(Codec.STRING, Codec.INT))
+              .map(value -> value.map(id -> id, PigeonVariant::fromLegacyId))
+              .orElse("");
 
-        Optional.ofNullable(ResourceLocation.tryParse(variant))
+        Optional.ofNullable(Identifier.tryParse(variant))
               .map(key -> ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, key))
-              .flatMap(key -> registryAccess().registryOrThrow(Envelope.Registries.PIGEON_VARIANT)
-                    .getHolder(key))
+              .flatMap(key -> registryAccess().lookupOrThrow(Envelope.Registries.PIGEON_VARIANT)
+                    .get(key))
               .ifPresent(this::setVariant);
 
-        setSitting(tag.getBoolean("Sitting"));
-        setTiredTicks(tag.getInt("TiredTicks"));
-        setEatingTicks(tag.getInt("EatingTicks"));
+        setSitting(input.getBooleanOr("Sitting", false));
+        setTiredTicks(input.getIntOr("TiredTicks", 0));
+        setEatingTicks(input.getIntOr("EatingTicks", 0));
 
-        timeInUltraWarmDimension = tag.getInt("TimeInUltraWarmDimension");
+        timeInUltraWarmDimension = input.getIntOr("TimeInUltraWarmDimension", 0);
 
-        if (tag.contains("Delivery")) {
-            setDelivery(Delivery.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.getCompound("Delivery"))
-                  .resultOrPartial(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag.getCompound("Delivery"), e))
-                  .orElse(null)
-            );
-        }
+        setDelivery(input.read("Delivery", Delivery.CODEC).orElse(null));
 
-        if (tag.contains("Origin")) {
-            setOrigin(CourierOrigin.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("Origin"))
-                  .resultOrPartial(e -> LOGGER.error("Cannot parse CourierOrigin from tag '{}': {}", tag.getCompound("Origin"), e))
-                  .orElse(null));
-        }
+        setOrigin(input.read("Origin", CourierOrigin.CODEC).orElse(null));
 
         setDelivering(delivery != null);
         setHasMail(delivery != null && !delivery.getMail().isEmpty());

@@ -4,8 +4,6 @@ import io.github.mortuusars.envelope.Platform;
 
 public class Mods {
     public static final Mod SABLE = new Mod("sable");
-    public static final Mod EVERY_COMPAT = new Mod("everycomp");
-
     public record Mod(String id) {
         public boolean isLoaded() {
             return Platform.isModLoaded(id);

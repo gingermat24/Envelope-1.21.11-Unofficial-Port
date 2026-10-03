@@ -4,7 +4,7 @@ import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableItem;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -44,7 +44,7 @@ public class DroppedMailSpawner extends Spawner {
               item.pos().getY() + 0.5,
               item.pos().getZ() + 0.5,
               item.item());
-        entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
+        entity.snapTo(spawnPos, entity.getYRot(), entity.getXRot());
         level.addFreshEntityWithPassengers(entity);
 
         backgroundDelivery.removeDroppedMail(item);

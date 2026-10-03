@@ -15,19 +15,13 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
 import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -38,7 +32,6 @@ public class EnvelopeClient {
     public static void init() {
         BuggerDebugScreen.addPage(new EnvelopeBuggerPage());
         BuggerEntityOverhead.addData(new PigeonEntityDataDisplay());
-        ItemModelOverrides.register();
     }
 
     public static SealRenderer getSealRenderer() {
@@ -46,52 +39,6 @@ public class EnvelopeClient {
     }
 
     // --
-
-    public static class ItemModelOverrides {
-        public static final ResourceLocation LETTER_TATTERED = Envelope.resource("letter_tattered");
-        public static final ResourceLocation LETTER_UNFOLDED = Envelope.resource("letter_unfolded");
-        public static final ResourceLocation LETTER_CONTENT = Envelope.resource("letter_content");
-
-        public static final ResourceLocation PAYBACK_TAG_DURATION = Envelope.resource("payback_tag_duration");
-
-        public static void register() {
-            ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
-
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_UNFOLDED, ItemModelOverrides::isLetterUnfolded);
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
-
-            ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
-
-            ItemProperties.register(Envelope.Items.PAYBACK_TAG.get(), PAYBACK_TAG_DURATION, ItemModelOverrides::getPaybackDuration);
-        }
-
-        public static float isLetterTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-            return stack.has(Envelope.DataComponents.LETTER_TATTERED) ? 1 : 0;
-        }
-
-        public static float isLetterUnfolded(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-            LetterContent content = stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY);
-            return content.unfolded() ? 1 : 0;
-        }
-
-        public static float hasLetterContent(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-            if (!stack.getOrDefault(Envelope.DataComponents.LETTER_AND_QUILL_CONTENT, LetterAndQuillContent.EMPTY).isEmpty()) {
-                return 1;
-            }
-            if (!stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).isEmpty()) {
-                return 1;
-            }
-            return 0;
-        }
-
-        public static float getPaybackDuration(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-            PaybackDuration duration = stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS) instanceof PaybackRequest request
-                  ? request.duration()
-                  : PaybackDuration.MEDIUM;
-            return duration.ordinal() / 10f; // 0.0, 0.1, 0.2, etc.
-        }
-    }
 
     public static class TooltipComponents {
         public static ClientTooltipComponent create(TooltipComponent component) {
@@ -125,7 +72,7 @@ public class EnvelopeClient {
                                               Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
             Mail.getSender(stack).ifPresent(sender -> {
                 DeliveryLog deliveryLog = Mail.getLog(stack);
-                if (Screen.hasShiftDown() && !deliveryLog.isEmpty()) {
+                if (net.minecraft.client.Minecraft.getInstance().hasShiftDown() && !deliveryLog.isEmpty()) {
                     consumer.accept(Component.translatable("gui.envelope.delivery_log"));
                     for (DeliveryRecord record : deliveryLog.records()) {
                         consumer.accept(record.getDisplayComponent());

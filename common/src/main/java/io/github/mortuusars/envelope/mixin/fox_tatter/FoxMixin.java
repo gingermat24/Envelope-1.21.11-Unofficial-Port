@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.SealedLetterItem;
 import net.minecraft.util.Unit;
-import net.minecraft.world.entity.animal.Fox;
+import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

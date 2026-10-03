@@ -1,17 +1,13 @@
 package io.github.mortuusars.envelope.world.mail.payback;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,27 +37,10 @@ public class PaybackDepartmentData extends SavedData {
     // -- Save / Load
 
     public static PaybackDepartmentData get(ServerLevel level, String name) {
-        return level.getDataStorage().computeIfAbsent(factory(), name);
+        return level.getDataStorage().computeIfAbsent(type(name));
     }
 
-    public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> Envelope.LOGGER.error("Cannot save PaybackDepartmentData: {}", e.message()))
-              .result()
-              .filter(t -> t instanceof CompoundTag)
-              .map(t -> ((CompoundTag) t))
-              .orElse(tag);
-    }
-
-    private static PaybackDepartmentData load(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> Envelope.LOGGER.error("Cannot load PaybackDepartmentData: {}", e.message()))
-              .result()
-              .map(Pair::getFirst)
-              .orElseGet(PaybackDepartmentData::new);
-    }
-
-    private static SavedData.Factory<PaybackDepartmentData> factory() {
-        return new SavedData.Factory<>(PaybackDepartmentData::new, PaybackDepartmentData::load, null);
+    private static SavedDataType<PaybackDepartmentData> type(String name) {
+        return new SavedDataType<>(name, PaybackDepartmentData::new, CODEC, DataFixTypes.LEVEL);
     }
 }

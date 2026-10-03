@@ -25,16 +25,18 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.registration.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @JeiPlugin
 public class EnvelopeJeiPlugin implements IModPlugin {
-    private static final ResourceLocation ID = Envelope.resource("jei_plugin");
+    private static final Identifier ID = Envelope.resource("jei_plugin");
 
     public static final IIngredientType<ServiceAddress> SERVICE_ADDRESS_INGREDIENT = new IIngredientType<>() {
         @Override
@@ -44,7 +46,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     };
 
     @Override
-    public @NotNull ResourceLocation getPluginUid() {
+    public @NotNull Identifier getPluginUid() {
         return ID;
     }
 
@@ -56,7 +58,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
         if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
-            List<ServiceAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
+            List<ServiceAddress> addressesWithRecipes = getMailingRecipes()
                   .stream()
                   .map(recipe -> recipe.value().getAddress())
                   .distinct()
@@ -78,9 +80,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        List<RecipeHolder<MailRecipe>> mailingRecipes = Minecrft.level()
-              .getRecipeManager()
-              .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
+        List<RecipeHolder<MailRecipe>> mailingRecipes = getMailingRecipes()
               .stream()
               .filter(recipe ->
                     !recipe.value().getAddress().getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN)
@@ -88,6 +88,20 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .toList();
 
         registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, mailingRecipes);
+    }
+
+    private static List<RecipeHolder<MailRecipe>> getMailingRecipes() {
+        return Optional.ofNullable(Minecrft.get().getSingleplayerServer())
+              .map(server -> server.getRecipeManager().getRecipes().stream()
+                    .filter(holder -> holder.value().getType() == Envelope.RecipeTypes.MAILING.get())
+                    .flatMap(holder -> {
+                        if (holder.value() instanceof MailRecipe recipe) {
+                            return Stream.of(new RecipeHolder<>(holder.id(), recipe));
+                        }
+                        return Stream.empty();
+                    })
+                    .toList())
+              .orElse(List.of());
     }
 
     @Override

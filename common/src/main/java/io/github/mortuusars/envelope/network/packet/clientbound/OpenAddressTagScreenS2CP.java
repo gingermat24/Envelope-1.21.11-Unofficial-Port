@@ -9,13 +9,13 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 public record OpenAddressTagScreenS2CP(InteractionHand hand, AllAddresses knownAddresses) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("open_address_tag_screen");
+    public static final Identifier ID = Envelope.resource("open_address_tag_screen");
     public static final Type<OpenAddressTagScreenS2CP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenAddressTagScreenS2CP> STREAM_CODEC = StreamCodec.composite(

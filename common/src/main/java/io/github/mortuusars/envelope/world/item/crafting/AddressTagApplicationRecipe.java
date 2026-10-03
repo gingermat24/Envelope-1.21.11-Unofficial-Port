@@ -71,13 +71,12 @@ public class AddressTagApplicationRecipe extends CustomRecipe {
         return result;
     }
 
-    @Override
     public boolean canCraftInDimensions(int width, int height) {
         return width * height >= 2;
     }
 
     @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return Envelope.RecipeSerializers.ADDRESS_TAG_APPLICATION.get();
     }
 }

@@ -4,10 +4,17 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,11 +22,10 @@ public interface MailRecipe extends Recipe<MailRecipeInput> {
     ServiceAddress getAddress();
 
     @Override
-    default @NotNull RecipeType<?> getType() {
+    default @NotNull RecipeType<? extends Recipe<MailRecipeInput>> getType() {
         return Envelope.RecipeTypes.MAILING.get();
     }
 
-    @Override
     default boolean isSpecial() {
         return true;
     }
@@ -33,14 +39,16 @@ public interface MailRecipe extends Recipe<MailRecipeInput> {
     }
 
     @Override
-    default @NotNull ItemStack getToastSymbol() {
-        return new ItemStack(Envelope.Blocks.PACKAGE.get());
+    default PlacementInfo placementInfo() {
+        return PlacementInfo.create(getIngredients());
     }
 
     @Override
-    default boolean canCraftInDimensions(int width, int height) {
-        return width * height >= PackageContents.SLOTS;
+    default RecipeBookCategory recipeBookCategory() {
+        return RecipeBookCategories.CRAFTING_MISC;
     }
+
+    NonNullList<Ingredient> getIngredients();
 
     default float getExperience() {
         return 0f;
@@ -58,23 +66,25 @@ public interface MailRecipe extends Recipe<MailRecipeInput> {
 
     // --
 
-    @Override
     default boolean matches(MailRecipeInput input, Level level) {
         if (input.ingredientCount() != getIngredients().size()) {
             return false;
         }
         return input.size() == 1 && getIngredients().size() == 1
               ? getIngredients().getFirst().test(input.getItem(0))
-              : input.stackedContents().canCraft(this, null);
+              : input.stackedContents().tryPick(getIngredients().stream()
+                    .<StackedContents.IngredientInfo<ItemStack>>map(ingredient -> ingredient::test)
+                    .toList(), 1, null);
     }
 
     /**
      * Regular result assemble method. Does not mutate world state. Can be called as many times as needed.
      */
-    @Override
     default @NotNull ItemStack assemble(MailRecipeInput input, HolderLookup.Provider registries) {
         return getResultItem(registries).copy();
     }
+
+    ItemStack getResultItem(HolderLookup.Provider registries);
 
     /**
      * Special assemble method, that allows performing extra actions, that could potentially mutate the world state.<br>

@@ -12,6 +12,7 @@ import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -19,10 +20,16 @@ import java.util.List;
 
 public class AddressTagApplicationRecipeExtension implements ICraftingCategoryExtension<AddressTagApplicationRecipe> {
     @Override
+    public List<SlotDisplay> getIngredients(RecipeHolder<AddressTagApplicationRecipe> recipeHolder) {
+        return List.of();
+    }
+
+    @Override
     public void setRecipe(RecipeHolder<AddressTagApplicationRecipe> holder, IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
-        List<ItemStack> mailableItems = BuiltInRegistries.ITEM.getTag(Envelope.Tags.Items.MAILABLE)
-              .map(named -> named.stream().map(ItemStack::new).toList())
-              .orElse(List.of());
+        List<ItemStack> mailableItems = BuiltInRegistries.ITEM.stream()
+              .map(ItemStack::new)
+              .filter(stack -> stack.is(Envelope.Tags.Items.MAILABLE))
+              .toList();
 
         ItemStack tag = new ItemStack(Envelope.Items.ADDRESS_TAG.get());
         tag.set(Envelope.DataComponents.ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE));

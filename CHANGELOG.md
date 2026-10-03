@@ -1,5 +1,22 @@
 # Changelog
 
+## Unofficial Fabric 1.21.11 port
+- Ported the Fabric build target from Minecraft 1.21.1 to 1.21.11.
+- Migrated Fabric configuration, entity, block-entity, and block-render-layer registration to the target APIs.
+- Migrated sealed-item tinting and payback-tag model selection to 1.21.11 item-model properties, preserving existing saved payback requests.
+- Set registry keys on block and item properties and registered custom tracked-data serializers through Fabric's synchronized registry.
+- Updated villager persistence, tooltip/input Mixins, and JEI recipe transfer hooks to the 1.21.11 APIs.
+- Migrated recipe ingredients to the 1.21.11 item/tag holder format and corrected invalid lost-mail loot entries.
+- Avoided querying tag-backed ingredients before target-version tags are bound during recipe loading.
+- Read legacy pigeon variant IDs without probing the wrong saved-data type.
+- Added the target animal default attributes to both pigeon variants, including the temptation range required by their AI.
+- Reused the existing pigeon spawn-egg textures with the target item-model format.
+- Added English names for the mod's item tags to satisfy target convention-tag validation.
+- Set the displayed mod name to Envelope [Unofficial Port] and added a dedicated creative tab with the sealed letter as its icon.
+- Restored the paper-crackle unsealing sound through the target consumable component.
+- Removed the NeoForge platform from this fork.
+- Removed integrations that only had Minecraft 1.21.1 dependencies (Every Compat and Sable's assembly-listener mixin).
+
 ## 0.7.5 - 2026-08-15
 - Added Every Compat (Wood Good) support for pigeonholes (implemented by [_**Dadamalda**_](https://github.com/DadamaldaDad))
 - Updated localization files.

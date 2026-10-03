@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.client.gui.widget.textbox;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.display.FormattedStringDisplayCache;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.display.FormattingToolbar;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.display.HorizontalAlignment;
@@ -14,11 +13,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -279,7 +280,7 @@ public class TextBox extends AbstractWidget {
             int y0 = getY() + rect.getY();
             int x1 = x0 + rect.getWidth();
             int y1 = y0 + rect.getHeight();
-            guiGraphics.fill(RenderType.guiTextHighlight(), x0, y0, x1, y1, color);
+            guiGraphics.fill(x0, y0, x1, y1, color);
         }
     }
 
@@ -301,16 +302,15 @@ public class TextBox extends AbstractWidget {
                         color, false);
             }
         } else {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0, 0, 50);
-            RenderSystem.disableBlend();
+            guiGraphics.nextStratum();
+            guiGraphics.pose().pushMatrix();
             guiGraphics.fill(
                     getX() + cursor.x,
                     getY() + cursor.y - 1,
                     getX() + cursor.x + 1,
                     getY() + cursor.y + font.lineHeight,
                     color);
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }
     }
 
@@ -328,10 +328,10 @@ public class TextBox extends AbstractWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
         if (!isFocused() || !isActive() || !visible) return false;
 
-        if (handleKeyPressed(keyCode, scanCode, modifiers)) {
+        if (handleKeyPressed(event.key(), event.scancode(), event.modifiers())) {
             lastActionTime = System.currentTimeMillis();
             onTextChanged().accept(getEditor().getText());
             refreshDisplayCache();
@@ -362,11 +362,11 @@ public class TextBox extends AbstractWidget {
             return true;
         }
 
-        return getEditor().keyPressed(keyCode);
+        return getEditor().keyPressed(new KeyEvent(keyCode, scanCode, modifiers));
     }
 
-    public boolean charTyped(char codePoint, int modifiers) {
-        if (isFocused() && getEditor().charTyped(codePoint)) {
+    public boolean charTyped(CharacterEvent event) {
+        if (isFocused() && getEditor().charTyped((char) event.codepoint())) {
             lastActionTime = System.currentTimeMillis();
             onTextChanged().accept(getEditor().getText());
             refreshDisplayCache();
@@ -377,9 +377,12 @@ public class TextBox extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (!isActive() || !visible) return false;
 
+        double mouseX = event.x();
+        double mouseY = event.y();
+        int button = event.button();
         if (formattingToolbarMouseClicked(mouseX, mouseY, button)) {
             return true;
         }
@@ -397,7 +400,7 @@ public class TextBox extends AbstractWidget {
                     getEditor().selectAll();
                 }
             } else {
-                getEditor().setCursorPos(indexAtMousePos, Screen.hasShiftDown());
+                getEditor().setCursorPos(indexAtMousePos, Minecraft.getInstance().hasShiftDown());
             }
 
             refreshDisplayCache();
@@ -427,10 +430,10 @@ public class TextBox extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (button == 0 && canDrag) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        if (event.button() == 0 && canDrag) {
             FormattedStringDisplayCache display = getDisplayCache();
-            int indexAtMousePos = display.getCharIndexAtPosition(font, (int) (mouseX - getX()), (int) (mouseY - getY()));
+            int indexAtMousePos = display.getCharIndexAtPosition(font, (int) (event.x() - getX()), (int) (event.y() - getY()));
             getEditor().setCursorPos(indexAtMousePos, true);
             refreshDisplayCache();
             return true;
@@ -446,28 +449,28 @@ public class TextBox extends AbstractWidget {
         int y = cursor.y + (font.lineHeight * yChange);
         int index = getDisplayCache().getCharIndexAtPosition(font, x, y);
 
-        getEditor().setCursorPos(index, Screen.hasShiftDown());
+        getEditor().setCursorPos(index, Minecraft.getInstance().hasShiftDown());
     }
 
     public void keyHome() {
-        if (Screen.hasControlDown()) {
-            getEditor().setCursorToStart(Screen.hasShiftDown());
+        if (Minecraft.getInstance().hasControlDown()) {
+            getEditor().setCursorToStart(Minecraft.getInstance().hasShiftDown());
         } else {
             int cursorPos = getEditor().getCursorPos();
             int lineIndex = getDisplayCache().findLineIndexByCharIndex(cursorPos);
             Line line = getDisplayCache().getLine(lineIndex);
-            getEditor().setCursorPos(line.firstCharIndex(), Screen.hasShiftDown());
+            getEditor().setCursorPos(line.firstCharIndex(), Minecraft.getInstance().hasShiftDown());
         }
     }
 
     public void keyEnd() {
-        if (Screen.hasControlDown()) {
-            getEditor().setCursorToEnd(Screen.hasShiftDown());
+        if (Minecraft.getInstance().hasControlDown()) {
+            getEditor().setCursorToEnd(Minecraft.getInstance().hasShiftDown());
         } else {
             int cursorPos = getEditor().getCursorPos();
             int lineIndex = getDisplayCache().findLineIndexByCharIndex(cursorPos);
             Line line = getDisplayCache().getLine(lineIndex);
-            getEditor().setCursorPos(line.lastCharIndex() + 1, Screen.hasShiftDown());
+            getEditor().setCursorPos(line.lastCharIndex() + 1, Minecraft.getInstance().hasShiftDown());
         }
     }
 

@@ -7,7 +7,7 @@ import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,15 +24,15 @@ public class ServiceAddressIngredientHelper implements IIngredientHelper<Service
 
     @SuppressWarnings("removal")
     @Override
-    public @NotNull String getUniqueId(ServiceAddress ingredient, UidContext context) {
+    public @NotNull Object getUid(ServiceAddress ingredient, UidContext context) {
         return ingredient.getString();
     }
 
     @Override
-    public @NotNull ResourceLocation getResourceLocation(ServiceAddress ingredient) {
+    public @NotNull Identifier getIdentifier(ServiceAddress ingredient) {
         return ingredient.getDefinitionHolder()
               .unwrapKey()
-              .map(ResourceKey::location)
+              .map(ResourceKey::identifier)
               .orElse(Envelope.resource("unknown"));
     }
 

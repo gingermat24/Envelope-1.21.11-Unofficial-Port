@@ -6,13 +6,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -77,21 +76,9 @@ public class InboxStorage extends SavedData {
     // --
 
     public static InboxStorage get(ServerLevel level) {
-        return level.getServer().overworld().getDataStorage().computeIfAbsent(factory(), "envelope_inboxes");
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public static @NotNull Factory<InboxStorage> factory() {
-        return new Factory<>(
-              InboxStorage::new,
-              (tag, provider) -> CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), tag)
-                    .resultOrPartial(e -> Envelope.LOGGER.error("Cannot load InboxStorage: {}", e))
-                    .orElse(null),
-              null);
-    }
-
-    public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return (CompoundTag) CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .resultOrPartial(e -> Envelope.LOGGER.error("Cannot save InboxStorage: {}", e))
-              .orElse(tag);
-    }
+    private static final SavedDataType<InboxStorage> TYPE =
+          new SavedDataType<>("envelope_inboxes", InboxStorage::new, CODEC, DataFixTypes.LEVEL);
 }

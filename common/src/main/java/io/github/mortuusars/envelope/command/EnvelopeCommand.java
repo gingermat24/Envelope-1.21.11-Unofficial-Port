@@ -24,6 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
@@ -31,7 +32,7 @@ import java.util.*;
 public class EnvelopeCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         dispatcher.register(Commands.literal("envelope")
-              .requires((stack) -> stack.hasPermission(2))
+              .requires((stack) -> stack.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
               .then(Commands.literal("send")
                     .then(Commands.argument("mail", ItemArgument.item(context))
                           .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
@@ -149,15 +150,15 @@ public class EnvelopeCommand {
         return Component.literal(name)
               .withStyle(Style.EMPTY
                     .withColor(Colors.ADDRESS_NEUTRAL)
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Address")
+                    .withHoverEvent(new HoverEvent.ShowText(Component.literal("Copy Address")
                           .append("\n")
                           .append(Component.literal(name).withStyle(ChatFormatting.GRAY))))
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, name)))
+                    .withClickEvent(new ClickEvent.CopyToClipboard(name)))
               .append(Component.literal("@[" + posStr + "]").withStyle(Style.EMPTY
                     .withColor(ChatFormatting.WHITE)
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Position")
+                    .withHoverEvent(new HoverEvent.ShowText(Component.literal("Copy Position")
                           .append("\n")
                           .append(Component.literal(posToCopy).withStyle(ChatFormatting.GRAY))))
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, posToCopy))));
+                    .withClickEvent(new ClickEvent.CopyToClipboard(posToCopy))));
     }
 }

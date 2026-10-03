@@ -21,6 +21,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class MailPaybackRequestCancelingRecipe extends CustomMailRecipe {
     }
 
     @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<? extends Recipe<MailRecipeInput>> getSerializer() {
         return Envelope.RecipeSerializers.MAIL_PAYBACK_REQUEST_CANCELING.get();
     }
 
@@ -103,8 +104,11 @@ public class MailPaybackRequestCancelingRecipe extends CustomMailRecipe {
               ServiceAddress.STREAM_CODEC, MailPaybackRequestCancelingRecipe::getAddress,
               Ingredient.CONTENTS_STREAM_CODEC
                     .apply(ByteBufCodecs.list(PackageContents.SLOTS))
-                    .map(list ->
-                                NonNullList.of(Ingredient.EMPTY, list.toArray(Ingredient[]::new)),
+                    .map(list -> {
+                                NonNullList<Ingredient> ingredients = NonNullList.create();
+                                ingredients.addAll(list);
+                                return ingredients;
+                          },
                           Function.identity()), MailPaybackRequestCancelingRecipe::getIngredients,
               MailPaybackRequestCancelingRecipe::new
         );

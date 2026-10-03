@@ -1,0 +1,23 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "envelope:letter_tattered",
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "envelope:item/sealed_letter_tattered",
+      "tints": [
+        {"type": "minecraft:constant", "value": -1},
+        {"type": "envelope:seal"}
+      ]
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "envelope:item/sealed_letter",
+      "tints": [
+        {"type": "minecraft:constant", "value": -1},
+        {"type": "envelope:seal"}
+      ]
+    }
+  }
+}
