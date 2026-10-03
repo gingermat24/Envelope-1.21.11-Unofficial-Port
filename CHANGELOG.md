@@ -1,6 +1,6 @@
 # Changelog
 
-## Unofficial Fabric port 0.1.0 — 2026-10-03
+## Unofficial Fabric port 0.1.0 - 2026-10-03
 
 - Ported the original 0.7.5 release to Fabric for Minecraft 1.21.11; removed the NeoForge target and integrations tied to 1.21.1.
 - Migrated Fabric registration, tracked-data synchronization, recipe ingredients, item-model properties, villager persistence, and tooltip/input hooks to the target APIs.
