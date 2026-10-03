@@ -8,14 +8,14 @@ import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class BackgroundCourierSpawner extends Spawner {
     @Override
     public void spawn(ServerLevel level) {
         if (Config.Server.DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE.get()
-              && !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
+              && !level.getGameRules().get(GameRules.SPAWN_MOBS)) {
             return;
         }
 
@@ -96,14 +96,14 @@ public class BackgroundCourierSpawner extends Spawner {
                       return;
                   }
 
-                  entity.moveTo(pos, entity.getYRot(), entity.getXRot());
+                  entity.snapTo(pos, entity.getYRot(), entity.getXRot());
                   level.addFreshEntityWithPassengers(entity);
 
                   if (entity instanceof PhysicalCourier courier) {
                       courier.onAppeared(level);
                       courier.setDelivery(backgroundCourier.getDelivery());
                   } else {
-                      ResourceLocation id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+                      Identifier id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
                       LOGGER.error("Failed to spawn BackgroundCourier properly: entity is not a Courier, but {}. Tag: {}",
                             id, backgroundCourier.getSpawnableEntityData().data());
                   }

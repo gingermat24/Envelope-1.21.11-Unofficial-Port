@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
@@ -23,7 +24,8 @@ public class PigeonAvoidEntityGoal<T extends LivingEntity> extends AvoidEntityGo
                                  double sprintSpeedModifier, Predicate<LivingEntity> predicateOnAvoidEntity) {
         super(pigeon, entityClassToAvoid, maxDistance, walkSpeedModifier, sprintSpeedModifier, predicateOnAvoidEntity);
         this.pigeon = pigeon;
-        this.targetingConditions = TargetingConditions.forCombat().range(maxDistance).selector(predicateOnAvoidEntity.and(avoidPredicate));
+        this.targetingConditions = TargetingConditions.forCombat().range(maxDistance)
+              .selector((entity, level) -> predicateOnAvoidEntity.test(entity) && avoidPredicate.test(entity));
     }
 
     public boolean isAvoiding() {
@@ -37,8 +39,12 @@ public class PigeonAvoidEntityGoal<T extends LivingEntity> extends AvoidEntityGo
             return false;
         }
 
-        toAvoid = pigeon.level().getNearestEntity(
-              pigeon.level().getEntitiesOfClass(avoidClass, pigeon.getBoundingBox().inflate(maxDist, maxDist, maxDist), entity -> true),
+        if (!(pigeon.level() instanceof ServerLevel serverLevel)) {
+            return false;
+        }
+
+        toAvoid = serverLevel.getNearestEntity(
+              serverLevel.getEntitiesOfClass(avoidClass, pigeon.getBoundingBox().inflate(maxDist, maxDist, maxDist), entity -> true),
               targetingConditions, pigeon, pigeon.getX(), pigeon.getY(), pigeon.getZ()
         );
 

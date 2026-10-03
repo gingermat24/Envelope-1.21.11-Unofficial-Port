@@ -14,13 +14,13 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import java.util.Optional;
 
 public class PackingScreen extends AbstractInHandContainerScreen<PackingMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/packing.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/gui/packing.png");
     public static final WidgetSprites PACK_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("packing/pack_button"));
     public static final WidgetSprites PRESET_ADDRESS_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("packing/preset_address_button"));
 

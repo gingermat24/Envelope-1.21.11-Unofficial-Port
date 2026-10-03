@@ -8,13 +8,13 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public record OpenLetterBlockViewScreenS2CP(ItemStack letter, BlockPos pos) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("open_letter_block_view_screen");
+    public static final Identifier ID = Envelope.resource("open_letter_block_view_screen");
     public static final Type<OpenLetterBlockViewScreenS2CP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenLetterBlockViewScreenS2CP> STREAM_CODEC = StreamCodec.composite(

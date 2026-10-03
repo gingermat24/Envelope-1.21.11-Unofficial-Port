@@ -28,7 +28,7 @@ public class PigeonWanderGoal extends WaterAvoidingRandomFlyingGoal {
 
     @Override
     protected @Nullable Vec3 getPosition() {
-        if (pigeon.isInWaterOrBubble()) {
+        if (pigeon.isInWater()) {
             @Nullable Vec3 pos = LandRandomPos.getPos(pigeon, 15, 15);
             if (pos != null) {
                 return pos;

@@ -9,7 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public record PaybackTagMenuSetSlotC2SP(int slotIndex, ItemStack item) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("payback_tag_menu_set_slot");
+    public static final Identifier ID = Envelope.resource("payback_tag_menu_set_slot");
     public static final Type<PaybackTagMenuSetSlotC2SP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PaybackTagMenuSetSlotC2SP> STREAM_CODEC = StreamCodec.composite(

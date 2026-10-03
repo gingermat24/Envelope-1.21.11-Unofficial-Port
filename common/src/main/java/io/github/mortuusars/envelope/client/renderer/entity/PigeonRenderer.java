@@ -8,11 +8,13 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
+public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel.RenderState, PigeonModel> {
     public static final ModelLayerLocation MODEL_LAYER = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
 
     public PigeonRenderer(EntityRendererProvider.Context context) {
@@ -22,14 +24,29 @@ public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(Pigeon entity) {
-        return entity.getVariant().value().texture();
+    public @NotNull Identifier getTextureLocation(PigeonModel.RenderState state) {
+        return state.texture;
     }
 
     @Override
-    protected float getBob(Pigeon livingBase, float partialTick) {
-        float f = Mth.lerp(partialTick, livingBase.oFlap, livingBase.flap);
-        float g = Mth.lerp(partialTick, livingBase.oFlapSpeed, livingBase.flapSpeed);
-        return (Mth.sin(f) + 1.0F) * g;
+    public PigeonModel.RenderState createRenderState() {
+        return new PigeonModel.RenderState();
+    }
+
+    @Override
+    public void extractRenderState(Pigeon entity, PigeonModel.RenderState state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
+        state.isFlying = entity.isFlying();
+        state.isSitting = entity.isSitting();
+        state.hasMail = entity.hasMail();
+        state.hasMailmanHat = entity.hasMailmanHat();
+        state.eatingTicks = entity.getEatingTicks();
+        state.partialTick = partialTick;
+        state.ageInTicks = entity.tickCount + partialTick;
+        state.customName = entity.getCustomName() == null ? "" : entity.getCustomName().getString();
+        float flap = Mth.lerp(partialTick, entity.oFlap, entity.flap);
+        float flapSpeed = Mth.lerp(partialTick, entity.oFlapSpeed, entity.flapSpeed);
+        state.flapBob = (Mth.sin(flap) + 1.0F) * flapSpeed;
+        state.texture = entity.getVariant().value().texture();
     }
 }

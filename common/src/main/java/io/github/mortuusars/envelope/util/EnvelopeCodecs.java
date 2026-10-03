@@ -27,17 +27,19 @@ public interface EnvelopeCodecs {
                 : DataResult.error(() -> "Value must be within 0.0 to 1.0 range."));
 
     static Codec<NonNullList<Ingredient>> recipeIngredients(int size, RecipeType<?> type) {
-        return Ingredient.CODEC_NONEMPTY
+        return Ingredient.CODEC
               .listOf()
               .flatXmap(
                     list -> {
-                        Ingredient[] ingredients = list.stream().filter(ingredient -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
-                        if (ingredients.length == 0) {
+                        if (list.isEmpty()) {
                             return DataResult.error(() -> "No ingredients for " + type.toString() + " recipe");
                         } else {
-                            return ingredients.length > size
-                                  ? DataResult.error(() -> "Too many ingredients for " + type.toString() + " recipe")
-                                  : DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
+                            if (list.size() > size) {
+                                return DataResult.error(() -> "Too many ingredients for " + type.toString() + " recipe");
+                            }
+                            NonNullList<Ingredient> ingredientList = NonNullList.create();
+                            ingredientList.addAll(list);
+                            return DataResult.success(ingredientList);
                         }
                     },
                     DataResult::success

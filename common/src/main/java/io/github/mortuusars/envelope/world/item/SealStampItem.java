@@ -44,13 +44,14 @@ public class SealStampItem extends Item implements ApplicatorItem {
     // --
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                                java.util.function.Consumer<Component> components, TooltipFlag flag) {
         if (flag.isAdvanced()) {
             getDie(stack)
                   .flatMap(Holder::unwrapKey)
                   .ifPresent(key -> {
-                      components.add(Component.literal("Die: ").withStyle(ChatFormatting.DARK_GRAY)
-                            .append(Component.literal(key.location().toString()).withStyle(ChatFormatting.GRAY)));
+                      components.accept(Component.literal("Die: ").withStyle(ChatFormatting.DARK_GRAY)
+                            .append(Component.literal(key.identifier().toString()).withStyle(ChatFormatting.GRAY)));
                   });
         }
     }
@@ -60,7 +61,6 @@ public class SealStampItem extends Item implements ApplicatorItem {
         return Optional.of(new SealDieTooltipComponent(getDie(stack)));
     }
 
-    @Override
     public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
         return hovered.has(Envelope.DataComponents.SEAL)
               || (hovered.getItem() instanceof Sealable sealable && sealable.canSeal(level, hovered));

@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditSc
 import io.github.mortuusars.envelope.world.item.component.LetterAndQuillContent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,11 +19,11 @@ public class LetterAndQuillItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
             Packets.sendToClient(new OpenLetterEditScreenS2CP(usedHand), serverPlayer);
         }
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+        return ItemUseResult.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide());
     }
 
     public LetterAndQuillContent getContent(ItemStack stack) {

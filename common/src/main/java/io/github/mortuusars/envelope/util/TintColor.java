@@ -1,11 +1,10 @@
 package io.github.mortuusars.envelope.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 /**
@@ -19,23 +18,19 @@ public record TintColor(float r, float g, float b, float a) {
     public static final StreamCodec<ByteBuf, TintColor> STREAM_CODEC = ByteBufCodecs.INT.map(TintColor::of, TintColor::tint);
 
     public static TintColor of(int argb) {
-        float a = (float) (FastColor.ARGB32.alpha(argb) - 127) / 127 + 1;
-        float r = (float) (FastColor.ARGB32.red(argb) - 127) / 127 + 1;
-        float g = (float) (FastColor.ARGB32.green(argb) - 127) / 127 + 1;
-        float b = (float) (FastColor.ARGB32.blue(argb) - 127) / 127 + 1;
+        float a = (float) (ARGB.alpha(argb) - 127) / 127 + 1;
+        float r = (float) (ARGB.red(argb) - 127) / 127 + 1;
+        float g = (float) (ARGB.green(argb) - 127) / 127 + 1;
+        float b = (float) (ARGB.blue(argb) - 127) / 127 + 1;
         return new TintColor(r, g, b, a);
     }
 
-    public void setShaderColor() {
-        RenderSystem.setShaderColor(r, g ,b, a);
-    }
-
     public int tint(int argb) {
-        int a = (int)Mth.clamp(FastColor.ARGB32.alpha(argb) * this.a, 0, 255);
-        int r = (int)Mth.clamp(FastColor.ARGB32.red(argb) * this.r, 0, 255);
-        int g = (int)Mth.clamp(FastColor.ARGB32.green(argb) * this.g, 0, 255);
-        int b = (int)Mth.clamp(FastColor.ARGB32.blue(argb) * this.b, 0, 255);
-        return FastColor.ARGB32.color(a, r, g, b);
+        int a = (int)Mth.clamp(ARGB.alpha(argb) * this.a, 0, 255);
+        int r = (int)Mth.clamp(ARGB.red(argb) * this.r, 0, 255);
+        int g = (int)Mth.clamp(ARGB.green(argb) * this.g, 0, 255);
+        int b = (int)Mth.clamp(ARGB.blue(argb) * this.b, 0, 255);
+        return ARGB.color(a, r, g, b);
     }
 
     public int tint() {

@@ -16,9 +16,11 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -30,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/payback_tag.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/gui/payback_tag.png");
 
     public static final WidgetSprites CONFIRM_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("payback/confirm"));
 
@@ -124,15 +126,15 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
         int x = leftPos - size - 4;
         int y = topPos + 38 - size / 2;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2, 0);
-        guiGraphics.pose().scale(scale, scale, scale);
-        guiGraphics.pose().translate(-8, -8, 0);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2);
+        guiGraphics.pose().scale(scale, scale);
+        guiGraphics.pose().translate(-8, -8);
         guiGraphics.renderItem(target, 0, 0);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
 
         if (isHovering(x - leftPos, y - topPos, size, size, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, target, mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(font, target, mouseX, mouseY);
         }
     }
 
@@ -140,9 +142,9 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
 
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(MouseButtonEvent event) {
         lastQuickMoved = ItemStack.EMPTY; // Prevents fast shift-clicking moving more items that needed
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override
@@ -153,7 +155,7 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
 
         if (hoveredSlot != null && hoveredSlot.index < PaybackRequest.SLOTS) {
             boolean decreasing = scrollY < 0;
-            boolean fast = Screen.hasShiftDown();
+            boolean fast = Minecrft.get().hasShiftDown();
             changeRequestedItemCount(decreasing, fast);
             return true;
         }
@@ -162,19 +164,20 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyEvent event) {
+        int keyCode = event.key();
+        if (super.keyPressed(event)) {
             return true;
         }
 
         if (hoveredSlot != null && hoveredSlot.index < PaybackRequest.SLOTS) {
             if (keyCode == InputConstants.KEY_ADD || keyCode == InputConstants.KEY_EQUALS) {
-                changeRequestedItemCount(false, Screen.hasShiftDown());
+                changeRequestedItemCount(false, event.hasShiftDown());
                 return true;
             }
 
             if (keyCode == 333 /*KEY_SUBTRACT*/ || keyCode == InputConstants.KEY_MINUS) {
-                changeRequestedItemCount(true, Screen.hasShiftDown());
+                changeRequestedItemCount(true, event.hasShiftDown());
                 return true;
             }
         }

@@ -69,13 +69,12 @@ public class PaybackTagApplicationRecipe extends CustomRecipe {
         return Mail.setPaybackRequest(target.copyWithCount(1), tag.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS));
     }
 
-    @Override
     public boolean canCraftInDimensions(int width, int height) {
         return width * height >= 2;
     }
 
     @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return Envelope.RecipeSerializers.PAYBACK_TAG_APPLICATION.get();
     }
 }

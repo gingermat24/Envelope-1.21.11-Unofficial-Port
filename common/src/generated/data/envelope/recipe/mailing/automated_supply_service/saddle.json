@@ -2,24 +2,12 @@
   "type": "envelope:mail_crafting",
   "address": "envelope:automated_supply_service",
   "ingredients": [
-    {
-      "tag": "c:ingots/iron"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    }
+    "#c:ingots/iron",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather"
   ],
   "result": {
     "count": 1,

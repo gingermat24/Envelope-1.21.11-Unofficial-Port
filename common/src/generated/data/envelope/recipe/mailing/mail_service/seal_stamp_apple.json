@@ -3,12 +3,8 @@
   "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
-    {
-      "item": "envelope:seal_stamp"
-    },
-    {
-      "item": "minecraft:golden_apple"
-    }
+    "envelope:seal_stamp",
+    "minecraft:golden_apple"
   ],
   "result": {
     "components": {

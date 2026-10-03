@@ -7,7 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class MailboxHasNewMailS2CP implements Packet {
     public static final MailboxHasNewMailS2CP INSTANCE = new MailboxHasNewMailS2CP();
-    public static final ResourceLocation ID = Envelope.resource("mailbox_has_new_mail");
+    public static final Identifier ID = Envelope.resource("mailbox_has_new_mail");
     public static final Type<MailboxHasNewMailS2CP> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, MailboxHasNewMailS2CP> STREAM_CODEC = StreamCodec.unit(INSTANCE);
     private MailboxHasNewMailS2CP() {

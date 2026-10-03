@@ -1,0 +1,39 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "envelope:letter_unfolded",
+    "on_true": {
+      "type": "minecraft:condition",
+      "property": "minecraft:has_component",
+      "component": "envelope:letter_tattered",
+      "on_true": {
+        "type": "minecraft:condition",
+        "property": "minecraft:has_component",
+        "component": "envelope:letter_content",
+        "on_true": {"type": "minecraft:model", "model": "envelope:item/letter_tattered_unfolded_content"},
+        "on_false": {"type": "minecraft:model", "model": "envelope:item/letter_tattered_unfolded"}
+      },
+      "on_false": {
+        "type": "minecraft:condition",
+        "property": "minecraft:has_component",
+        "component": "envelope:letter_content",
+        "on_true": {"type": "minecraft:model", "model": "envelope:item/letter_unfolded_content"},
+        "on_false": {"type": "minecraft:model", "model": "envelope:item/letter_unfolded"}
+      }
+    },
+    "on_false": {
+      "type": "minecraft:condition",
+      "property": "minecraft:has_component",
+      "component": "envelope:letter_tattered",
+      "on_true": {
+        "type": "minecraft:condition",
+        "property": "minecraft:has_component",
+        "component": "envelope:letter_content",
+        "on_true": {"type": "minecraft:model", "model": "envelope:item/letter"},
+        "on_false": {"type": "minecraft:model", "model": "envelope:item/letter_tattered"}
+      },
+      "on_false": {"type": "minecraft:model", "model": "envelope:item/letter"}
+    }
+  }
+}

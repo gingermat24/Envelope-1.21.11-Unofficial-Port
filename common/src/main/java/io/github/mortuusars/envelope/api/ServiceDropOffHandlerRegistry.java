@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffHandler;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class ServiceDropOffHandlerRegistry {
         handlers.put(definition, list);
     }
 
-    public static void register(ResourceLocation definition, MailDropOffHandler handler) {
+    public static void register(Identifier definition, MailDropOffHandler handler) {
         register(ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, definition), handler);
     }
 

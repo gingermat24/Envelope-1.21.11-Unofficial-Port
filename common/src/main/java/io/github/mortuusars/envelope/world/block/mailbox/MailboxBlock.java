@@ -26,9 +26,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +42,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -54,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 public class MailboxBlock extends BaseEntityBlock {
     public static final MapCodec<MailboxBlock> CODEC = simpleCodec(MailboxBlock::new);
 
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty HANGING = BlockStateProperties.HANGING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
     public static final BooleanProperty HAS_MAIL = BooleanProperty.create("has_mail");
@@ -150,7 +149,7 @@ public class MailboxBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && !blockEntity.getAllMail().isEmpty()) {
             return 15;
@@ -167,36 +166,24 @@ public class MailboxBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
-            // Using MailboxBlockEntity#onBlockRemoved does not cover every case,
-            // as block entity might not exist while the block is still placed.
-            // This happens with CarryOn relocation for example, where block entity is removed first.
-            // So we remove any registered mailbox at this position:
-            MailService.of(serverLevel).getMailboxes().remove(pos);
-
-            if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
-                blockEntity.onBlockRemoved(level, pos, state, newState);
-            }
-        }
-
-        super.onRemove(state, level, pos, newState, movedByPiston);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        MailService.of(level).getMailboxes().remove(pos);
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!MailService.operatesIn(level)) {
             player.displayClientMessage(Component.literal("Mail Service does not operate in this dimension.")
                   .withStyle(ChatFormatting.RED), true);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
-                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeMailService().getKnownAddresses();
+                AllAddresses knownAddresses = ((ServerLevel) serverPlayer.level()).getEnvelopeMailService().getKnownAddresses();
                 Packets.sendToClient(new OpenMailboxAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         if (player.isCreative()
@@ -216,7 +203,7 @@ public class MailboxBlock extends BaseEntityBlock {
                     blockEntity.onMailInserted(mail);
                 }
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         if (stack.is(Envelope.Items.PIGEON_SPAWN_EGG.get())) {
@@ -224,7 +211,7 @@ public class MailboxBlock extends BaseEntityBlock {
                 if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                       && blockEntity.isAvailableForPickup()
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
-                      pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
+                      pos.relative(state.getValue(FACING)), EntitySpawnReason.SPAWN_ITEM_USE) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
                     if (player.isCreative()) {
                         pigeon.setOrigin(CourierOrigin.service());
@@ -237,7 +224,7 @@ public class MailboxBlock extends BaseEntityBlock {
                 }
             }
 
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
@@ -253,13 +240,13 @@ public class MailboxBlock extends BaseEntityBlock {
         if (!MailService.operatesIn(level)) {
             player.displayClientMessage(Component.literal("Mail Service does not operate in this dimension.")
                   .withStyle(ChatFormatting.RED), true);
-            return InteractionResult.SUCCESS_NO_ITEM_USED;
+            return InteractionResult.SUCCESS;
         }
 
         blockEntity.openMenu(player);
         player.awardStat(Envelope.Stats.INTERACT_WITH_MAILBOX.get());
 
-        return InteractionResult.SUCCESS_NO_ITEM_USED;
+        return InteractionResult.SUCCESS;
     }
 
     // --
@@ -357,7 +344,7 @@ public class MailboxBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide
+        return level.isClientSide()
               ? null
               : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.MAILBOX.get(),
               (lvl, blockPos, blockState, blockEntity) -> blockEntity.serverTick(((ServerLevel) lvl), blockPos, state));

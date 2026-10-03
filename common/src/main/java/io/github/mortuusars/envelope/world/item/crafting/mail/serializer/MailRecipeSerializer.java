@@ -43,8 +43,11 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
               ServiceAddress.STREAM_CODEC, MailCraftingRecipe::getAddress,
               Ingredient.CONTENTS_STREAM_CODEC
                     .apply(ByteBufCodecs.list(PackageContents.SLOTS))
-                    .map(list ->
-                                NonNullList.of(Ingredient.EMPTY, list.toArray(Ingredient[]::new)),
+                    .map(list -> {
+                                NonNullList<Ingredient> ingredients = NonNullList.create();
+                                ingredients.addAll(list);
+                                return ingredients;
+                          },
                           Function.identity()), MailCraftingRecipe::getIngredients,
               ItemStack.STREAM_CODEC, MailCraftingRecipe::getResult,
               ByteBufCodecs.FLOAT, MailCraftingRecipe::getExperience,

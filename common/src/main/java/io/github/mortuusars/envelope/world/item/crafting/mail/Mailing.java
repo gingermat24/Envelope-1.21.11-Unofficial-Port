@@ -19,7 +19,13 @@ public class Mailing {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static List<RecipeHolder<MailRecipe>> getAllRecipes(ServerLevel level) {
-        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get());
+        return level.getServer().getRecipeManager().getRecipes().stream()
+              .filter(holder -> holder.value() instanceof MailRecipe)
+              .map(holder -> {
+                  MailRecipe recipe = (MailRecipe) holder.value();
+                  return new RecipeHolder<>(holder.id(), recipe);
+              })
+              .toList();
     }
 
     public static Stream<RecipeHolder<MailRecipe>> getAllRecipesOf(ServiceAddress address, ServerLevel level) {
@@ -70,10 +76,13 @@ public class Mailing {
     }
 
     public static void consumeInputs(MailRecipe recipe, MailRecipeInput input) {
-        NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(input);
+        NonNullList<ItemStack> remainingItems = NonNullList.withSize(input.size(), ItemStack.EMPTY);
 
         for (int slot = 0; slot < input.items().size(); slot++) {
             ItemStack item = input.getItem(slot);
+            if (!item.isEmpty()) {
+                remainingItems.set(slot, item.getItem().getCraftingRemainder());
+            }
             if (!item.isEmpty()) {
                 item.shrink(1);
                 input.setItem(slot, item);

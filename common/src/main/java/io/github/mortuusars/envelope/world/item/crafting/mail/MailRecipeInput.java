@@ -16,7 +16,7 @@ public class MailRecipeInput implements RecipeInput {
     private final MailService service;
     private final Address sender;
     private final List<ItemStack> items;
-    private StackedContents stackedContents;
+    private StackedContents<ItemStack> stackedContents;
     private int ingredientCount;
 
     public MailRecipeInput(MailService service, Address sender, List<ItemStack> items) {
@@ -36,7 +36,7 @@ public class MailRecipeInput implements RecipeInput {
         for (ItemStack itemStack : items) {
             if (!itemStack.isEmpty()) {
                 i++;
-                this.stackedContents.accountStack(itemStack, 1);
+                this.stackedContents.account(itemStack, 1);
             }
         }
         this.ingredientCount = i;
@@ -75,7 +75,7 @@ public class MailRecipeInput implements RecipeInput {
         return items.size();
     }
 
-    public StackedContents stackedContents() {
+    public StackedContents<ItemStack> stackedContents() {
         return stackedContents;
     }
 

@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.mail.address;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 

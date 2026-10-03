@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.util.profiling.Profiler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,58 +91,55 @@ public class BuggerDebugScreen {
     public static boolean render(GuiGraphics guiGraphics) {
         if (!active()) return false;
 
-        Minecraft.getInstance().getProfiler().push("bugger");
+        Profiler.get().push("bugger");
 
         if (zoom == 0) {
             zoom = ((int) Minecrft.get().getWindow().getGuiScale());
         }
 
-        guiGraphics.drawManaged(() -> {
-            drawPageTabs(guiGraphics);
+        drawPageTabs(guiGraphics);
 
-            float scale = (float) (zoom / Minecrft.get().getWindow().getGuiScale());
+        float scale = (float) (zoom / Minecrft.get().getWindow().getGuiScale());
 
-            if (!isOnVanillaDebugPage()) {
-                List<String> leftLines = currentPage.getLeftLines();
-                List<String> rightLines = currentPage.getRightLines();
+        if (!isOnVanillaDebugPage()) {
+            List<String> leftLines = currentPage.getLeftLines();
+            List<String> rightLines = currentPage.getRightLines();
 
-                int correctedScroll = scroll;
-                int maxScroll = Math.max(leftLines.size() - 8, 0);
-                int effectiveScroll = Mth.clamp(scroll, 0, maxScroll);
+            int correctedScroll = scroll;
+            int maxScroll = Math.max(leftLines.size() - 8, 0);
+            int effectiveScroll = Mth.clamp(scroll, 0, maxScroll);
 
-                if (!leftLines.isEmpty()) {
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().scale(scale, scale, scale);
+            if (!leftLines.isEmpty()) {
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().scale(scale, scale);
 
-                    correctedScroll = Math.min(scroll, effectiveScroll);
-                    leftLines = leftLines.stream().skip(effectiveScroll).toList();
-                    drawLines(guiGraphics, leftLines, true);
+                correctedScroll = Math.min(scroll, effectiveScroll);
+                leftLines = leftLines.stream().skip(effectiveScroll).toList();
+                drawLines(guiGraphics, leftLines, true);
 
-                    guiGraphics.pose().popPose();
-                }
-
-                if (!rightLines.isEmpty()) {
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(Minecrft.get().getWindow().getGuiScaledWidth(), 0, 0);
-                    guiGraphics.pose().scale(scale, scale, scale);
-                    guiGraphics.pose().translate(-Minecrft.get().getWindow().getGuiScaledWidth(), 0, 0);
-
-                    maxScroll = Math.max(rightLines.size() - 8, 0);
-                    effectiveScroll = Mth.clamp(scroll, 0, maxScroll);
-                    correctedScroll = Math.max(correctedScroll, effectiveScroll);
-                    rightLines = rightLines.stream().skip(effectiveScroll).toList();
-                    drawLines(guiGraphics, rightLines, false);
-                    guiGraphics.pose().popPose();
-                }
-
-                scroll = correctedScroll;
+                guiGraphics.pose().popMatrix();
             }
 
-            currentPage.render(guiGraphics, Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true), scale);
-        });
+            if (!rightLines.isEmpty()) {
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(Minecrft.get().getWindow().getGuiScaledWidth(), 0);
+                guiGraphics.pose().scale(scale, scale);
+                guiGraphics.pose().translate(-Minecrft.get().getWindow().getGuiScaledWidth(), 0);
 
+                maxScroll = Math.max(rightLines.size() - 8, 0);
+                effectiveScroll = Mth.clamp(scroll, 0, maxScroll);
+                correctedScroll = Math.max(correctedScroll, effectiveScroll);
+                rightLines = rightLines.stream().skip(effectiveScroll).toList();
+                drawLines(guiGraphics, rightLines, false);
+                guiGraphics.pose().popMatrix();
+            }
 
-        Minecraft.getInstance().getProfiler().pop();
+            scroll = correctedScroll;
+        }
+
+        currentPage.render(guiGraphics, Minecrft.get().getDeltaTracker().getGameTimeDeltaPartialTick(true), scale);
+
+        Profiler.get().pop();
         return !isOnVanillaDebugPage();
     }
 
@@ -206,11 +204,11 @@ public class BuggerDebugScreen {
     public static boolean onMousePress(int button, int action, int modifiers) {
         if (!active()) return false;
         if (Minecraft.getInstance().screen != null) return false;
-        if (button == InputConstants.MOUSE_BUTTON_MIDDLE && Screen.hasShiftDown()) {
+        if (button == InputConstants.MOUSE_BUTTON_MIDDLE && Minecraft.getInstance().hasShiftDown()) {
             scroll = 0;
             return true;
         }
-        if (button == InputConstants.MOUSE_BUTTON_MIDDLE && Screen.hasControlDown()) {
+        if (button == InputConstants.MOUSE_BUTTON_MIDDLE && Minecraft.getInstance().hasControlDown()) {
             zoom = ((int) Minecrft.get().getWindow().getGuiScale());
             return true;
         }
@@ -221,12 +219,12 @@ public class BuggerDebugScreen {
         if (!active()) return false;
         if (Minecraft.getInstance().screen != null) return false;
 
-        if (Screen.hasShiftDown()) {
+        if (Minecraft.getInstance().hasShiftDown()) {
             scroll = Math.max(scroll - (int) amount * 3, 0);
             return true;
         }
 
-        if (Screen.hasControlDown()) {
+        if (Minecraft.getInstance().hasControlDown()) {
             if (amount > 0)
                 zoomIn();
             else
@@ -281,15 +279,15 @@ public class BuggerDebugScreen {
             scroll = Integer.MAX_VALUE;
             return true;
         }
-        if (key == InputConstants.KEY_INSERT && Screen.hasControlDown()) {
+        if (key == InputConstants.KEY_INSERT && Minecraft.getInstance().hasControlDown()) {
             test();
             return true;
         }
-        if ((key == InputConstants.KEY_ADD || key == InputConstants.KEY_EQUALS) && Screen.hasControlDown()) {
+        if ((key == InputConstants.KEY_ADD || key == InputConstants.KEY_EQUALS) && Minecraft.getInstance().hasControlDown()) {
             zoomIn();
             return true;
         }
-        if ((key == 333 /*KEY_SUBTRACT*/ || key == InputConstants.KEY_MINUS) && Screen.hasControlDown()) {
+        if ((key == 333 /*KEY_SUBTRACT*/ || key == InputConstants.KEY_MINUS) && Minecraft.getInstance().hasControlDown()) {
             zoomOut();
             return true;
         }
@@ -316,11 +314,11 @@ public class BuggerDebugScreen {
             scroll = Math.max(scroll - 3, 0);
             return true;
         }
-        if ((key == InputConstants.KEY_ADD || key == InputConstants.KEY_EQUALS) && Screen.hasControlDown()) {
+        if ((key == InputConstants.KEY_ADD || key == InputConstants.KEY_EQUALS) && Minecraft.getInstance().hasControlDown()) {
             zoomIn();
             return true;
         }
-        if ((key == 333 /*KEY_SUBTRACT*/ || key == InputConstants.KEY_MINUS) && Screen.hasControlDown()) {
+        if ((key == 333 /*KEY_SUBTRACT*/ || key == InputConstants.KEY_MINUS) && Minecraft.getInstance().hasControlDown()) {
             zoomOut();
             return true;
         }

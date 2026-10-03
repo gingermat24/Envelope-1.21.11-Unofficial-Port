@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Entity.class)
 public class EntityMixin {
     @Shadow
-    public float fallDistance;
+    public double fallDistance;
 
     @WrapMethod(method = "checkFallDamage")
     private void onCheckFallDamage(double y, boolean onGround, BlockState state, BlockPos pos, Operation<Void> original) {
-        @Nullable Float distance = null;
+        @Nullable Double distance = null;
         Entity entity = (Entity)(Object)this;
 
         if (state.getBlock() instanceof PaperBoxBlock block && fallDistance > block.getFallDistanceToBreak(state, pos, entity)) {

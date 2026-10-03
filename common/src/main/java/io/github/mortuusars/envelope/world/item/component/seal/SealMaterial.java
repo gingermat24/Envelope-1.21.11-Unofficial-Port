@@ -12,7 +12,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -20,13 +20,13 @@ import java.util.function.Function;
 
 public final class SealMaterial {
     public static final Codec<SealMaterial> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
-          ResourceLocation.CODEC.fieldOf("texture").forGetter(SealMaterial::textureId),
+          Identifier.CODEC.fieldOf("texture").forGetter(SealMaterial::textureId),
           EnvelopeCodecs.HEX_COLOR.fieldOf("model_tint_color").forGetter(SealMaterial::modelTintColor),
           ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette)
     ).apply(i, SealMaterial::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealMaterial> DIRECT_STREAM_CODEC = StreamCodec.composite(
-          ResourceLocation.STREAM_CODEC, SealMaterial::textureId,
+          Identifier.STREAM_CODEC, SealMaterial::textureId,
           ByteBufCodecs.INT, SealMaterial::modelTintColor,
           ShadingPalette.STREAM_CODEC, SealMaterial::impressionPalette,
           SealMaterial::new
@@ -41,23 +41,23 @@ public final class SealMaterial {
     public static final ResourceKey<SealMaterial> RED_WAX = ResourceKey.create(Envelope.Registries.SEAL_MATERIAL, Envelope.resource("red_wax"));
     public static final ResourceKey<SealMaterial> GOLD = ResourceKey.create(Envelope.Registries.SEAL_MATERIAL, Envelope.resource("gold"));
 
-    private final ResourceLocation textureId;
-    private final ResourceLocation textureFull;
+    private final Identifier textureId;
+    private final Identifier textureFull;
     private final int modelTintColor;
     private final ShadingPalette impressionPalette;
 
-    public SealMaterial(ResourceLocation texture, int modelTintColor, ShadingPalette impressionPalette) {
+    public SealMaterial(Identifier texture, int modelTintColor, ShadingPalette impressionPalette) {
         this.textureId = texture;
         this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
         this.modelTintColor = modelTintColor;
         this.impressionPalette = impressionPalette;
     }
 
-    public ResourceLocation textureId() {
+    public Identifier textureId() {
         return textureId;
     }
 
-    public ResourceLocation texture() {
+    public Identifier texture() {
         return textureFull;
     }
 
@@ -106,8 +106,8 @@ public final class SealMaterial {
     }
 
     public static void bootstrap(BootstrapContext<SealMaterial> context) {
-        Function<ResourceKey<SealMaterial>, ResourceLocation> keyToTexture = key ->
-              key.location().withPath(path -> "seal/material/" + path);
+        Function<ResourceKey<SealMaterial>, Identifier> keyToTexture = key ->
+              key.identifier().withPath(path -> "seal/material/" + path);
 
         context.register(RED_WAX, new SealMaterial(
               keyToTexture.apply(RED_WAX),

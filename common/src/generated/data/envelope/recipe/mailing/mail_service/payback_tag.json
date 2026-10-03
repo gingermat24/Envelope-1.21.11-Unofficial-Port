@@ -2,12 +2,8 @@
   "type": "envelope:mail_crafting",
   "address": "envelope:mail_service",
   "ingredients": [
-    {
-      "item": "envelope:address_tag"
-    },
-    {
-      "tag": "c:dyes/red"
-    }
+    "envelope:address_tag",
+    "#c:dyes/red"
   ],
   "result": {
     "count": 1,

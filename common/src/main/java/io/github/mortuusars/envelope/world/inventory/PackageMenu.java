@@ -94,7 +94,8 @@ public class PackageMenu extends AbstractInHandContainerMenu {
             onDestroyed(player, stack);
             stack.shrink(1);
 
-            player.level().playSound(player, player, SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
+            player.level().playSound(player, player.getX(), player.getY(), player.getZ(),
+                  SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
         }
 
         super.removed(player);

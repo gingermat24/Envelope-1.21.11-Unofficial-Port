@@ -46,7 +46,7 @@ public class ItemAndStack<T extends Item> implements DataComponentHolder {
     }
 
     @Nullable
-    public <C> C set(DataComponentType<? super C> component, @Nullable C value) {
+    public <C> C set(DataComponentType<C> component, @Nullable C value) {
         return stack.set(component, value);
     }
 

@@ -4,12 +4,13 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class PackageTooltipComponent implements ClientTooltipComponent {
-    public static final ResourceLocation BACKGROUND_SPRITE = Envelope.resource("tooltip/package/background");
+    public static final Identifier BACKGROUND_SPRITE = Envelope.resource("tooltip/package/background");
     protected static final int BG_WIDTH = 58;
     protected static final int BG_HEIGHT = 40;
 
@@ -25,13 +26,13 @@ public class PackageTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return BG_HEIGHT + 3;
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-        guiGraphics.blitSprite(BACKGROUND_SPRITE, x, y, BG_WIDTH, BG_HEIGHT);
+    public void renderImage(Font font, int x, int y, int width, int height, GuiGraphics guiGraphics) {
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, x, y, BG_WIDTH, BG_HEIGHT);
 
         for (int row = 0; row < 2; row++) {
             for (int column = 0; column < 3; column++) {

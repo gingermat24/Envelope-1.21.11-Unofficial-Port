@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "P": {
-      "tag": "minecraft:planks"
-    },
-    "S": {
-      "tag": "minecraft:wooden_slabs"
-    },
-    "T": {
-      "item": "envelope:address_tag"
-    }
+    "P": "#minecraft:planks",
+    "S": "#minecraft:wooden_slabs",
+    "T": "envelope:address_tag"
   },
   "pattern": [
     "SSS",

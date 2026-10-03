@@ -13,7 +13,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -54,18 +53,23 @@ public class LetterItem extends BlockItem implements Sealable {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
-        stack.set(Envelope.DataComponents.LETTER_CONTENT,
-              stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).withUnfolded(true));
-        player.getCooldowns().addCooldown(this, 5);
+        LetterContent content = stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY);
+        if (content.isEmpty()) {
+            stack.remove(Envelope.DataComponents.LETTER_CONTENT);
+        } else {
+            stack.set(Envelope.DataComponents.LETTER_CONTENT, content.withUnfolded(true));
+        }
+        stack.set(Envelope.DataComponents.LETTER_UNFOLDED, net.minecraft.util.Unit.INSTANCE);
+        player.getCooldowns().addCooldown(stack, 5);
 
         if (player instanceof ServerPlayer serverPlayer) {
             Packets.sendToClient(new OpenLetterViewScreenS2CP(usedHand), serverPlayer);
         }
 
         level.playSound(player, player, Envelope.SoundEvents.PAPER_CRACKLE.get(), SoundSource.PLAYERS, 1, 1);
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return ItemUseResult.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override

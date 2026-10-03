@@ -10,14 +10,14 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public record LetterEditC2SP(int slot, String text, boolean fold) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("letter_edit");
+    public static final Identifier ID = Envelope.resource("letter_edit");
     public static final Type<LetterEditC2SP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, LetterEditC2SP> STREAM_CODEC = StreamCodec.composite(
@@ -34,9 +34,9 @@ public record LetterEditC2SP(int slot, String text, boolean fold) implements Pac
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        if (slot < 0 || slot > player.getInventory().items.size()) {
+        if (slot < 0 || slot >= player.getInventory().getContainerSize()) {
             Envelope.LOGGER.error("Cannot handle {} packet: slot {} is not in valid range (0 - {}).",
-                    ID, slot, player.getInventory().items.size());
+                    ID, slot, player.getInventory().getContainerSize() - 1);
             return false;
         }
 

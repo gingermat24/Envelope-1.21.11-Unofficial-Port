@@ -7,13 +7,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.CustomSpawner;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
@@ -25,45 +25,44 @@ public class PigeonInStructureSpawner implements CustomSpawner {
     protected int nextAttemptDelay;
 
     @Override
-    public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
-        if (!spawnFriendlies || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
-            return 0;
+    public void tick(ServerLevel level, boolean spawnMobs) {
+        if (!spawnMobs || !level.getGameRules().get(GameRules.SPAWN_MOBS)) {
+            return;
         }
 
         nextAttemptDelay--;
 
         if (nextAttemptDelay > 0) {
-            return 0;
+            return;
         }
 
         nextAttemptDelay = SPAWN_ATTEMPT_DELAY;
 
         Player player = level.getRandomPlayer();
         if (player == null) {
-            return 0;
+            return;
         }
 
-        RandomSource randomSource = level.random;
+        RandomSource randomSource = level.getRandom();
         int x = (8 + randomSource.nextInt(24)) * (randomSource.nextBoolean() ? -1 : 1);
         int y = (8 + randomSource.nextInt(24)) * (randomSource.nextBoolean() ? -1 : 1);
         BlockPos spawnPos = player.blockPosition().offset(x, 0, y);
         spawnPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, spawnPos);
 
         if (!level.isLoaded(spawnPos)) {
-            return 0;
+            return;
         }
 
         if (SpawnPlacements.isSpawnPositionOk(Envelope.EntityTypes.PIGEON.get(), level, spawnPos)) {
             if (Config.Server.PIGEON_SPAWNS_IN_VILLAGE.get() && level.isCloseToVillage(spawnPos, 2)) {
-                return this.spawnInVillage(level, spawnPos);
+                this.spawnInVillage(level, spawnPos);
+                return;
             }
 
             if (level.structureManager().getStructureWithPieceAt(spawnPos, Envelope.Tags.Structures.PIGEONS_SPAWN_IN).isValid()) {
-                return this.spawnInStructure(level, spawnPos);
+                this.spawnInStructure(level, spawnPos);
             }
         }
-
-        return 0;
     }
 
     protected int spawnInVillage(ServerLevel serverLevel, BlockPos pos) {
@@ -86,13 +85,13 @@ public class PigeonInStructureSpawner implements CustomSpawner {
     }
 
     protected int spawn(ServerLevel level, BlockPos pos) {
-        @Nullable Pigeon pigeon = Envelope.EntityTypes.PIGEON.get().create(level);
+        @Nullable Pigeon pigeon = Envelope.EntityTypes.PIGEON.get().create(level, EntitySpawnReason.NATURAL);
         if (pigeon == null) {
             return 0;
         }
 
-        pigeon.moveTo(pos, 0.0F, 0.0F);
-        pigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.NATURAL, null);
+        pigeon.snapTo(pos, 0.0F, 0.0F);
+        pigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), EntitySpawnReason.NATURAL, null);
         level.addFreshEntityWithPassengers(pigeon);
         level.playSound(null, pigeon, Envelope.SoundEvents.PIGEON_AMBIENT.get(), SoundSource.NEUTRAL, 2, 1);
         return 1;

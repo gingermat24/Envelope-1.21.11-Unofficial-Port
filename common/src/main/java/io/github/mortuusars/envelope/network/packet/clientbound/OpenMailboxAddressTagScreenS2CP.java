@@ -11,7 +11,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ public record OpenMailboxAddressTagScreenS2CP(InteractionHand hand,
                                               AllAddresses knownAddresses,
                                               BlockPos pos,
                                               BlockAddress currentAddress) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("open_mailbox_address_tag_screen");
+    public static final Identifier ID = Envelope.resource("open_mailbox_address_tag_screen");
     public static final Type<OpenMailboxAddressTagScreenS2CP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenMailboxAddressTagScreenS2CP> STREAM_CODEC = StreamCodec.composite(

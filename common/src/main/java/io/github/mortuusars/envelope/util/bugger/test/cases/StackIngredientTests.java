@@ -9,8 +9,8 @@ import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import net.minecraft.Util;
-import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.util.Util;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
@@ -34,13 +34,12 @@ public class StackIngredientTests extends BuggerTests {
     }
 
     private void equality() {
-        StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3, DataComponentPredicate.builder()
-              .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
-              .build());
+        DataComponentMap tattered = DataComponentMap.builder()
+              .set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
+              .build();
+        StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3, tattered);
 
-        StackIngredient ingredient2 = new StackIngredient(Items.FEATHER, 3, DataComponentPredicate.builder()
-              .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
-              .build());
+        StackIngredient ingredient2 = new StackIngredient(Items.FEATHER, 3, tattered);
 
         add("StackIngredient_EqualsIfSame", Test.isTrue(() -> ingredient.equals(ingredient2)));
         add("StackIngredient_NotEqualsIfDifferent", Test.isFalse(() -> ingredient.equals(new StackIngredient(Items.EMERALD, 23))));
@@ -78,9 +77,9 @@ public class StackIngredientTests extends BuggerTests {
 
     private void componentMatching() {
         StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3,
-              DataComponentPredicate.builder()
-                    .expect(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress())
-                    .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
+              DataComponentMap.builder()
+                    .set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress())
+                    .set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
                     .build());
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);

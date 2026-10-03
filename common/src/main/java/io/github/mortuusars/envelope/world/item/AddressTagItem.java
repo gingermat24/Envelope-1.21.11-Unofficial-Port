@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
@@ -36,10 +35,11 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                                java.util.function.Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
         if (address != null) {
-            tooltipComponents.add(address.format()
+            tooltipComponents.accept(address.format()
                   .withIcon()
                   .withIconColor(Colors.ADDRESS_NEUTRAL)
                   .withColor(Colors.ADDRESS_NEUTRAL)
@@ -99,17 +99,16 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
-            AllAddresses knownAddresses = MailService.of(serverPlayer.serverLevel()).getKnownAddresses();
+            AllAddresses knownAddresses = MailService.of((net.minecraft.server.level.ServerLevel) serverPlayer.level()).getKnownAddresses();
             Packets.sendToClient(new OpenAddressTagScreenS2CP(usedHand, knownAddresses), serverPlayer);
-            player.getCooldowns().addCooldown(this, 6);
+            player.getCooldowns().addCooldown(player.getItemInHand(usedHand), 6);
         }
 
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+        return ItemUseResult.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide());
     }
 
-    @Override
     public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
         return true;
     }

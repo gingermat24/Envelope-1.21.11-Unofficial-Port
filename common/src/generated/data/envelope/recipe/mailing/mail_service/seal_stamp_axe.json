@@ -3,12 +3,8 @@
   "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
-    {
-      "item": "envelope:seal_stamp"
-    },
-    {
-      "tag": "minecraft:axes"
-    }
+    "envelope:seal_stamp",
+    "#minecraft:axes"
   ],
   "result": {
     "components": {

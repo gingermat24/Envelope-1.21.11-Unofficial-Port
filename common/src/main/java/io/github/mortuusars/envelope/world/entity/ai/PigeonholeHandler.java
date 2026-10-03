@@ -183,7 +183,7 @@ public class PigeonholeHandler {
     public boolean wantsToEnterPigeonhole(Pigeon pigeon) {
         if (getEnterCooldown() > 0) return false;
         Level level = pigeon.level();
-        boolean wouldPreferInside = level.isNight() || level.isRaining() || level.isThundering();
+        boolean wouldPreferInside = level.getDayTime() % 24000L >= 13000L || level.isRaining() || level.isThundering();
         boolean tiredOfOutside = pigeon.isTired() || getWantCooldown() <= 0;
         return (wouldPreferInside || tiredOfOutside);
     }

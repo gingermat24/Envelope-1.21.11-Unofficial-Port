@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.network.packet.serverbound.PackingMenuPrese
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.recipe.transfer.IRecipeTransferContext;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.library.transfer.BasicRecipeTransferHandler;
@@ -22,9 +23,10 @@ import java.util.Optional;
 
 @Mixin(BasicRecipeTransferHandler.class)
 public abstract class BasicRecipeTransferHandlerMixin<C extends AbstractContainerMenu, R> implements IRecipeTransferHandler<C, R> {
-    @Inject(method = "transferRecipe", at = @At(value = "INVOKE", target = "Lmezz/jei/common/network/IConnectionToServer;sendPacketToServer(Lmezz/jei/common/network/packets/PlayToServerPacket;)V"))
+    @Inject(method = "transferRecipeInternal", at = @At(value = "INVOKE", target = "Lmezz/jei/common/network/IConnectionToServer;sendPacketToServer(Lmezz/jei/common/network/packets/PlayToServerPacket;)V"))
     private void onTransferRecipe(C container, R recipe, IRecipeSlotsView recipeSlotsView, Player player,
-                                  boolean maxTransfer, boolean doTransfer, CallbackInfoReturnable<IRecipeTransferError> cir) {
+                                  boolean maxTransfer, boolean doTransfer, @Nullable IRecipeTransferContext<R, C> context,
+                                  CallbackInfoReturnable<IRecipeTransferError> cir) {
         @Nullable Recipe<?> actualRecipe = null;
 
         if (recipe instanceof Recipe<?> direct) {

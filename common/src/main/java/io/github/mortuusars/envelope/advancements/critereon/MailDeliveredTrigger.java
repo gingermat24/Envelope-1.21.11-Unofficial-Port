@@ -4,10 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.advancements.predicate.DeliveryPredicate;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class MailDeliveredTrigger extends SimpleCriterionTrigger<MailDeliveredTr
 
         public boolean matches(ServerPlayer player,
                                Delivery delivery) {
-            return (this.delivery.isEmpty() || this.delivery.get().matches(player.serverLevel(), delivery));
+            return (this.delivery.isEmpty() || this.delivery.get().matches((ServerLevel) player.level(), delivery));
         }
     }
 }

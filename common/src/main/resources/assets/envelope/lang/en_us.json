@@ -54,6 +54,19 @@
 
   "item.envelope.lost_mail": "Lost Mail",
 
+  "tag.item.envelope.cannot_be_packaged": "Cannot Be Packaged",
+  "tag.item.envelope.letters": "Letters",
+  "tag.item.envelope.mailable": "Mailable Items",
+  "tag.item.envelope.packages": "Packages",
+  "tag.item.envelope.pigeon_food": "Pigeon Food",
+  "tag.item.envelope.pigeonholes": "Pigeonholes",
+  "tag.item.envelope.villager_feeding_pigeon_food_common": "Common Pigeon Food",
+  "tag.item.envelope.villager_feeding_pigeon_food_uncommon": "Uncommon Pigeon Food",
+  "tag.item.envelope.villager_feeding_pigeon_food_rare": "Rare Pigeon Food",
+  "tag.item.envelope.waste_scoopable": "Scoopable Waste",
+
+  "itemGroup.envelope": "Envelope [Unofficial Port]",
+
   "container.envelope.mailbox": "Mailbox",
   "container.envelope.payback_tag": "Payback",
 

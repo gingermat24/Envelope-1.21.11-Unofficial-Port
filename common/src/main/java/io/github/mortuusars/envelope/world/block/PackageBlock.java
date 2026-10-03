@@ -19,14 +19,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PackageBlock extends Block implements EntityBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public static final VoxelShape SHAPE_X = Block.box(4, 0, 3, 12, 6, 13);
     public static final VoxelShape SHAPE_Y = Block.box(3, 0, 4, 13, 6, 12);
@@ -81,13 +81,13 @@ public class PackageBlock extends Block implements EntityBlock {
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         if (level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
             blockEntity.setPackage(stack.copy());
-            level.blockUpdated(pos, state.getBlock()); // Forces seal tint color to update
+            level.updateNeighborsAt(pos, state.getBlock()); // Forces seal tint color to update
         }
     }
 
     @Override
     public @NotNull BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide
+        if (!level.isClientSide()
               && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity
               && !player.isSecondaryUseActive()) {
             if (!player.isCreative()) {
@@ -99,14 +99,4 @@ public class PackageBlock extends Block implements EntityBlock {
         return super.playerWillDestroy(level, pos, state, player);
     }
 
-    @Override
-    public void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
-            if (blockEntity.unpackWhenBroken()) {
-                level.playSound(null, pos, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.BLOCKS, 0.8f, 1);
-            }
-            blockEntity.dropContents(level, pos);
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
 }

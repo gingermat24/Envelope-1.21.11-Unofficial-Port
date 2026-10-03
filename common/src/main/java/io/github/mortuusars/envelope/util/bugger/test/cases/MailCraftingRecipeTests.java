@@ -166,7 +166,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
     private MailCraftingRecipe recipe(Ingredient... ingredients) {
         return new MailCraftingRecipe(
               MailService.of(server.overworld()).getAddress(),
-              NonNullList.of(Ingredient.EMPTY, ingredients),
+              NonNullList.of(Ingredient.of(Items.AIR), ingredients),
               new ItemStack(Items.BARRIER),
               0);
     }

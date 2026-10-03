@@ -7,18 +7,19 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.text.Formatting;
 import io.github.mortuusars.envelope.client.util.Pos2i;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class FormattingToolbar {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/formatting_toolbar.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/gui/formatting_toolbar.png");
 
     public static final Map<Character, String> HOTKEYS = new HashMap<>();
 
@@ -162,8 +163,7 @@ public class FormattingToolbar {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!isVisible() || !shouldShow()) return;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0, 500);
+        guiGraphics.nextStratum();
 
         @Nullable FormattingButton hoveredButton = null;
 
@@ -183,18 +183,17 @@ public class FormattingToolbar {
                 }
             }
 
-            guiGraphics.blit(TEXTURE, x + button.area.getX(), y + button.area.getY(),
-                    button.uv.x, button.uv.y + vOffset, button.area.getWidth(), button.area.getHeight());
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+                    x + button.area.getX(), y + button.area.getY(),
+                    button.uv.x, button.uv.y + vOffset, button.area.getWidth(), button.area.getHeight(), 256, 256);
         }
 
         if (hoveredButton != null) {
             MutableComponent component = Component.translatable(
                             "gui.envelope.formatting." + hoveredButton.formatting.getName())
                     .append(" §8" + HOTKEYS.getOrDefault(hoveredButton.formatting.getChar(), ""));
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, component, mouseX, mouseY + 20);
+            guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, component, mouseX, mouseY + 20);
         }
-
-        guiGraphics.pose().popPose();
     }
 
     // -- Input

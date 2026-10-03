@@ -86,9 +86,9 @@ public class LetterCloningRecipe extends CustomRecipe {
 
 		for (int i = 0; i < items.size(); i++) {
 			ItemStack stack = input.getItem(i);
-			@Nullable Item remainingItem = stack.getItem().getCraftingRemainingItem();
-			if (remainingItem != null) {
-				items.set(i, new ItemStack(remainingItem));
+			ItemStack remainingItem = stack.getItem().getCraftingRemainder();
+			if (!remainingItem.isEmpty()) {
+				items.set(i, remainingItem.copy());
 			} else if (stack.getItem() instanceof LetterItem) {
 				items.set(i, stack.copyWithCount(1));
 				break;
@@ -99,11 +99,10 @@ public class LetterCloningRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public @NotNull RecipeSerializer<?> getSerializer() {
+	public @NotNull RecipeSerializer<? extends CustomRecipe> getSerializer() {
 		return Envelope.RecipeSerializers.LETTER_CLONING.get();
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height) {
 		return width >= 3 && height >= 3;
 	}

@@ -5,13 +5,15 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.Register;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.advancements.critereon.ItemSubPredicate;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.predicates.DataComponentPredicate;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,9 +21,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.world.entity.Entity;
@@ -58,11 +59,11 @@ public class RegisterImpl {
     }
 
     public static <T extends BlockEntity> BlockEntityType<T> newBlockEntityType(Register.BlockEntitySupplier<T> blockEntitySupplier, Block... validBlocks) {
-        return BlockEntityType.Builder.of(blockEntitySupplier::create, validBlocks).build();
+        return FabricBlockEntityTypeBuilder.create(blockEntitySupplier::create, validBlocks).build();
     }
 
     public static Supplier<PoiType> poiType(ResourceKey<PoiType> key, int ticketCount, int searchDistance, Supplier<Set<BlockState>> states) {
-        PoiType type = PointOfInterestHelper.register(key.location(), ticketCount, searchDistance, states.get());
+        PoiType type = PointOfInterestHelper.register(key.identifier(), ticketCount, searchDistance, states.get());
         return () -> type;
     }
 
@@ -74,13 +75,14 @@ public class RegisterImpl {
     public static <T extends Entity> Supplier<EntityType<T>> entityType(String id, EntityType.EntityFactory<T> factory,
                                                                         MobCategory category, float width, float height,
                                                                         int clientTrackingRange, boolean velocityUpdates, int updateInterval) {
-        EntityType<T> type = Registry.register(BuiltInRegistries.ENTITY_TYPE, Envelope.resource(id),
+        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Envelope.resource(id));
+        EntityType<T> type = Registry.register(BuiltInRegistries.ENTITY_TYPE, key,
                 EntityType.Builder.of(factory, category)
                         .sized(width, height)
                         .clientTrackingRange(clientTrackingRange)
                         .alwaysUpdateVelocity(velocityUpdates)
                         .updateInterval(updateInterval)
-                        .build());
+                        .build(key));
         return () -> type;
     }
 
@@ -88,12 +90,13 @@ public class RegisterImpl {
         EntityType.Builder<T> builder = EntityType.Builder.of(factory, category);
         typeBuilder.accept(builder);
         builder.alwaysUpdateVelocity(receiveVelocityUpdates);
-        EntityType<T> type = Registry.register(BuiltInRegistries.ENTITY_TYPE, Envelope.resource(id), builder.build());
+        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Envelope.resource(id));
+        EntityType<T> type = Registry.register(BuiltInRegistries.ENTITY_TYPE, key, builder.build(key));
         return () -> type;
     }
 
     public static <T> Supplier<EntityDataSerializer<T>> entityDataSerializer(String id, EntityDataSerializer<T> serializer) {
-        EntityDataSerializers.registerSerializer(serializer);
+        FabricTrackedDataRegistry.register(Envelope.resource(id), serializer);
         return () -> serializer;
     }
 
@@ -132,8 +135,8 @@ public class RegisterImpl {
         return () -> obj;
     }
 
-    public static <T extends ItemSubPredicate.Type<?>> Supplier<T> itemSubPredicate(String name, Supplier<T> supplier) {
-        T obj = Registry.register(BuiltInRegistries.ITEM_SUB_PREDICATE_TYPE, Envelope.resource(name), supplier.get());
+    public static <T extends DataComponentPredicate.Type<?>> Supplier<T> dataComponentPredicate(String name, Supplier<T> supplier) {
+        T obj = Registry.register(BuiltInRegistries.DATA_COMPONENT_PREDICATE_TYPE, Envelope.resource(name), supplier.get());
         return () -> obj;
     }
 
@@ -160,7 +163,7 @@ public class RegisterImpl {
         return () -> particleType;
     }
 
-    public static Supplier<ResourceLocation> stat(ResourceLocation location, StatFormatter formatter) {
+    public static Supplier<Identifier> stat(Identifier location, StatFormatter formatter) {
         net.minecraft.core.Registry.register(BuiltInRegistries.CUSTOM_STAT, location, location);
         net.minecraft.stats.Stats.CUSTOM.get(location, formatter);
         return () -> location;

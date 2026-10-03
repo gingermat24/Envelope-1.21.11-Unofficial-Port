@@ -5,10 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class PairData<A, B> extends Data<Pair<A, B>> {
-    public PairData(ResourceLocation id, MapCodec<A> firstCodec, MapCodec<B> secondCodec) {
+    public PairData(Identifier id, MapCodec<A> firstCodec, MapCodec<B> secondCodec) {
         super(id, codec(firstCodec, secondCodec));
     }
 

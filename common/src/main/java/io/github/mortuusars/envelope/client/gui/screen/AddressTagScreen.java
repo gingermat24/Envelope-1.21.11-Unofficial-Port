@@ -16,9 +16,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -30,7 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AddressTagScreen extends Screen {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/gui/address_tag.png");
 
     public static final WidgetSprites CONFIRM_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("address_tag/confirm"));
 
@@ -167,7 +170,7 @@ public class AddressTagScreen extends Screen {
     protected boolean confirm() {
         if (!isCurrentIdSameAsExistingAddress()) {
             Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
-            int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
+            int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().getSelectedSlot() : Inventory.SLOT_OFFHAND;
             Packets.sendToServer(new AddressTagApplyC2SP(slot, getOrCreateAddressFromCurrentValue()));
         }
         close();
@@ -175,11 +178,11 @@ public class AddressTagScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft minecraft, int width, int height) {
+    public void resize(int width, int height) {
         // Prevent contents reset when window is resized
         String text = addressBox.getValue();
         int cursorPosition = addressBox.getCursorPosition();
-        super.resize(minecraft, width, height);
+        super.resize(width, height);
         addressBox.setValue(text);
         addressBox.setCursorPosition(cursorPosition);
         suggestions.update();
@@ -195,10 +198,8 @@ public class AddressTagScreen extends Screen {
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
+        guiGraphics.nextStratum();
         suggestions.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.pose().popPose();
 
         renderLabels(guiGraphics);
         renderAddressIcon(guiGraphics, mouseX, mouseY, partialTick);
@@ -208,7 +209,8 @@ public class AddressTagScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         renderTransparentBackground(guiGraphics);
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos, topPos,
+              0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
     }
 
     protected void renderLabels(@NotNull GuiGraphics guiGraphics) {
@@ -222,7 +224,7 @@ public class AddressTagScreen extends Screen {
         guiGraphics.drawString(font, AddressFormatter.getIcon(address), leftPos + 17, topPos + 21, color, true);
 
         if (address != Address.UNKNOWN && isHovering(15, 20, 9, 9, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, address.getType().translate(), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(font, address.getType().translate(), mouseX, mouseY);
         }
     }
 
@@ -238,26 +240,27 @@ public class AddressTagScreen extends Screen {
         int x = leftPos - size - 4;
         int y = topPos + (imageHeight - size) / 2;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2, 0);
-        guiGraphics.pose().scale(scale, scale, scale);
-        guiGraphics.pose().translate(-8, -8, 0);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2);
+        guiGraphics.pose().scale(scale, scale);
+        guiGraphics.pose().translate(-8, -8);
         guiGraphics.renderItem(target, 0, 0);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
 
         if (isHovering(x - leftPos, y - topPos, size, size, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, target, mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(font, target, mouseX, mouseY);
         }
     }
 
     // -- Input
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (suggestions.keyPressed(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyEvent event) {
+        if (suggestions.keyPressed(event)) {
             return true;
         }
 
+        int keyCode = event.key();
         if (keyCode == InputConstants.KEY_ESCAPE) {
             close();
             return true;
@@ -275,28 +278,23 @@ public class AddressTagScreen extends Screen {
             return true;
         }
 
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (suggestions.mouseClicked(mouseX, mouseY, button)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (suggestions.handleClick(event.x(), event.y())) {
             return true;
         }
 
-        if (button == InputConstants.MOUSE_BUTTON_RIGHT && addressBox.isMouseOver(mouseX, mouseY)) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT && addressBox.isMouseOver(event.x(), event.y())) {
             if (!addressBox.getValue().isEmpty()) {
                 addressBox.setValue("");
             }
             return true;
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public void mouseMoved(double mouseX, double mouseY) {
-        suggestions.mouseMoved(mouseX, mouseY);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override

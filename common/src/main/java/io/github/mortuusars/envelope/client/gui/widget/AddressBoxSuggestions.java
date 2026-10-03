@@ -11,6 +11,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -73,6 +75,9 @@ public class AddressBoxSuggestions extends AbstractWidget {
         int y = getY();
 
         int hoveredIndex = getHoveredSuggestionIndex(mouseX, mouseY);
+        if (hoveredIndex >= 0 && selectedIndex != hoveredIndex) {
+            select(hoveredIndex);
+        }
 
         for (int i = scroll; i < Math.min(maxDisplayedLines + scroll, suggestions.size()); i++) {
             Suggestion suggestion = suggestions.get(i);
@@ -96,7 +101,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
                 text = font.plainSubstrByWidth(suggestion.getText(), getWidth() - font.width(ellipsis)) + ellipsis;
 
                 if (hoveredIndex == i) {
-                    guiGraphics.renderTooltip(font, Component.literal(suggestion.getText()), mouseX, mouseY);
+                    guiGraphics.setTooltipForNextFrame(font, Component.literal(suggestion.getText()), mouseX, mouseY);
                 }
             }
             guiGraphics.drawString(font, text, getX(), y + 1, textColor, true);
@@ -125,7 +130,8 @@ public class AddressBoxSuggestions extends AbstractWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
+        int keyCode = event.key();
         if (keyCode == InputConstants.KEY_LCONTROL) {
             show = !show;
             return true;
@@ -150,18 +156,6 @@ public class AddressBoxSuggestions extends AbstractWidget {
         }
 
         return false;
-    }
-
-    @Override
-    public void mouseMoved(double mouseX, double mouseY) {
-        if (!show) {
-            return;
-        }
-
-        int hoveredSuggestion = getHoveredSuggestionIndex(mouseX, mouseY);
-        if (hoveredSuggestion >= 0 && selectedIndex != hoveredSuggestion) {
-            select(hoveredSuggestion);
-        }
     }
 
     @Override
@@ -221,15 +215,21 @@ public class AddressBoxSuggestions extends AbstractWidget {
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(MouseButtonEvent event, boolean doubleClick) {
+        handleClick(event.x(), event.y());
+    }
+
+    public boolean handleClick(double mouseX, double mouseY) {
         if (!show) {
-            return;
+            return false;
         }
 
         int hoveredSuggestion = getHoveredSuggestionIndex(mouseX, mouseY);
         if (hoveredSuggestion >= 0 && hoveredSuggestion < suggestions.size()) {
             editBox.setValue(suggestions.get(hoveredSuggestion).getText());
+            return true;
         }
+        return false;
     }
 
     public int getHoveredSuggestionIndex(double mouseX, double mouseY) {

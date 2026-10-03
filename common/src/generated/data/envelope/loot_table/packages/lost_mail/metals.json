@@ -145,7 +145,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:chain",
+          "name": "minecraft:iron_chain",
           "weight": 10
         },
         {

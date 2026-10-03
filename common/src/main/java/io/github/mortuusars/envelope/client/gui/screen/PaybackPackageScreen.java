@@ -5,8 +5,9 @@ import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class PaybackPackageScreen extends AbstractInHandContainerScreen<PaybackPackageMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/payback_package.png");
+    public static final Identifier TEXTURE = Envelope.resource("textures/gui/payback_package.png");
 
     public PaybackPackageScreen(PaybackPackageMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title, TEXTURE);
@@ -32,7 +33,8 @@ public class PaybackPackageScreen extends AbstractInHandContainerScreen<PaybackP
         super.renderBg(guiGraphics, partialTick, mouseX, mouseY);
 
         if (getMenu().isDestroyedOnClose()) {
-            guiGraphics.blit(TEXTURE, leftPos + 45, topPos + 17, 0, 178, 86, 64);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos + 45, topPos + 17,
+                  0, 178, 86, 64, 256, 256);
         }
     }
 
@@ -41,7 +43,7 @@ public class PaybackPackageScreen extends AbstractInHandContainerScreen<PaybackP
         List<Component> components = super.getTooltipFromContainerItem(stack);
 
         if (hoveredSlot instanceof PreviewSlot) {
-            PaybackPackageItem.appendPaybackSubjectHoverText(components, getMenu().getPaybackSubject());
+            PaybackPackageItem.appendPaybackSubjectHoverText(components::add, getMenu().getPaybackSubject());
         }
 
         return components;

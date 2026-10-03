@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.util.bugger.data;
 
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 
 import java.util.Optional;
@@ -12,7 +12,7 @@ public class OptionalEntityData<T> extends PairData<Integer, Optional<T>> {
     protected BiConsumer<Entity, Optional<T>> handler = (entity, data) -> {
     };
 
-    public OptionalEntityData(ResourceLocation id, Codec<T> codec) {
+    public OptionalEntityData(Identifier id, Codec<T> codec) {
         super(id, Codec.INT.fieldOf("id"), codec.optionalFieldOf("data"));
     }
 

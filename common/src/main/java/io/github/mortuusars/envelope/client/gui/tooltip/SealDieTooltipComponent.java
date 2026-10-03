@@ -38,12 +38,12 @@ public class SealDieTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return 31;
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+    public void renderImage(Font font, int x, int y, int width, int height, GuiGraphics guiGraphics) {
         EnvelopeClient.getSealRenderer().renderDie(symbol, ShadingPalette.IRON_DIE, guiGraphics, x - 1, y - 1);
     }
 }

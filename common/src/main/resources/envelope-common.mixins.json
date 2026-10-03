@@ -8,10 +8,13 @@
     "EditBoxMixin",
     "applicator_carrying_tooltip.AbstractContainerScreenMixin",
     "bugger.EntityRendererMixin",
+    "bugger.EntityRenderStateMixin",
     "bugger.KeyboardHandlerMixin",
     "bugger.MouseHandlerMixin",
     "bugger.ScreenOverlayMixin",
     "bugger.ScreenRenderLinesInvoker",
+    "item_tint.ItemTintSourcesMixin",
+    "item_tint.SelectItemModelPropertiesMixin",
     "tooltip.ClientTooltipComponentMixin"
   ],
   "mixins": [
@@ -27,7 +30,6 @@
     "predators.CatMixin",
     "predators.FoxMixin",
     "predators.OcelotMixin",
-    "sable_compat.MailboxBlockMixin",
     "shears_clearing.ItemStackMixin",
     "shears_clearing.ShearsItemMixin",
     "spawners.MinecraftServerMixin",

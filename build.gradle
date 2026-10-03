@@ -47,29 +47,6 @@ subprojects {
         }
 
         maven {
-            name = "NeoForge"
-            url "https://maven.neoforged.net/releases/"
-        }
-        maven {
-            name = 'ParchmentMC'
-            url = 'https://maven.parchmentmc.org'
-        }
-
-        maven {
-            name = "Curseforge"
-            url 'https://www.cursemaven.com'
-            content {
-                includeGroup "curse.maven"
-            }
-        }
-        maven {
-            name = "Modrinth"
-            url = "https://api.modrinth.com/maven"
-            content {
-                includeGroup "maven.modrinth"
-            }
-        }
-        maven {
             name = "ModMaven"
             url = "https://modmaven.dev"
         }
@@ -109,11 +86,6 @@ subprojects {
             url "https://maven.ithundxr.dev/snapshots"
         }
 
-        // Sable
-        maven {
-            url = "https://maven.ryanhcode.dev/releases"
-        }
-
         // moddedmc.wiki, etc.
         maven {
             url "https://maven.sinytra.org"
@@ -125,28 +97,16 @@ subprojects {
             url = "https://maven.terraformersmc.com/"
         }
 
-        // Every Compat
-        maven {
-            url "https://registry.somethingcatchy.net/repository/maven-public/"
-        }
     }
 
     loom {
         silentMojangMappingsLicense()
-        runs {
-            client {
-                vmArgs '-XX:+AllowEnhancedClassRedefinition', '-XX:HotswapAgent=fatjar'
-            }
-        }
     }
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
 
-        mappings loom.layered() {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${parchment_version}@zip")
-        }
+        mappings loom.officialMojangMappings()
     }
 
     java {
@@ -166,10 +126,6 @@ subprojects {
     processResources {
         var expandProps = [
                 minecraft_version            : minecraft_version,
-                minecraft_version_range      : minecraft_version_range,
-                neoforge_version             : neoforge_version,
-                neoforge_version_range       : neoforge_version_range,
-                neoforge_loader_version_range: neoforge_loader_version_range,
                 mod_id                       : mod_id,
                 mod_name                     : mod_name,
                 mod_version                  : mod_version,
@@ -181,7 +137,7 @@ subprojects {
                 mod_license                  : mod_license,
                 maven_group                  : maven_group
         ]
-        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/neoforge.mods.toml', "*.mixins.json"]) {
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', "*.mixins.json"]) {
             expand expandProps
         }
         inputs.properties(expandProps)
@@ -286,13 +242,6 @@ publishMods {
         minecraftVersions.add("${minecraft_version}")
     }
 
-    curseforge("curseforgeNeoForge") {
-        from cfOptions
-        file project(":neoforge")
-        modLoaders.add("neoforge")
-        displayName = "${mod_name} - NeoForge ${minecraft_version} - ${mod_version}"
-    }
-
     curseforge("curseforgeFabric") {
         from cfOptions
         file project(":fabric")
@@ -300,13 +249,6 @@ publishMods {
         displayName = "${mod_name} - Fabric ${minecraft_version} - ${mod_version}"
         requires("fabric-api")
         requires("forge-config-api-port")
-    }
-
-    modrinth("modrinthNeoForge") {
-        from mrOptions
-        file project(":neoforge")
-        modLoaders.add("neoforge")
-        displayName = "${mod_name} - ${mod_version}"
     }
 
     modrinth("modrinthFabric") {

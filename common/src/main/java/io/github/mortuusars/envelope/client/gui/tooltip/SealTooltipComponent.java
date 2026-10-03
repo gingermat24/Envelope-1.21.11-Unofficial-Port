@@ -6,9 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
-import org.joml.Matrix4f;
 
 public class SealTooltipComponent implements ClientTooltipComponent {
     protected final Seal seal;
@@ -23,35 +21,34 @@ public class SealTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return 32;
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+    public void renderImage(Font font, int x, int y, int width, int height, GuiGraphics guiGraphics) {
         EnvelopeClient.getSealRenderer().render(seal, guiGraphics, x, y);
     }
 
     @Override
-    public void renderText(Font font, int x, int y, Matrix4f matrix, MultiBufferSource.BufferSource buffer) {
+    public void renderText(GuiGraphics guiGraphics, Font font, int x, int y) {
         // Signature:
         x += 34;
         y += 11;
         int color = seal.material().value().impressionPalette().highlight().tint();
         int outlineColor = seal.material().value().impressionPalette().shadow().tint();
-        text(seal.signature(), font, x - 1, y, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x - 1, y - 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x, y - 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x + 1, y - 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x + 1, y, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x + 1, y + 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x, y + 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x - 1, y + 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x, y, color, matrix, buffer);
+        text(guiGraphics, seal.signature(), font, x - 1, y, outlineColor);
+        text(guiGraphics, seal.signature(), font, x - 1, y - 1, outlineColor);
+        text(guiGraphics, seal.signature(), font, x, y - 1, outlineColor);
+        text(guiGraphics, seal.signature(), font, x + 1, y - 1, outlineColor);
+        text(guiGraphics, seal.signature(), font, x + 1, y, outlineColor);
+        text(guiGraphics, seal.signature(), font, x + 1, y + 1, outlineColor);
+        text(guiGraphics, seal.signature(), font, x, y + 1, outlineColor);
+        text(guiGraphics, seal.signature(), font, x - 1, y + 1, outlineColor);
+        text(guiGraphics, seal.signature(), font, x, y, color);
     }
 
-    private void text(Component text, Font font, int x, int y, int color, Matrix4f matrix, MultiBufferSource.BufferSource buffer) {
-        font.drawInBatch(text, x, y, color, false, matrix, buffer,
-              Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+    private void text(GuiGraphics guiGraphics, Component text, Font font, int x, int y, int color) {
+        guiGraphics.drawString(font, text, x, y, color, false);
     }
 }

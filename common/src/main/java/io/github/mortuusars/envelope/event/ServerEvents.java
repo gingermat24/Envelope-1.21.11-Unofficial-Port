@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.event;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 
 public class ServerEvents {
     public static void serverStarted(MinecraftServer server) {
@@ -11,6 +12,6 @@ public class ServerEvents {
     }
 
     public static void playerLogin(ServerPlayer player) {
-        player.serverLevel().getEnvelopeMailService().getKnownPlayers().add(player);
+        ((ServerLevel) player.level()).getEnvelopeMailService().getKnownPlayers().add(player);
     }
 }

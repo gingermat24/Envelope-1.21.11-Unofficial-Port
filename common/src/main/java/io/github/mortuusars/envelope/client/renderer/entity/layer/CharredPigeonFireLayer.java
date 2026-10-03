@@ -5,25 +5,27 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
+import io.github.mortuusars.envelope.client.model.CharredPigeonModel.RenderState;
 
-public class CharredPigeonFireLayer extends RenderLayer<CharredPigeon, CharredPigeonModel> {
-    public static final RenderType RENDER_TYPE = RenderType.eyes(Envelope.resource("textures/entity/charred_pigeon/charred_pigeon_fire.png"));
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/charred_pigeon/charred_pigeon_fire.png");
+public class CharredPigeonFireLayer extends RenderLayer<RenderState, CharredPigeonModel> {
+    public static final Identifier TEXTURE = Envelope.resource("textures/entity/charred_pigeon/charred_pigeon_fire.png");
 
-    public CharredPigeonFireLayer(RenderLayerParent<CharredPigeon, CharredPigeonModel> renderer) {
+    public CharredPigeonFireLayer(RenderLayerParent<RenderState, CharredPigeonModel> renderer) {
         super(renderer);
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, CharredPigeon pigeon, float limbSwing,
-                       float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-        getParentModel().renderToBuffer(poseStack, buffer.getBuffer(
-              RenderType.entityTranslucentEmissive(Envelope.resource("textures/entity/charred_pigeon/charred_pigeon_fire.png"))),
-              0xFFFFFFFF, OverlayTexture.NO_OVERLAY);
+    public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, RenderState state,
+                       float yRot, float xRot) {
+        getParentModel().setupAnim(state);
+        collector.submitModel(getParentModel(), state, poseStack, RenderTypes.entityTranslucentEmissive(TEXTURE),
+              packedLight, LivingEntityRenderer.getOverlayCoords(state, 0), -1, null, state.outlineColor, null);
     }
 }

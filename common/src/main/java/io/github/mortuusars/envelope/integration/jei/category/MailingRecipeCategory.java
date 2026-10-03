@@ -36,7 +36,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         MailRecipe recipe = recipeHolder.value();
 
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
+        builder.addInvisibleIngredients(RecipeIngredientRole.CRAFTING_STATION)
               .addItemLike(Envelope.Items.PAPER_BOX.get())
               .addItemLike(Envelope.Items.PACKAGE.get());
 

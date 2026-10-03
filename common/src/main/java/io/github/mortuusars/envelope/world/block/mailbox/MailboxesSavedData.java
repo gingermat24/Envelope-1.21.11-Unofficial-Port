@@ -2,14 +2,11 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,21 +35,9 @@ public class MailboxesSavedData extends SavedData {
     // -- Save / Load
 
     public static MailboxesSavedData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(factory(), "envelope_mailboxes");
+        return level.getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public static @NotNull Factory<MailboxesSavedData> factory() {
-        return new Factory<>(
-              MailboxesSavedData::new,
-              (tag, provider) -> CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), tag)
-                    .resultOrPartial(e -> Envelope.LOGGER.error("Cannot load MailboxesSavedData: {}", e))
-                    .orElse(null),
-              null);
-    }
-
-    public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return (CompoundTag) CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .resultOrPartial(e -> Envelope.LOGGER.error("Cannot save MailboxesSavedData: {}", e))
-              .orElse(tag);
-    }
+    private static final SavedDataType<MailboxesSavedData> TYPE =
+          new SavedDataType<>("envelope_mailboxes", MailboxesSavedData::new, CODEC, DataFixTypes.LEVEL);
 }

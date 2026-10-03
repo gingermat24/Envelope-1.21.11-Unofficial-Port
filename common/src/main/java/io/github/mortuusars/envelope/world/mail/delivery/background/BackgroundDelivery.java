@@ -1,17 +1,14 @@
 package io.github.mortuusars.envelope.world.mail.delivery.background;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableItem;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -20,7 +17,7 @@ public class BackgroundDelivery extends SavedData {
     public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           Codec.list(BackgroundCourier.CODEC)
                 .optionalFieldOf("couriers", Collections.emptyList())
-                .forGetter(BackgroundDelivery::getActiveCouriers),
+                .forGetter(BackgroundDelivery::getActiveCouriersForSave),
           Codec.list(FinishedBackgroundCourier.CODEC)
                 .optionalFieldOf("finished_couriers", Collections.emptyList())
                 .forGetter(BackgroundDelivery::getFinishedCouriers),
@@ -46,6 +43,11 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public List<BackgroundCourier> getActiveCouriers() {
+        return couriers;
+    }
+
+    private List<BackgroundCourier> getActiveCouriersForSave() {
+        processPendingCouriers();
         return couriers;
     }
 
@@ -113,7 +115,7 @@ public class BackgroundDelivery extends SavedData {
     // -- Save / Load
 
     public static BackgroundDelivery get(ServerLevel level, String name) {
-        return level.getDataStorage().computeIfAbsent(factory(), name);
+        return level.getDataStorage().computeIfAbsent(type(name));
     }
 
     @Override
@@ -121,25 +123,7 @@ public class BackgroundDelivery extends SavedData {
         return !couriers.isEmpty() || super.isDirty();
     }
 
-    public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        processPendingCouriers();
-        return CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> Envelope.LOGGER.error("Cannot save BackgroundDelivery: {}", e.message()))
-              .result()
-              .filter(t -> t instanceof CompoundTag)
-              .map(t -> ((CompoundTag) t))
-              .orElse(tag);
-    }
-
-    private static BackgroundDelivery load(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> Envelope.LOGGER.error("Cannot load BackgroundDelivery: {}", e.message()))
-              .result()
-              .map(Pair::getFirst)
-              .orElseGet(BackgroundDelivery::new);
-    }
-
-    private static Factory<BackgroundDelivery> factory() {
-        return new Factory<>(BackgroundDelivery::new, BackgroundDelivery::load, null);
+    private static SavedDataType<BackgroundDelivery> type(String name) {
+        return new SavedDataType<>(name, BackgroundDelivery::new, CODEC, DataFixTypes.LEVEL);
     }
 }

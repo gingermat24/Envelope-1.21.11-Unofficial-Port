@@ -3,12 +3,8 @@
   "category": "misc",
   "group": "pigeonhole",
   "key": {
-    "H": {
-      "item": "minecraft:hay_block"
-    },
-    "P": {
-      "item": "minecraft:acacia_planks"
-    }
+    "H": "minecraft:hay_block",
+    "P": "minecraft:acacia_planks"
   },
   "pattern": [
     "PPP",

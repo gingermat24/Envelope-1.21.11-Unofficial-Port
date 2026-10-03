@@ -9,10 +9,16 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import java.util.List;
 
 public class LetterCloningRecipeExtension implements ICraftingCategoryExtension<LetterCloningRecipe> {
+    @Override
+    public List<SlotDisplay> getIngredients(RecipeHolder<LetterCloningRecipe> recipeHolder) {
+        return List.of();
+    }
+
     @Override
     public void setRecipe(RecipeHolder<LetterCloningRecipe> holder, IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
         List<List<ItemStack>> inputs = List.of(

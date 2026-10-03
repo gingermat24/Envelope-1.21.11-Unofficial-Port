@@ -3,17 +3,32 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public interface Unsealable {
     ItemLike getUnsealedItem();
+
+    static Item.Properties withUnsealingConsumable(Item.Properties properties) {
+        Consumable consumable = Consumable.builder()
+              .consumeSeconds(1.0F)
+              .animation(ItemUseAnimation.EAT)
+              .sound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(Envelope.SoundEvents.PAPER_CRACKLE.get()))
+              .hasConsumeParticles(false)
+              .build();
+        return properties.component(DataComponents.CONSUMABLE, consumable);
+    }
 
     default SoundEvent getUnsealingSound() {
         return Envelope.SoundEvents.PAPER_CRACKLE.get();

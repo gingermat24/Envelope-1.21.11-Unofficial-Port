@@ -45,7 +45,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         ItemStack hovered = hoveredSlot.getItem();
 
         if (applicator.shouldRenderTooltipWhileCarrying(Minecrft.level(), hoveredSlot.getItem(), hovered)) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hovered), hovered.getTooltipImage(), x, y);
+            guiGraphics.setTooltipForNextFrame(font, getTooltipFromContainerItem(hovered), hovered.getTooltipImage(), x, y);
             ci.cancel();
         }
     }

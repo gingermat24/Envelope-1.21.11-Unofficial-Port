@@ -79,12 +79,13 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (player.isSecondaryUseActive()) {
-            @Nullable PaybackRequest removedRequest = player.getItemInHand(hand).remove(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+            ItemStack stack = player.getItemInHand(hand);
+            @Nullable PaybackRequest removedRequest = stack.remove(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
             if (removedRequest != null) {
                 player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
-                return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
+                return ItemUseResult.sidedSuccess(stack, level.isClientSide());
             }
         }
 
@@ -94,13 +95,12 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
                   new SimpleMenuProvider((id, inventory, pl) ->
                         new PaybackTagMenu(id, inventory, hand), Component.translatable("container.envelope.payback_tag")),
                   buffer -> buffer.writeEnum(hand));
-            player.getCooldowns().addCooldown(this, 3);
+            player.getCooldowns().addCooldown(player.getItemInHand(hand), 3);
         }
 
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
+        return ItemUseResult.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
-    @Override
     public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
         return true;
     }

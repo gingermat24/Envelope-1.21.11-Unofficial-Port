@@ -9,7 +9,7 @@ import io.github.mortuusars.envelope.util.bugger.BuggerData;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -17,10 +17,10 @@ import java.util.Optional;
 
 public class Data<T> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private final ResourceLocation id;
+    private final Identifier id;
     private final Codec<T> codec;
 
-    public Data(ResourceLocation id, Codec<T> codec) {
+    public Data(Identifier id, Codec<T> codec) {
         @Nullable Data<?> definition = BuggerData.DEFINITIONS.get(id);
         Preconditions.checkArgument(definition == null || definition.codec().equals(codec),
               "Duplicate definition detected: '" + id + "'.");
@@ -29,7 +29,7 @@ public class Data<T> {
         this.codec = codec;
     }
 
-    public ResourceLocation id() {
+    public Identifier id() {
         return id;
     }
 

@@ -13,10 +13,11 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -40,6 +41,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -219,7 +222,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
             Platform.openMenu(serverPlayer, this, buffer -> {
                 buffer.writeBlockPos(getBlockPos());
                 BlockAddress.STREAM_CODEC.encode(buffer, getAddress());
-                ItemStack.LIST_STREAM_CODEC.encode(buffer, getAllMail());
+                ItemStack.OPTIONAL_LIST_STREAM_CODEC.encode(buffer, getAllMail());
             });
             playSound(SoundEvents.BARREL_OPEN, 0.6f, 1.1f);
         }
@@ -345,7 +348,9 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     }
 
     public void onBlockRemoved(Level level, BlockPos pos, BlockState state, BlockState newState) {
-        Containers.dropContentsOnDestroy(state, newState, level, pos);
+        if (!state.is(newState.getBlock())) {
+            Containers.dropContents(level, pos, this);
+        }
         clearMail();
         blockRemoved = true;
     }
@@ -410,19 +415,21 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     // -- Loading/Saving
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        ContainerHelper.saveAllItems(tag, items, registries);
-        if (address != null) tag.putString("address", address.getString());
-        if (owner != null) tag.putUUID("owner", owner);
-        if (!inboxId.equals(Util.NIL_UUID)) tag.putUUID("inbox_id", inboxId);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, items);
+        if (address != null) output.putString("address", address.getString());
+        if (owner != null) output.store("owner", UUIDUtil.CODEC, owner);
+        if (!inboxId.equals(Util.NIL_UUID)) output.store("inbox_id", UUIDUtil.CODEC, inboxId);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        ContainerHelper.loadAllItems(tag, items, registries);
-        setAddress(tag.contains("address", Tag.TAG_STRING) ? new BlockAddress(tag.getString("address")) : null);
-        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
-        inboxId = tag.hasUUID("inbox_id") ? tag.getUUID("inbox_id") : UUID.randomUUID();
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        ContainerHelper.loadAllItems(input, items);
+        setAddress(input.getString("address").map(BlockAddress::new).orElse(null));
+        owner = input.read("owner", UUIDUtil.CODEC).orElse(null);
+        inboxId = input.read("inbox_id", UUIDUtil.CODEC).orElseGet(UUID::randomUUID);
     }
 
     // -- Util

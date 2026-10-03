@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
@@ -25,7 +24,8 @@ public class MailboxBlockItem extends BlockItem {
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
         if (!MailService.operatesIn(context.getLevel())
-              || context.getItemInHand().getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY).contains("address")) {
+              || (context.getItemInHand().get(DataComponents.BLOCK_ENTITY_DATA) != null
+                  && context.getItemInHand().get(DataComponents.BLOCK_ENTITY_DATA).contains("address"))) {
             return super.useOn(context);
         }
 
@@ -36,7 +36,7 @@ public class MailboxBlockItem extends BlockItem {
                 var hitResult = new BlockHitResult(context.getClickLocation(),
                       context.getClickedFace(), context.getClickedPos(), context.isInside());
                 var packet = new OpenMailboxPlacingScreenS2CP(context.getHand(), hitResult,
-                      MailService.of(serverPlayer.serverLevel()).getKnownAddresses());
+                      MailService.of((net.minecraft.server.level.ServerLevel) serverPlayer.level()).getKnownAddresses());
                 Packets.sendToClient(packet, serverPlayer);
             }
 

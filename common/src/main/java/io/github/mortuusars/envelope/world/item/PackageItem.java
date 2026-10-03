@@ -52,23 +52,24 @@ public class PackageItem extends BlockItem implements Sealable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag tooltipFlag) {
-        super.appendHoverText(stack, context, components, tooltipFlag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                                java.util.function.Consumer<Component> components, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, display, components, tooltipFlag);
 
         @Nullable SeededContainerLoot loot = stack.get(DataComponents.CONTAINER_LOOT);
         if (loot != null) {
-            components.add(Component.translatable("container.envelope.package.contents_unknown").withStyle(ChatFormatting.GRAY));
+            components.accept(Component.translatable("container.envelope.package.contents_unknown").withStyle(ChatFormatting.GRAY));
 
             if (tooltipFlag.isAdvanced()) {
-                components.add(Component.literal("Loot Table: ").withStyle(ChatFormatting.DARK_GRAY)
-                      .append(Component.literal(loot.lootTable().location().toString()).withStyle(ChatFormatting.DARK_GRAY)));
+                components.accept(Component.literal("Loot Table: ").withStyle(ChatFormatting.DARK_GRAY)
+                      .append(Component.literal(loot.lootTable().identifier().toString()).withStyle(ChatFormatting.DARK_GRAY)));
             }
         }
 
         if (tooltipFlag.isAdvanced()) {
             int xp = stack.getOrDefault(Envelope.DataComponents.PACKAGE_EXPERIENCE, 0);
             if (xp > 0) {
-                components.add(Component.literal("Experience: " + xp).withStyle(ChatFormatting.DARK_GRAY));
+                components.accept(Component.literal("Experience: " + xp).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
     }
@@ -92,7 +93,7 @@ public class PackageItem extends BlockItem implements Sealable {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public @NotNull InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (Config.Server.PACKAGE_SNEAK_QUICK_UNPACK.get() && player.isSecondaryUseActive()) {
@@ -113,7 +114,7 @@ public class PackageItem extends BlockItem implements Sealable {
         }
 
         player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
-        return InteractionResultHolder.success(stack);
+        return ItemUseResult.success(stack);
     }
 
     protected void unpackLootTableIfPresent(ItemStack stack, Level level, Vec3 pos, @Nullable Player player) {

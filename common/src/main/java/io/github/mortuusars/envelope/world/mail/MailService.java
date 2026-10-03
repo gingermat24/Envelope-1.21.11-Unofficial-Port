@@ -42,7 +42,7 @@ public class MailService {
     protected @Nullable BackgroundDelivery backgroundDelivery;
 
     private MailService(ServerLevel level) {
-        Preconditions.checkArgument(operatesIn(level), "MailService cannot exist in the '" + level.dimension().location() + "' dimension.");
+        Preconditions.checkArgument(operatesIn(level), "MailService cannot exist in the '" + level.dimension().identifier() + "' dimension.");
         this.level = level;
         this.mailboxes = new Mailboxes(level);
         this.serviceAddresses = new ServiceAddresses(this);
@@ -188,7 +188,7 @@ public class MailService {
                     ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + courier.getRandom().nextInt(6),
                     delivery.getMail().getHoverName().copy()
                           .withStyle(Style.EMPTY.withUnderlined(true)
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(delivery.getMail())))))
+                                .withHoverEvent(new HoverEvent.ShowItem(delivery.getMail()))))
                     : CommonComponents.EMPTY)
               .append(Component.translatable("letter.envelope.courier_death_notice.condolence_" + courier.getRandom().nextInt(5),
                     courier.getName()))

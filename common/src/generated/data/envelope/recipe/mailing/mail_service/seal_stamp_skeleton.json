@@ -3,12 +3,8 @@
   "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
-    {
-      "item": "envelope:seal_stamp"
-    },
-    {
-      "item": "minecraft:skeleton_skull"
-    }
+    "envelope:seal_stamp",
+    "minecraft:skeleton_skull"
   ],
   "result": {
     "components": {
