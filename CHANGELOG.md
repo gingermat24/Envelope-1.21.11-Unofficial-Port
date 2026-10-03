@@ -1,6 +1,6 @@
 # Changelog
 
-## Unofficial Fabric 1.21.11 port
+## Unofficial Fabric 1.21.11 port (0.1.0 - 03/10/2026)
 - Ported the Fabric build target from Minecraft 1.21.1 to 1.21.11.
 - Migrated Fabric configuration, entity, block-entity, and block-render-layer registration to the target APIs.
 - Migrated sealed-item tinting and payback-tag model selection to 1.21.11 item-model properties, preserving existing saved payback requests.
@@ -16,7 +16,12 @@
 - Restored the paper-crackle unsealing sound through the target consumable component.
 - Removed the NeoForge platform from this fork.
 - Removed integrations that only had Minecraft 1.21.1 dependencies (Every Compat and Sable's assembly-listener mixin).
+- Set the port version to 0.1.0 and updated the author, Modrinth, source, and issue links.
+- Added Mod Menu links for the port's Modrinth page and issue tracker.
+- Skip JEI integration mixins when JEI is not installed.
+- Disabled the CurseForge publish task; configure releases for Modrinth only.
 
+ORIGINAL MOD:
 ## 0.7.5 - 2026-08-15
 - Added Every Compat (Wood Good) support for pigeonholes (implemented by [_**Dadamalda**_](https://github.com/DadamaldaDad))
 - Updated localization files.
@@ -35,7 +40,7 @@
 
 ## 0.7.1 - 2026-07-23
 - Fixed service crafting returning the input package instead of a package with leftover items when not all items were used in the craft.
-- Fixed transferring all mail from inbox with Ctrl+Shift+Click hanging the client indefinitely. 
+- Fixed transferring all mail from inbox with Ctrl+Shift+Click hanging the client indefinitely.
 
 ## 0.7.0 - Integration Hell - 2026-07-21
 
@@ -180,13 +185,13 @@ _Pigeon wandering is still not fixed in this release. Will be fixed in 0.7._
 Added a new way to craft items by sending a Package with ingredients to the service address.
 - Works similarly to the shapeless crafting.
 - Results are returned using the same courier, or with a service courier, if some of the ingredients were unprocessed.
-- Data-driven. 
+- Data-driven.
 - Can give experience. Applied to the resulting package.
 - Shown in **JEI**
   - Clicking on an arrow in the Mailbox menu, or on a box in the Paper Box menu will show available recipes.
 
 Included recipes:
-- Payback Tag 
+- Payback Tag
   - no longer craftable in the Crafting Table
 - Seal Stamps with custom impressions
 - Rotten Flesh -> Leather
@@ -194,7 +199,7 @@ Included recipes:
 - Name Tag
 - Tuff, Dripstone, Calcite
 - Glow Ink Sac
-- Book and Quill and Letter and Quill 
+- Book and Quill and Letter and Quill
 - Lost Mail
   - Has random loot inside
 - Letter Broadcasting
@@ -274,7 +279,7 @@ Misc:
 - Smaller improvements and fixes
 
 #### Misc
-- _doMobSpawning_ game rule no longer prevents delivering pigeons from spawning. _Configurable._ 
+- _doMobSpawning_ game rule no longer prevents delivering pigeons from spawning. _Configurable._
 - Fixed crash in Letter view screen  
 - Fixed error with `C2ME`
 
@@ -307,9 +312,9 @@ Package:
 - Opening a Package that will be destroyed after opening now requires holding the use button, to not unpack accidentally.
 
 ## 0.4.0.3
-- Added Courier Death Notice. 
-- Reworked how delivery route and delivery duration is calculated. 
-  - It's somewhat involved, maybe I'll explain it the future in a wiki or something. 
+- Added Courier Death Notice.
+- Reworked how delivery route and delivery duration is calculated.
+  - It's somewhat involved, maybe I'll explain it the future in a wiki or something.
 - Reduced `courier_travel_speed` config value from 25 to 20.
 
 ## 0.4.0.2 - Reworks, reworks, reworks
@@ -320,7 +325,7 @@ Package:
   - Pigeonhole no longer acts like a mailbox. Now it's just a place for pigeons to chill.
 - Reduced xp requirement for setting/changing mailbox address from 5 to 3 levels.
 - Mail items:
-  - Tooltips now have separate lines for sender/recipient addresses. 
+  - Tooltips now have separate lines for sender/recipient addresses.
   - Delivered mail no longer keeps sending data (recipient and payback).
   - Delivery Log can now be seen in the mail item tooltip by pressing [Shift], if mail has a sender component.
   - Using Shears on the mail item in inventory (clicking the item with them) removes delivery data.
@@ -339,9 +344,9 @@ Package:
   - Added Payback Tag, Payback Packing Box and Payback Package
   - Mail with Payback will be handled by Mail Service for safe transfer of goods and payment between addresses
 - Added Packing Box - separate item type that represents an empty package; Package usage experience remains basically the same
-- Improved visual style of sender/recipient addresses on mailable items 
+- Improved visual style of sender/recipient addresses on mailable items
 - Changed Mail Service address icon
-- Renamed address type `pigeonhole` to `block` 
+- Renamed address type `pigeonhole` to `block`
 - Fixed relocating Pigeonhole block with CarryOn not removing background Pigeonhole data
   - This system will most likely receive proper rework in the future updates  
 - Smaller changes and improvements
@@ -357,9 +362,9 @@ Package:
 
 ## 0.3.0.1
 - Letter
-  - Added **Sealed Letter** 
+  - Added **Sealed Letter**
   - Added letter copying recipe
-  - Added `envelope:letter_tattered` data component for Letter and Sealed Letter 
+  - Added `envelope:letter_tattered` data component for Letter and Sealed Letter
     - Letters become tattered when a Fox spits it out from its mouth
     - Tattered letters differ only in appearance, functionality is the same
   - Updated how existing letters work and look
@@ -392,7 +397,7 @@ Delivery:
 - Pigeon movement should be smoother in some cases
 - Added `/envelope pigeonhole` commands
 - Changed command `/mail send [item]` to `/envelope send [item]`
-- Pigeons released from Pigeonhole for emergency reasons will no longer start delivering mail as usual 
+- Pigeons released from Pigeonhole for emergency reasons will no longer start delivering mail as usual
 - Restricted all mail operations to overworld only
 - Improvements to Bugger (Debug utility enabled with `debug.debug_mode` server config option. Adds more info to F3 screen, more log messages, etc).
 

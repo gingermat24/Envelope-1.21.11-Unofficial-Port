@@ -224,8 +224,7 @@ publishMods {
 
     var forceDryRun = false
     dryRun = forceDryRun
-            || (providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null
-            || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null)
+            || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
     def cfOptions = curseforgeOptions {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
@@ -249,6 +248,10 @@ publishMods {
         displayName = "${mod_name} - Fabric ${minecraft_version} - ${mod_version}"
         requires("fabric-api")
         requires("forge-config-api-port")
+    }
+
+    tasks.named("publishCurseforgeFabric") {
+        enabled = false
     }
 
     modrinth("modrinthFabric") {
