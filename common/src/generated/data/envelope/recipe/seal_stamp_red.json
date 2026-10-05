@@ -1,0 +1,6 @@
+{
+  "category": "equipment",
+  "material": "minecraft:red_dye",
+  "result_material": "envelope:red_wax",
+  "type": "envelope:crafting_seal_stamp_dye"
+}

@@ -1,0 +1,6 @@
+{
+  "category": "equipment",
+  "material": "minecraft:gold_ingot",
+  "result_material": "envelope:gold",
+  "type": "envelope:crafting_seal_stamp_dye"
+}

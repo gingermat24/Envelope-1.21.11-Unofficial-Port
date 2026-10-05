@@ -210,7 +210,7 @@ public class AddressTagScreen extends Screen {
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         renderTransparentBackground(guiGraphics);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos, topPos,
-              0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+              0, 0, imageWidth, imageHeight, 256, 256);
     }
 
     protected void renderLabels(@NotNull GuiGraphics guiGraphics) {

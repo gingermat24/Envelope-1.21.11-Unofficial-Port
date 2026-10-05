@@ -7,18 +7,21 @@ import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.AgeableMobRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel.RenderState, PigeonModel> {
+public class PigeonRenderer extends AgeableMobRenderer<Pigeon, PigeonModel.RenderState, PigeonModel> {
     public static final ModelLayerLocation MODEL_LAYER = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
+    public static final ModelLayerLocation BABY_MODEL_LAYER = new ModelLayerLocation(Envelope.resource("pigeon_baby"), "main");
 
     public PigeonRenderer(EntityRendererProvider.Context context) {
-        super(context, new PigeonModel(context.bakeLayer(MODEL_LAYER)), 0.35f);
+        super(context,
+              new PigeonModel(context.bakeLayer(MODEL_LAYER)),
+              new PigeonModel(context.bakeLayer(BABY_MODEL_LAYER)),
+              0.35f);
         addLayer(new PigeonBackpackLayer(this, context.getModelSet()));
         addLayer(new PigeonHatLayer(this, context.getModelSet()));
     }

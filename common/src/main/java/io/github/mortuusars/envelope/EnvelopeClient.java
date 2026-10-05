@@ -48,7 +48,7 @@ public class EnvelopeClient {
                 case PaybackRequest paybackRequest -> new PaybackRequestTooltipComponent(paybackRequest);
                 case Seal seal -> new SealTooltipComponent(seal);
                 case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die ->
-                      new SealDieTooltipComponent(die.impression());
+                      new SealDieTooltipComponent(die.impression(), die.material());
                 case CompositeTooltip composite -> new CompositeTooltipComponent(
                       composite.components().stream().map(ClientTooltipComponent::create).toList()
                 );

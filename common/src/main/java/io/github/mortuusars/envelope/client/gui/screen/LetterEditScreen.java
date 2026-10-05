@@ -62,8 +62,8 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
         textBox = addRenderableWidget(new TextBox(font, leftPos + 17, topPos + 21, 142, 144)
               .setFontColor(0xFF7B593D)
               .setFontUnfocusedColor(0xFF7B593D)
-              .setSelectionColor(0xFF664488)
-              .setSelectionUnfocusedColor(0xFF696170)
+              .setSelectionColor(0x80664488)
+              .setSelectionUnfocusedColor(0x80696170)
               .setHintColor(0xFFC2A57F)
               .setText(FormattedString.parse(letter.map(LetterAndQuillItem::getContent).text())));
 
@@ -99,7 +99,7 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos, topPos,
-              0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+              0, 0, imageWidth, imageHeight, imageWidth, imageHeight, 256, 256);
     }
 
     // -- Input

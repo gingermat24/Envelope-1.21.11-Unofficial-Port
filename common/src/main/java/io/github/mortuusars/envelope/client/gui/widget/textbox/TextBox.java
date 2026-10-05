@@ -251,6 +251,7 @@ public class TextBox extends AbstractWidget {
             guiGraphics.drawString(font, string, x, getY(), getAutocompleteSuggestionColor(), false);
         }
 
+        guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
         renderLines(guiGraphics, mouseX, mouseY, partialTick, displayCache.getLines(), getCurrentFontColor());
 
         int cursorColor = getCurrentFontColor();
@@ -262,6 +263,7 @@ public class TextBox extends AbstractWidget {
 
         renderCursor(guiGraphics, mouseX, mouseY, partialTick, getEditor(), displayCache.getCursor(), cursorColor);
         renderSelection(guiGraphics, mouseX, mouseY, partialTick, displayCache.getSelection(), getCurrentSelectionColor());
+        guiGraphics.disableScissor();
 
         if (isFormattingEnabled()) {
             getFormattingToolbar().render(guiGraphics, mouseX, mouseY, partialTick);

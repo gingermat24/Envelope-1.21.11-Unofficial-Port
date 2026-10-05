@@ -59,19 +59,19 @@ subprojects {
 
         // CarryOn
         maven {
-            url "https://maven.blamejared.com/"
+            url = "https://maven.blamejared.com/"
         }
 
         // KubeJS
         maven {
-            url "https://maven.latvian.dev/releases"
+            url = "https://maven.latvian.dev/releases"
             content {
                 includeGroup "dev.latvian.mods"
                 includeGroup "dev.latvian.apps"
             }
         }
         maven {
-            url 'https://jitpack.io'
+            url = 'https://jitpack.io'
             content {
                 includeGroup "com.github.rtyley"
             }
@@ -79,16 +79,16 @@ subprojects {
 
         // Create, Ponder, Flywheel
         maven {
-            url "https://maven.createmod.net"
+            url = "https://maven.createmod.net"
         }
         // Registrate
         maven {
-            url "https://maven.ithundxr.dev/snapshots"
+            url = "https://maven.ithundxr.dev/snapshots"
         }
 
         // moddedmc.wiki, etc.
         maven {
-            url "https://maven.sinytra.org"
+            url = "https://maven.sinytra.org"
         }
 
         // EMI

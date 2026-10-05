@@ -15,6 +15,7 @@ import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
@@ -314,6 +315,8 @@ public class Envelope {
         /**
          * Only for display purposes. Shouldn't be used delivery in logic.
          */
+        public static final DataComponentType<DeliveryInfo> MAIL_DELIVERY_INFO = Register.dataComponentType("mail_delivery_info", b ->
+              b.persistent(DeliveryInfo.CODEC).networkSynchronized(DeliveryInfo.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
@@ -353,6 +356,8 @@ public class Envelope {
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_DIE = Register.dataComponentType("seal_stamp_die",
               b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
+        public static final DataComponentType<Holder<SealMaterial>> SEAL_STAMP_MATERIAL = Register.dataComponentType("seal_stamp_material",
+              b -> b.persistent(SealMaterial.CODEC).networkSynchronized(SealMaterial.STREAM_CODEC).cacheEncoding());
         @Deprecated(forRemoval = true)
         public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
               b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
@@ -442,6 +447,8 @@ public class Envelope {
               "crafting_special_address_tag_application", () -> new CustomRecipe.Serializer<>(AddressTagApplicationRecipe::new));
         public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer(
               "crafting_special_payback_tag_application", () -> new CustomRecipe.Serializer<>(PaybackTagApplicationRecipe::new));
+        public static final Supplier<RecipeSerializer<SealStampDyeRecipe>> SEAL_STAMP_DYE = Register.recipeSerializer(
+              "crafting_seal_stamp_dye", SealStampDyeRecipe.Serializer::new);
 
         public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer(
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));

@@ -96,14 +96,13 @@ public class PaybackDepartment {
         // Depending on mail counts this could get laggy, especially if multiple returns occur at the same time.
 
         if (getMailService().getGameTime() % 200 == 0) { // Check every minute
-            getData().getPaybackPendingSubjects().entrySet().removeIf(entry -> {
-                if (entry.getValue().expiresAt() <= getMailService().getGameTime()) {
-                    returnSubjectToSender(entry.getValue(), DeliveryRecord.Message.PAYBACK_EXPIRED);
-                    getData().setDirty();
-                    return true;
-                }
-                return false;
-            });
+            long gameTime = getMailService().getGameTime();
+            List<PaybackSubject> expiredSubjects = getData().getPaybackPendingSubjects().values().stream()
+                  .filter(subject -> subject.expiresAt() <= gameTime)
+                  .toList();
+
+            expiredSubjects.forEach(subject ->
+                  returnSubjectToSender(subject, DeliveryRecord.Message.PAYBACK_EXPIRED));
         }
     }
 

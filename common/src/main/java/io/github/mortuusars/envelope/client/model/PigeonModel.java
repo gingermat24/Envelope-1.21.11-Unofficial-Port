@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.client.model;
 
 import io.github.mortuusars.envelope.util.EasingFunction;
+import net.minecraft.client.model.BabyModelTransform;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -9,7 +10,12 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+import java.util.Set;
+
 public class PigeonModel extends EntityModel<PigeonModel.RenderState> {
+    private static final MeshTransformer BABY_TRANSFORMER =
+          new BabyModelTransform(true, 10F, 0F, 2F, 2F, 24F, Set.of("head"));
+
     private final ModelPart root;
 
     private final ModelPart head;
@@ -46,6 +52,14 @@ public class PigeonModel extends EntityModel<PigeonModel.RenderState> {
     }
 
     public static LayerDefinition createLayerDefinition() {
+        return createLayerDefinition(false);
+    }
+
+    public static LayerDefinition createBabyLayerDefinition() {
+        return createLayerDefinition(true);
+    }
+
+    private static LayerDefinition createLayerDefinition(boolean baby) {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition part = mesh.getRoot();
 
@@ -122,7 +136,7 @@ public class PigeonModel extends EntityModel<PigeonModel.RenderState> {
                     .addBox(0.0F, 0.0F, -3.0F, 1.0F, 4.0F, 6.0F, CubeDeformation.NONE),
               PartPose.offsetAndRotation(-4.0F, 17.0F, 0.0F, 0.0F, 0.0F, 0.3927F));
 
-        return LayerDefinition.create(mesh, 64, 64);
+        return LayerDefinition.create(baby ? BABY_TRANSFORMER.apply(mesh) : mesh, 64, 64);
     }
 
     public void setupAnim(RenderState state) {

@@ -46,6 +46,11 @@ public class SealStampItem extends Item implements ApplicatorItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
                                 java.util.function.Consumer<Component> components, TooltipFlag flag) {
+        Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL))
+              .flatMap(Holder::unwrapKey)
+              .ifPresent(key -> components.accept(Component.translatable("tooltip.envelope.seal_stamp.color",
+                    Component.translatable("seal_material.envelope." + key.identifier().getPath()))));
+
         if (flag.isAdvanced()) {
             getDie(stack)
                   .flatMap(Holder::unwrapKey)
@@ -58,7 +63,8 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of(new SealDieTooltipComponent(getDie(stack)));
+        return Optional.of(new SealDieTooltipComponent(getDie(stack),
+              Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL))));
     }
 
     public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
@@ -80,15 +86,30 @@ public class SealStampItem extends Item implements ApplicatorItem {
         ItemStack target = slot.getItem();
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
+        @Nullable Holder<SealMaterial> stampMaterial = stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL);
+        if (existingSeal != null && stampMaterial != null) {
+            target.set(Envelope.DataComponents.SEAL,
+                  new Seal(stampMaterial, existingSeal.impression(), existingSeal.signature(), existingSeal.playerUuid()));
+            slot.set(target);
+            player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+            return true;
+        }
+
         if (existingSeal != null && canApplyGold(stack, player)) {
             ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.RED_WAX);
             ResourceKey<SealMaterial> newMaterial = currentMaterial == SealMaterial.RED_WAX ? SealMaterial.GOLD : SealMaterial.RED_WAX;
 
             Holder<SealMaterial> material = SealMaterial.getOrThrow(player.registryAccess(), newMaterial);
 
-            target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(), existingSeal.signature()));
+            target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(),
+                  existingSeal.signature(), existingSeal.playerUuid()));
             slot.set(target);
             player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+            return true;
+        }
+
+        if (stampMaterial == null) {
+            player.playSound(SoundEvents.COMPARATOR_CLICK);
             return true;
         }
 
@@ -108,9 +129,11 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     public Seal createSeal(ItemStack stack, Player player) {
         return new Seal(
-              SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX),
+              stack.getOrDefault(Envelope.DataComponents.SEAL_STAMP_MATERIAL,
+                    SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX)),
               getDieOrDefault(stack, player.registryAccess(), player),
-              player.getName());
+              player.getName(),
+              Optional.of(player.getUUID()));
     }
 
     protected boolean canApplyGold(ItemStack stack, Player player) {

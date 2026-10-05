@@ -8,10 +8,8 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 /**
- * Approximation of hard-light blend mode to calculate tint.<br>
- * Color brighter than 50% will produce brighter image, lower than 50% - darker.<br><br>
- * It's not 1:1, but I don't know of a closer solution.
- * setShaderColor seems to behave slightly differently than anything that I can do in photoshop.
+ * Encodes palette colors as multipliers centered on mid-gray, matching the original seal-impression shading.
+ * The GUI renderer applies these multipliers to source pixels before uploading a cached tinted texture.
  */
 public record TintColor(float r, float g, float b, float a) {
     public static final Codec<TintColor> CODEC = EnvelopeCodecs.HEX_COLOR.xmap(TintColor::of, TintColor::tint);
@@ -26,10 +24,10 @@ public record TintColor(float r, float g, float b, float a) {
     }
 
     public int tint(int argb) {
-        int a = (int)Mth.clamp(ARGB.alpha(argb) * this.a, 0, 255);
-        int r = (int)Mth.clamp(ARGB.red(argb) * this.r, 0, 255);
-        int g = (int)Mth.clamp(ARGB.green(argb) * this.g, 0, 255);
-        int b = (int)Mth.clamp(ARGB.blue(argb) * this.b, 0, 255);
+        int a = Math.round(Mth.clamp(ARGB.alpha(argb) * this.a, 0, 255));
+        int r = Math.round(Mth.clamp(ARGB.red(argb) * this.r, 0, 255));
+        int g = Math.round(Mth.clamp(ARGB.green(argb) * this.g, 0, 255));
+        int b = Math.round(Mth.clamp(ARGB.blue(argb) * this.b, 0, 255));
         return ARGB.color(a, r, g, b);
     }
 

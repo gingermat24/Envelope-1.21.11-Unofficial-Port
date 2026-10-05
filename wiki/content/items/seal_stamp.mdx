@@ -9,13 +9,20 @@ related_items: ["envelope:sealed_letter", "envelope:sealed_package"]
 
 ## Obtaining
 ### Crafting
-Seal stamps can be crafted in a [crafting table](https://minecraft.wiki/w/Crafting_Table). Crafted stamps will have the default [die](#die).
+Seal stamps can be crafted in a [crafting table](https://minecraft.wiki/w/Crafting_Table). A crafted stamp has no die configured; when used, it makes an impression of the first letter or number in the sealer's name.
+Combine a seal stamp with any dye in a crafting table to make a colored seal stamp. Colored stamps keep their color when configured with a die at the Mail Service.
 
 ### Mailing
-Several unique seal stamps can be obtained by sending any seal stamp with a special item to the <Asset location="envelope:gui/address_mail_service" width={20} /> Mail Service.
+Mail a seal stamp with a matching item to the <Asset location="envelope:gui/address_mail_service" width={20} /> Mail Service to configure one of its available emblem dies:
+- Book → book
+- Golden Apple → apple
+- Axe, Hoe, Pickaxe, Shovel, or Sword → the matching tool emblem
+- Skeleton Skull → skeleton
+
+These recipes configure emblem dies, not a chosen A-Z letter. A stamp without a configured die uses the sealer's first letter or number when used.
 
 ### Loot
-Some seal stamps with unique [dies](#die) can be found on the [collapsed mail hub](@envelope:collapsed_mail_hub) storage platform.
+The storage platform on the [collapsed mail hub](@envelope:collapsed_mail_hub) can contain stamps configured with a heart, creeper, letter/envelope, crossed swords, or villager die.
 
 ## Die
 <div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
@@ -43,6 +50,7 @@ Some seal stamps with unique [dies](#die) can be found on the [collapsed mail hu
         and right-clicking with it on the target item, similar to a [bundle](https://minecraft.wiki/w/Bundle).
 
         Seal is shown in the sealed item tooltip, along with the name of a person who sealed it.
+        A colored seal stamp can also be used on an already sealed item to change the seal's color without changing its impression or signature.
 
         Stamp does not have durability and can infinitely create seals.
     </div>
@@ -52,4 +60,3 @@ Some seal stamps with unique [dies](#die) can be found on the [collapsed mail hu
         <div style={{ marginTop: "6px"}}>*Seal Stamp tooltip showing the die*</div>
     </center>
 </div>
-

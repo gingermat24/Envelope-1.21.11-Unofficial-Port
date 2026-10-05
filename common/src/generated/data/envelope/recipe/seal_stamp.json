@@ -3,11 +3,12 @@
   "category": "equipment",
   "key": {
     "I": "#c:ingots/iron",
-    "S": "#minecraft:wooden_slabs"
+    "H": "minecraft:honeycomb",
+    "P": "#minecraft:planks"
   },
   "pattern": [
-    " S ",
-    " S ",
+    " P ",
+    " H ",
     " I "
   ],
   "result": {

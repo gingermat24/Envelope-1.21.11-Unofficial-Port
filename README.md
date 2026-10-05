@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://cdn.modrinth.com/data/cached_images/6e0993e87e68db70381140d3b7b168326bf9f492.png" width="256" alt="Envelope mod logo">
+  <img src="common/src/main/resources/icon.png" width="256" alt="Envelope [Unofficial Port] mod icon">
   <br>
 
   <img src="https://img.shields.io/badge/Fabric-1.21.11-e04e14" alt="Fabric 1.21.11">
@@ -32,7 +32,7 @@
 
   <br>
 
-  <a href="https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port-">
+  <a href="https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port">
     <img src="https://img.shields.io/badge/GitHub-Source-181717?logo=github&logoColor=white" alt="GitHub source code">
   </a>
 
@@ -52,11 +52,27 @@ The original mod was not available for this Minecraft version, so I ported it to
 
 This project is **not the original Envelope mod**. It is a community-made port intended to bring the original mod to a newer Minecraft version.
 
+## How this port differs
+
+The port is based on the original 0.7.5 release. Its core gameplay—pigeons, mailboxes, letters, packages, seals, and delivery—comes from upstream. This project adapts it for Fabric on Minecraft 1.21.11; it is not a new implementation of those features.
+
+Changes added in this port:
+
+* **Seal Stamp customization:** 16 dye colors plus gold; crafting preserves the selected die, and colored stamps can recolor existing seals. Undyed stamps cannot seal mail.
+* **Original seal-impression artwork:** the stamp glyphs retain the upstream grayscale shading and detail when tinted; wax/background textures remain separate.
+* **Seal material tinting:** `model_tint_color` colors the seal overlay on letters and packages, while `impression_palette` shades stamp and seal previews.
+* **Courier ascent configuration:** `delivery.ascend_distance` controls how far couriers ascend; the default is 24 blocks.
+* **Recipe updates:** removed the Slimeball from the Automated Supply Service Letter and Writable Book recipes, and revised the Seal Stamp recipe to use honeycomb, planks, and an iron ingot.
+
+Some recipe changes were inspired by the partial 0.8.0-snapshot1 notes shared by the original creators; credit for those ideas belongs to them.
+
+This is a partial adaptation of the upstream 0.8.0 notes. Features not implemented here, including Cloud Depository and Letter Presetting, are not included.
+
 ## Credits
 
 Full credit goes to the original creators of **Envelope**.
 
-The original creators retain credit for the original code, textures, models, images, assets, and overall mod concept. This port only contains the changes necessary to make the mod work on **Fabric 1.21.11**.
+The original creators retain credit for the original code, textures, models, images, assets, and overall mod concept. This port adapts that work for **Fabric 1.21.11** and includes the port-specific changes listed above.
 
 Please support the original project and its creators:
 
@@ -76,7 +92,5 @@ If you encounter an issue that is specific to the 1.21.11 port, please report it
 If you want to contact me directly, you can reach me on Discord at **matteo_sb**.
 
 ---
-
-> The port is based on original mod v0.7.5 and corresponds to port v0.1.0, with dependency, version, and other changes made for compatibility.
 
 > As much as i am against AI in a lot of contexts, like daily life, school, art, and more, since i'm still a beginner i used it a little to ask questions, understand things, and check my code while learning. i still wrote and worked on the mod myself, and i mainly used AI as a learning tool. hope yall understand, especially since this is my first time porting a more complicated mod.

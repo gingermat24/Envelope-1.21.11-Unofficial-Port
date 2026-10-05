@@ -1,0 +1,6 @@
+{
+  "category": "equipment",
+  "material": "minecraft:magenta_dye",
+  "result_material": "envelope:magenta",
+  "type": "envelope:crafting_seal_stamp_dye"
+}

@@ -176,20 +176,21 @@ public class FormattedStringDisplayCache {
                 Char character = string.get(i);
                 int charWidth = character.getWidth(font, true);
 
-                if (character.character() == ' ') {
-                    lastSpaceIndex = i;
-                }
-
                 if (lineWidth + charWidth > width) {
-                    // If space exists, break at last space
                     if (lastSpaceIndex != -1) {
-                        i = lastSpaceIndex + 1; // Move to next word after space
+                        i = lastSpaceIndex + 1;
+                    } else if (i == firstCharIndex) {
+                        i++;
                     }
                     break;
                 }
 
                 lineWidth += charWidth;
                 i++;
+
+                if (character.character() == ' ') {
+                    lastSpaceIndex = i - 1;
+                }
 
                 if (character.character() == '\n') {
                     break;
@@ -198,6 +199,7 @@ public class FormattedStringDisplayCache {
 
             FormattedString lineString = string.subString(firstCharIndex, i);
             String renderedString = lineString.toString(true);
+            lineWidth = font.width(renderedString);
             int x = alignment.align(width, font.width(renderedString));
             int y = lines.size() * font.lineHeight;
 

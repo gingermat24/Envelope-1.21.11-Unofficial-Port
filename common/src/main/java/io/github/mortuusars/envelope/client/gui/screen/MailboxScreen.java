@@ -257,10 +257,10 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
+        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
 
         int inboxLabelX = 68 - font.width(inboxLabel) / 2;
-        guiGraphics.drawString(font, inboxLabel, inboxLabelX, 6, 0x404040, false);
+        guiGraphics.drawString(font, inboxLabel, inboxLabelX, 6, 0xFF404040, false);
 
         if (getMenu().getMail().isEmpty()) {
             Component empty = Component.translatable("gui.envelope.mailbox.empty");
@@ -269,9 +269,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         }
 
         int sendLabelX = 220 - font.width(sendLabel) / 2;
-        guiGraphics.drawString(font, sendLabel, sendLabelX, 6, 0x404040, false);
+        guiGraphics.drawString(font, sendLabel, sendLabelX, 6, 0xFF404040, false);
 
-        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
+        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xFF404040, false);
     }
 
     protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, ItemStack mail, int x, int y) {

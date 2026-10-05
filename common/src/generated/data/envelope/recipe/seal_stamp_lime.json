@@ -1,0 +1,6 @@
+{
+  "category": "equipment",
+  "material": "minecraft:lime_dye",
+  "result_material": "envelope:lime",
+  "type": "envelope:crafting_seal_stamp_dye"
+}

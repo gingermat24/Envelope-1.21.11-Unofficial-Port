@@ -48,7 +48,7 @@ public class AbstractInHandContainerScreen<T extends AbstractInHandContainerMenu
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos, topPos,
-              0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+              0, 0, imageWidth, imageHeight, 256, 256);
     }
 
     @Override

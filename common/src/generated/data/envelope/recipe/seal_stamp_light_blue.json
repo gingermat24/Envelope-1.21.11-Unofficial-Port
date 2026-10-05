@@ -1,0 +1,6 @@
+{
+  "category": "equipment",
+  "material": "minecraft:light_blue_dye",
+  "result_material": "envelope:light_blue",
+  "type": "envelope:crafting_seal_stamp_dye"
+}

@@ -32,7 +32,7 @@ tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
-// Makes datagenerated resources usable:
+// Runtime data in src/generated is source-controlled; build/bin are derived outputs and must not be edited.
 sourceSets {
     main {
         // Generated resources are shared from this directory.

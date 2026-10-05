@@ -107,6 +107,7 @@ gradle-app.setting
 .gradletasknamecache
 
 **/build/
+**/bin/
 mcmodsrepo
 
 # Common working directory

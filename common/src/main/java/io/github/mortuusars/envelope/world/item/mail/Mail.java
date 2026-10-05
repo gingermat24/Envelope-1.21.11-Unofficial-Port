@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.ContainerUtils;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -11,7 +12,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Unit;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -39,11 +39,11 @@ public final class Mail {
     // -- Address
 
     public static Optional<Address> getSender(ItemStack stack) {
-        return Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_SENDER));
+        return DeliveryInfo.of(stack).sender();
     }
 
     public static @NotNull Address getSenderOrElse(ItemStack stack, Address orElse) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_SENDER, orElse);
+        return getSender(stack).orElse(orElse);
     }
 
     public static @NotNull Address getSenderOrUnknown(ItemStack stack) {
@@ -51,7 +51,7 @@ public final class Mail {
     }
 
     public static void setSender(@NotNull ItemStack stack, @Nullable Address sender) {
-        stack.set(Envelope.DataComponents.MAIL_SENDER, sender);
+        DeliveryInfo.of(stack).mutable().sender(sender).immutableApplyTo(stack);
     }
 
     public static Optional<Address> getRecipient(ItemStack stack) {
@@ -100,11 +100,11 @@ public final class Mail {
     // -- Returned
 
     public static boolean isReturned(ItemStack stack) {
-        return stack.has(Envelope.DataComponents.MAIL_RETURNED);
+        return DeliveryInfo.of(stack).isReturned();
     }
 
     public static ItemStack setReturned(ItemStack stack, boolean returned) {
-        stack.set(Envelope.DataComponents.MAIL_RETURNED, returned ? Unit.INSTANCE : null);
+        DeliveryInfo.of(stack).mutable().returned(returned).immutableApplyTo(stack);
         return stack;
     }
 
@@ -124,21 +124,21 @@ public final class Mail {
     // -- Log
 
     public static DeliveryLog getLog(ItemStack stack) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY);
+        return DeliveryInfo.of(stack).log();
     }
 
     public static ItemStack setLog(ItemStack stack, DeliveryLog log) {
-        stack.set(Envelope.DataComponents.MAIL_DELIVERY_LOG, log);
+        DeliveryInfo.of(stack).mutable().setLog(log).immutableApplyTo(stack);
         return stack;
     }
 
     public static ItemStack writeToLog(ItemStack stack, DeliveryRecord record) {
-        stack.update(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY, log -> log.append(record));
+        DeliveryInfo.of(stack).mutable().updateLog(log -> log.append(record)).immutableApplyTo(stack);
         return stack;
     }
 
     public static ItemStack writeToLog(ItemStack stack, DeliveryRecord... records) {
-        stack.update(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY, log -> log.append(records));
+        DeliveryInfo.of(stack).mutable().updateLog(log -> log.append(records)).immutableApplyTo(stack);
         return stack;
     }
 
@@ -148,6 +148,7 @@ public final class Mail {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 
         mail.remove(Envelope.DataComponents.MAIL_ID);
+        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_INFO);
         mail.remove(Envelope.DataComponents.MAIL_SENDER);
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
         mail.remove(Envelope.DataComponents.MAIL_RETURNED);

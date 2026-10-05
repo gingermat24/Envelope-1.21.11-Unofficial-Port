@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item.crafting.mail;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.SealStampItem;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -45,6 +46,20 @@ public class MailCraftingRecipe implements MailRecipe {
     @Override
     public @NotNull ItemStack getResultItem(HolderLookup.Provider registries) {
         return result;
+    }
+
+    @Override
+    public @NotNull ItemStack assemble(MailRecipeInput input, HolderLookup.Provider registries) {
+        ItemStack assembled = result.copy();
+        if (assembled.getItem() instanceof SealStampItem) {
+            input.items().stream()
+                  .filter(stack -> stack.getItem() instanceof SealStampItem)
+                  .map(stack -> stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL))
+                  .filter(material -> material != null)
+                  .findFirst()
+                  .ifPresent(material -> assembled.set(Envelope.DataComponents.SEAL_STAMP_MATERIAL, material));
+        }
+        return assembled;
     }
 
     @Override

@@ -91,14 +91,16 @@ public class LetterViewScreen extends Screen {
         final int y = topPos + 21;
         int textColor = 0xFF7B593D;
 
+        guiGraphics.enableScissor(x, y, x + maxTextWidth, y + maxTextHeight);
         for (int i = 0; i < Math.min(lines.size(), maxTextLines); i++) {
             guiGraphics.drawString(font, lines.get(i), x, y + i * font.lineHeight, textColor, false);
         }
+        guiGraphics.disableScissor();
 
         if (isTattered) {
             guiGraphics.nextStratum();
             guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TATTERED_OVERLAY, leftPos, topPos,
-                  0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+                  0, 0, imageWidth, imageHeight, imageWidth, imageHeight, 256, 256);
         }
 
         @Nullable Style style = getComponentStyleAt(mouseX, mouseY);
@@ -119,7 +121,7 @@ public class LetterViewScreen extends Screen {
         this.renderTransparentBackground(guiGraphics);
         Identifier texture = isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos, topPos,
-              0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+              0, 0, imageWidth, imageHeight, imageWidth, imageHeight, 256, 256);
     }
 
     @Nullable
