@@ -54,7 +54,7 @@ This project is **not the original Envelope mod**. It is a community-made port i
 
 ## How this port differs
 
-The port is based on the original 0.7.5 release. Its core gameplay—pigeons, mailboxes, letters, packages, seals, and delivery—comes from upstream. This project adapts it for Fabric on Minecraft 1.21.11; it is not a new implementation of those features.
+The port is based on the original 0.7.5 release. Its core gameplay (pigeons, mailboxes, letters, packages, seals, and delivery) comes from upstream. This project adapts it for Fabric on Minecraft 1.21.11; it is not a new implementation of those features.
 
 Changes added in this port:
 
