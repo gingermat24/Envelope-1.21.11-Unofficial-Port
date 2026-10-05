@@ -70,6 +70,19 @@ Some recipe changes were inspired by the partial 0.8.0-snapshot1 notes shared by
 
 This is a partial adaptation of the upstream 0.8.0 notes. Features not implemented here, including Cloud Depository and Letter Presetting, are not included.
 
+## Dependencies and compatibility
+
+For Minecraft 1.21.11, install Fabric Loader and the following required mods:
+
+* [Fabric API](https://modrinth.com/mod/fabric-api)
+* [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
+
+[JEI](https://modrinth.com/mod/jei) is optional and adds recipe-viewer integration. It is not required on a server for the core mod.
+
+No incompatible mods are currently declared. This does not guarantee compatibility with every mod combination; known conflicts should be reported in the issue tracker.
+
+The published Fabric jar does not embed third-party mods or libraries. The shared `common` module is included as part of the mod itself.
+
 ## Credits
 
 Full credit goes to the original creators of **Envelope**.

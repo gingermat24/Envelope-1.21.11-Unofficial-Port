@@ -21,6 +21,7 @@
 - Made Mailbox labels render with an opaque text color.
 - Consolidated sender, delivery-log, and returned status into `mail_delivery_info`; legacy components remain readable and are removed when delivery data is next written. Retained `mail_id` for mailbox identity and removal.
 - Avoided mutating the pending-subject map while returning expired payback requests, preventing a server-side concurrent-modification crash.
+- Declared the minimum Fabric Loader version in Fabric mod metadata.
 
 ## Beta 0.1.0 - 03/10/2026
 
