@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="common/src/main/resources/icon.png" width="256" alt="Envelope [Unofficial Port] mod icon">
+  <img src="https://cdn.modrinth.com/data/cached_images/1e5ca1695c736651de431c425bf9d0293811d101_0.webp" width="256" alt="Envelope [Unofficial Port] mod icon">
   <br>
 
   <img src="https://img.shields.io/badge/Fabric-1.21.11-e04e14" alt="Fabric 1.21.11">
@@ -39,6 +39,8 @@
 <br><br>
 
 <b>Modrinth is the recommended source for the Unofficial Port mod, as releases are published there first and more frequently.</b>
+
+</b>Dowload from the link Above</b>
 
 </div>
 
