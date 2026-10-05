@@ -244,7 +244,7 @@ publishMods {
 
     curseforge("curseforgeFabric") {
         from cfOptions
-        file project(":fabric")
+        file.set(project(":fabric").tasks.named("remapJar").flatMap { it.archiveFile })
         modLoaders.add("fabric")
         displayName = "${mod_name} - Fabric ${minecraft_version} - ${mod_version}"
         requires("fabric-api")
@@ -257,7 +257,7 @@ publishMods {
 
     modrinth("modrinthFabric") {
         from mrOptions
-        file project(":fabric")
+        file.set(project(":fabric").tasks.named("remapJar").flatMap { it.archiveFile })
         modLoaders.add("fabric")
         displayName = "${mod_name} - ${mod_version}"
         requires("fabric-api")

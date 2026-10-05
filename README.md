@@ -83,6 +83,8 @@ No incompatible mods are currently declared. This does not guarantee compatibili
 
 The published Fabric jar does not embed third-party mods or libraries. The shared `common` module is included as part of the mod itself.
 
+When uploading a build manually, use `fabric/build/libs/envelope-fabric-1.21.11-<version>.jar`. Do not upload the `envelope-common` JAR; it is an internal shared module and does not contain Fabric mod metadata. The `-sources` and `-dev-shadow` JARs are not release files.
+
 ## Credits
 
 Full credit goes to the original creators of **Envelope**.
