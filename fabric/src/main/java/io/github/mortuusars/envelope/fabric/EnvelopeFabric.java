@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
@@ -109,6 +110,7 @@ public class EnvelopeFabric implements ModInitializer {
 
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
+        FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.COURIER_BAT.get(), CourierBat.createAttributes().build());
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             PlatformImpl.server = server;

@@ -65,10 +65,13 @@ Changes added in this port:
 * **Seal material tinting:** `model_tint_color` colors the seal overlay on letters and packages, while `impression_palette` shades stamp and seal previews.
 * **Courier ascent configuration:** `delivery.ascend_distance` controls how far couriers ascend; the default is 24 blocks.
 * **Recipe updates:** removed the Slimeball from the Automated Supply Service Letter and Writable Book recipes, and revised the Seal Stamp recipe to use honeycomb, planks, and an iron ingot.
+* **Courier delivery updates:** pigeon background travel speed now defaults to 25 blocks per second; courier damage evasion, spawning-rule behavior, and Mail Service courier-death notices have dedicated server settings. Couriers play their ambient sound when completing a delivery, and their appear/disappear particles are visible at greater distances.
+* **Mail commands:** administrative send and broadcast commands are grouped under `/envelope mail`; send supports an explicit `to <address>` recipient override and optional `from <address>` sender. `/envelope debug terminate_all_deliveries confirm` provides an explicit confirmation step before stopping deliveries.
+* **Maintenance fixes:** bulk-expiring payback mail now safely returns all pending items; removed obsolete no-op service ticking and disabled experimental debug-command code.
 
-Some recipe changes were inspired by the partial 0.8.0-snapshot1 notes shared by the original creators; credit for those ideas belongs to them.
+This is a partial adaptation of the upstream 0.8.0 notes (snapshot 1 and 2). Version 0.3.0 adds the Courier Bat's night deliveries, Spider Eye mailbox slot, night-time service dispatch, bat-speed routing, day/night courier changes at the mail hub, and The Pigeons and the Bats advancement.
 
-This is a partial adaptation of the upstream 0.8.0 notes. Features not implemented here, including Cloud Depository and Letter Presetting, are not included.
+Some server configuration paths were renamed in 0.3.0. Back up and review the existing Envelope server config after updating; renamed settings may be regenerated with defaults and need to be reapplied.
 
 ## Dependencies and compatibility
 

@@ -1,10 +1,12 @@
 package io.github.mortuusars.envelope.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -33,13 +35,7 @@ public class EnvelopeCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         dispatcher.register(Commands.literal("envelope")
               .requires((stack) -> stack.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
-              .then(Commands.literal("send")
-                    .then(Commands.argument("mail", ItemArgument.item(context))
-                          .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
-                          .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
-                                .executes(c -> sendMail(c,
-                                      ItemArgument.getItem(c, "mail"),
-                                      parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))))
+              .then(mailCommands(context))
               .then(Commands.literal("mailbox")
                     .then(Commands.literal("list")
                           .executes(EnvelopeCommand::listAllMailboxes)
@@ -52,13 +48,40 @@ public class EnvelopeCommand {
               .then(EnvelopeDebugCommand.commands()));
     }
 
+    private static LiteralArgumentBuilder<CommandSourceStack> mailCommands(CommandBuildContext context) {
+        var mailArgument = Commands.argument("mail", ItemArgument.item(context))
+              .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail"), Optional.empty(), Optional.empty()));
+        mailArgument.then(Commands.literal("to")
+              .then(Commands.argument("recipient", CompoundTagArgument.compoundTag())
+                    .executes(c -> sendMailTo(c, Optional.empty()))));
+
+        var senderArgument = Commands.argument("sender", CompoundTagArgument.compoundTag())
+              .executes(EnvelopeCommand::sendMailFrom);
+        senderArgument.then(Commands.literal("to")
+              .then(Commands.argument("recipient", CompoundTagArgument.compoundTag())
+                    .executes(c -> sendMailTo(c,
+                          Optional.of(parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))));
+        mailArgument.then(Commands.literal("from").then(senderArgument));
+
+        var broadcastMailArgument = Commands.argument("mail", ItemArgument.item(context))
+              .executes(c -> broadcastMail(c, ItemArgument.getItem(c, "mail"), Optional.empty()));
+        broadcastMailArgument.then(Commands.literal("from")
+              .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
+                    .executes(EnvelopeCommand::broadcastMailFrom)));
+
+        return Commands.literal("mail")
+              .then(Commands.literal("send").then(mailArgument))
+              .then(Commands.literal("broadcast").then(broadcastMailArgument));
+    }
+
     // -- Mail
 
-    private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item, Address sender) throws CommandSyntaxException {
+    private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item,
+                                Optional<Address> sender, Optional<Address> target) throws CommandSyntaxException {
         ServerLevel level = context.getSource().getLevel();
         ItemStack mail = item.createItemStack(1, false);
 
-        Address recipient = Mail.getRecipientOrUnknown(mail);
+        Address recipient = target.orElseGet(() -> Mail.getRecipientOrUnknown(mail));
 
         if (mail.isEmpty()) {
             context.getSource().sendFailure(Component.literal("Cannot send: mail is empty."));
@@ -70,16 +93,76 @@ public class EnvelopeCommand {
             return 0;
         }
 
+        Mail.setRecipient(mail, recipient);
+
         MailService.of(level).getDeliveryManager()
               .startService(Delivery.draft()
                     .deliver(mail)
-                    .from(sender)
+                    .from(sender.orElse(Address.UNKNOWN))
                     .to(recipient));
 
         Component message = Component.literal("Mail sent to ").append(recipient.format().asRecipient().toComponent());
         context.getSource().sendSuccess(() -> message, true);
 
         return 0;
+    }
+
+    private static int sendMailTo(CommandContext<CommandSourceStack> context, Optional<Address> sender) throws CommandSyntaxException {
+        return sendMail(context,
+              ItemArgument.getItem(context, "mail"),
+              sender,
+              Optional.of(parseAddress(context, CompoundTagArgument.getCompoundTag(context, "recipient"))));
+    }
+
+    private static int sendMailFrom(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        return sendMail(context,
+              ItemArgument.getItem(context, "mail"),
+              Optional.of(parseAddress(context, CompoundTagArgument.getCompoundTag(context, "sender"))),
+              Optional.empty());
+    }
+
+    private static int broadcastMail(CommandContext<CommandSourceStack> context, ItemInput item,
+                                     Optional<Address> sender) throws CommandSyntaxException {
+        ServerLevel level = context.getSource().getLevel();
+        ItemStack mail = item.createItemStack(1, false);
+
+        if (mail.isEmpty() || !mail.is(Envelope.Tags.Items.MAILABLE)) {
+            context.getSource().sendFailure(Component.literal("Cannot broadcast: item is not sendable mail."));
+            return 0;
+        }
+
+        MailService service = MailService.of(level);
+        Address from = sender.orElse(Address.UNKNOWN);
+        int sent = 0;
+
+        for (PlayerAddress recipient : service.getKnownPlayers().getDefaultAddresses().keySet()) {
+            if (recipient.equals(from) || recipient.resolve(service).isUnknown()) {
+                continue;
+            }
+
+            ItemStack copy = mail.copy();
+            Mail.setRecipient(copy, recipient);
+            service.getDeliveryManager().startService(Delivery.draft()
+                  .deliver(copy)
+                  .from(from)
+                  .to(recipient));
+            sent++;
+        }
+
+        if (sent == 0) {
+            context.getSource().sendFailure(Component.literal("Cannot broadcast: there are no eligible recipients."));
+            return 0;
+        }
+
+        int recipientCount = sent;
+        context.getSource().sendSuccess(() -> Component.literal("Broadcast sent to " + recipientCount + " recipients."), true);
+        return recipientCount;
+    }
+
+    private static int broadcastMailFrom(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        return broadcastMail(context,
+              ItemArgument.getItem(context, "mail"),
+              Optional.of(parseAddress(context, CompoundTagArgument.getCompoundTag(context, "sender"))));
     }
 
     private static Address parseAddress(CommandContext<CommandSourceStack> context, CompoundTag tag) {

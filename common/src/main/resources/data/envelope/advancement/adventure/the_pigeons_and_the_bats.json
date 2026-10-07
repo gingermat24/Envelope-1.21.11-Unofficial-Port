@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:adventure/root",
+  "criteria": {
+    "deliver_with_both_couriers": {
+      "trigger": "envelope:deliver_with_pigeon_and_bat"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.the_pigeons_and_the_bats.description"
+    },
+    "icon": {
+      "id": "minecraft:bat_spawn_egg"
+    },
+    "title": {
+      "translate": "advancement.envelope.the_pigeons_and_the_bats.title"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "deliver_with_both_couriers"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

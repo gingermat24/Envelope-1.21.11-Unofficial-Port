@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
@@ -379,6 +380,12 @@ public class Envelope {
     }
 
     public static class EntityTypes {
+        public static final Supplier<EntityType<CourierBat>> COURIER_BAT = Register.entityType("courier_bat",
+              CourierBat::new, MobCategory.CREATURE, true, builder -> builder
+                    .sized(0.5F, 0.5F)
+                    .eyeHeight(0.35F)
+                    .clientTrackingRange(8));
+
         public static final Supplier<EntityType<Pigeon>> PIGEON = Register.entityType("pigeon",
               Pigeon::new, MobCategory.CREATURE, true, builder -> builder
                     .sized(0.65F, 0.85F)
@@ -536,6 +543,8 @@ public class Envelope {
         public static Supplier<MailDeliveredTrigger> MAIL_DELIVERED = Register.criterionTrigger("mail_delivered", MailDeliveredTrigger::new);
         public static Supplier<BreakPaperBoxWhenFallingTrigger> BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER = Register.criterionTrigger("break_paper_box_when_falling", BreakPaperBoxWhenFallingTrigger::new);
         public static Supplier<PlayerTrigger> SMOKE_PIGEONHOLE = Register.criterionTrigger("smoke_pigeonhole", PlayerTrigger::new);
+        public static Supplier<PlayerTrigger> DELIVER_WITH_PIGEON_AND_BAT =
+              Register.criterionTrigger("deliver_with_pigeon_and_bat", PlayerTrigger::new);
         public static Supplier<PlayerTrigger> SCOOP_DIAMOND = Register.criterionTrigger("scoop_diamond", PlayerTrigger::new);
         public static Supplier<PlayerTrigger> SPAWN_ARCHIMEDES = Register.criterionTrigger("spawn_archimedes", PlayerTrigger::new);
 
@@ -619,6 +628,8 @@ public class Envelope {
         public static class Items {
             public static final TagKey<Item> PIGEON_FOOD =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeon_food"));
+            public static final TagKey<Item> BAT_FOOD =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("bat_food"));
 
             public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_COMMON =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_common"));
@@ -652,8 +663,8 @@ public class Envelope {
         }
 
         public static class DamageTypes {
-            public static final TagKey<DamageType> BYPASSES_PIGEON_DELIVERY_EVASION =
-                  TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("bypasses_pigeon_delivery_evasion"));
+            public static final TagKey<DamageType> BYPASSES_COURIER_DELIVERY_EVASION =
+                  TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("bypasses_courier_delivery_evasion"));
             public static final TagKey<DamageType> SPAWNS_ARCHIMEDES =
                   TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("spawns_archimedes"));
         }

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.3.0 - 07/10/2026
+
+- Ported the Courier Bat for night mail delivery; mailboxes can employ nearby vanilla Bats or summon one when none are available.
+- Added the Spider Eye Bat-food slot to mailboxes without moving the existing food and mail slot indices, preserving existing mailbox inventories.
+- Mail Service deliveries use Bats at night, and background couriers switch between Bat and Pigeon at the virtual mail hub when the time of day changes.
+- Added separate Pigeon and Bat background travel speeds (25 and 50 blocks per second by default) and the "The Pigeons and the Bats" advancement.
+- Added Bat entity registration, courier AI, delivery visuals, backpack texture, and Bat settings for mailbox employment and spawning.
+- Adapted the Bat feature and related assets from the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637). Soulbound Seal/lock features remain outside this release.
+- Updated pigeon background delivery speed from 20 to 25 blocks per second.
+- Added a unified courier damage-evasion setting and renamed the corresponding damage-type tag.
+- Replaced the courier `doMobSpawning` setting with `spawning_ignores_domobspawning_rule`; its default preserves the prior behavior of respecting the game rule.
+- Added a server setting to disable Mail Service notices when a courier dies.
+- Made courier appearance/disappearance particles visible at greater distances and play courier ambient sounds when deliveries finish.
+- Moved administrative send and broadcast commands to `/envelope mail send` and `/envelope mail broadcast`; mail sending accepts an optional `from <address>` sender and `to <address>` recipient override.
+- Added `/envelope debug terminate_all_deliveries`, with a separate `confirm` literal to prevent accidental termination.
+- Fixed bulk-expiring pending payback mail by iterating over a snapshot while items are removed and returned.
+- Removed an unused service-address tick callback and obsolete experimental code from the debug command.
+- Renamed server configuration paths. Existing settings may be regenerated and need to be reapplied after updating.
+- Adapted selected delivery and command changes from the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637).
+
 ## 0.2.1 - 05/10/2026
 
 - Added the `delivery.ascend_distance` server configuration option; its default is 24 blocks.

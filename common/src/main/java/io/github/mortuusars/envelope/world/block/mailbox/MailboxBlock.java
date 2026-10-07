@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.address.BlockAddressValidation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -209,6 +210,7 @@ public class MailboxBlock extends BaseEntityBlock {
         if (stack.is(Envelope.Items.PIGEON_SPAWN_EGG.get())) {
             if (level instanceof ServerLevel serverLevel) {
                 if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
+                      && !CourierBat.isNight(level)
                       && blockEntity.isAvailableForPickup()
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
                       pos.relative(state.getValue(FACING)), EntitySpawnReason.SPAWN_ITEM_USE) instanceof Pigeon pigeon

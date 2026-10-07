@@ -30,8 +30,12 @@ public record TravelDuration(int ticks) {
     // --
 
     public static TravelDuration basedOnDistance(int distanceInBlocks) {
+        return basedOnDistance(distanceInBlocks, Config.Server.DELIVERY_PIGEON_TRAVEL_SPEED.get());
+    }
+
+    public static TravelDuration basedOnDistance(int distanceInBlocks, double speed) {
         distanceInBlocks = Math.min(distanceInBlocks, Config.Server.DELIVERY_TRAVEL_DURATION_DISTANCE_CAP.get());
-        double seconds = distanceInBlocks / Config.Server.DELIVERY_COURIER_TRAVEL_SPEED.get();
+        double seconds = distanceInBlocks / Math.max(0.01, speed);
         return new TravelDuration(Math.max(1, (int) Ticks.fromSeconds(seconds)));
     }
 }

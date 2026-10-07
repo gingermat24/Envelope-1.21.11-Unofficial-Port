@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
@@ -30,6 +31,10 @@ public interface Courier {
     Optional<Delivery> getCurrentDelivery();
 
     CourierOrigin getOrigin();
+
+    default double getDeliveryTravelSpeed() {
+        return Config.Server.DELIVERY_PIGEON_TRAVEL_SPEED.get();
+    }
 
     default boolean isDelivering() {
         return getCurrentDelivery().isPresent();
@@ -127,8 +132,11 @@ public interface Courier {
             Mail.setSender(delivery.getMail(), delivery.getSender());
         }
 
+        updateCourierAtHub(level, delivery);
+
         if (!service.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
             Mail.returned(delivery.getMail(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
+            delivery.updateRoute(level, getDeliveryTravelSpeed());
             delivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return true;
         }
@@ -137,7 +145,7 @@ public interface Courier {
             return true;
         }
 
-        delivery.updateRoute(level);
+        delivery.updateRoute(level, getDeliveryTravelSpeed());
         return false;
     }
 
@@ -147,6 +155,8 @@ public interface Courier {
         if (!Mail.isReturned(delivery.getMail()) && Mail.getSender(delivery.getMail()).isEmpty()) {
             Mail.setSender(delivery.getMail(), delivery.getRecipient());
         }
+
+        updateCourierAtHub(level, delivery);
 
         if (service.getPaybackDepartment().tryHandleReturn(delivery)) {
             return true;
@@ -159,10 +169,12 @@ public interface Courier {
         }
 
         if (service.getDeliveryManager().canDeliverTo(delivery.getSender())) {
-            delivery.updateRoute(level);
+            delivery.updateRoute(level, getDeliveryTravelSpeed());
         }
-
         return false;
+    }
+
+    default void updateCourierAtHub(ServerLevel level, Delivery delivery) {
     }
 
     default void handleMailDropOff(ServerLevel level, Delivery delivery, Address recipient) {

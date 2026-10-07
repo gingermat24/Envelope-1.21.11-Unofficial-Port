@@ -7,7 +7,11 @@ import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
@@ -35,15 +39,20 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -51,10 +60,11 @@ import org.slf4j.Logger;
 import java.util.*;
 
 public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbox {
-    public static final int REGULAR_SLOTS = 2;
+    public static final int REGULAR_SLOTS = 3;
     public static final int SLOT_FOOD = 0;
     public static final int SLOT_MAIL = 1;
-    public static final int INBOX_SLOT = 2;
+    public static final int SLOT_BAT_FOOD = 2;
+    public static final int INBOX_SLOT = 3;
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -66,6 +76,11 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     private @NotNull List<ItemStack> mail = new ArrayList<>();
     private boolean loaded = false;
     private boolean blockRemoved = false;
+    private boolean deliveredWithPigeon;
+    private boolean deliveredWithBat;
+    private boolean courierAdvancementTriggered;
+    private int batEmployCooldown;
+    private int batEmployAttempt;
 
     protected MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -189,6 +204,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
         if (slot == SLOT_MAIL) return isSendable(stack);
+        if (slot == SLOT_BAT_FOOD) return stack.is(Envelope.Tags.Items.BAT_FOOD);
         return false;
     }
 
@@ -204,7 +220,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     public boolean isAvailableForPickup() {
         if (level == null) return false;
-        return !getItem(SLOT_FOOD).isEmpty() && isSendable(getItem(SLOT_MAIL));
+        int foodSlot = CourierBat.isNight(level) ? SLOT_BAT_FOOD : SLOT_FOOD;
+        return !getItem(foodSlot).isEmpty() && isSendable(getItem(SLOT_MAIL));
     }
 
     @Override
@@ -237,34 +254,52 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     // -- Delivery
 
     public boolean tryStartDelivery(Pigeon pigeon) {
-        if (!MailService.operatesIn(pigeon.level())) {
+        return tryStartDelivery(pigeon, SLOT_FOOD);
+    }
+
+    public boolean tryStartDelivery(CourierBat bat) {
+        return tryStartDelivery(bat, SLOT_BAT_FOOD);
+    }
+
+    private boolean tryStartDelivery(io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier courier, int foodSlot) {
+        net.minecraft.world.entity.Entity entity = (net.minecraft.world.entity.Entity) courier;
+        if (!MailService.operatesIn(entity.level())) {
             return false;
         }
 
-        ServerLevel level = ((ServerLevel) pigeon.level());
+        ServerLevel level = (ServerLevel) entity.level();
 
-        if (pigeon.isDelivering()) return false;
+        if (courier.isDelivering()) return false;
         ItemStack mailStack = getItem(SLOT_MAIL);
         if (!isSendable(mailStack)) return false;
+        if (!canPlaceItem(foodSlot, getItem(foodSlot)) || getItem(foodSlot).isEmpty()) return false;
 
         applyAddress();
 
         ItemStack mail = Mail.removePreviousDeliveryData(mailStack.copyWithCount(1));
 
         MailService.of(level).getDeliveryManager()
-              .start(pigeon, Delivery.draft()
+              .start(courier, Delivery.draft()
                     .deliver(mail)
                     .from(getAddress())
                     .to(Mail.getRecipientOrUnknown(mail))
                     .owner(getOwner()));
 
         removeItem(SLOT_MAIL, 1);
-        removeItem(SLOT_FOOD, 1);
+        removeItem(foodSlot, 1);
 
-        Vec3 pos = pigeon.position();
+        Vec3 pos = entity.position();
         level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
         level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
 
+        if (courier instanceof Pigeon) {
+            deliveredWithPigeon = true;
+        } else if (courier instanceof CourierBat) {
+            deliveredWithBat = true;
+        }
+        triggerCourierAdvancementIfReady();
+
+        setChanged();
         return true;
     }
 
@@ -338,6 +373,72 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
             onLoaded();
             loaded = true;
         }
+        updateBlockStateIfNeeded();
+        triggerCourierAdvancementIfReady();
+        maybeEmployBat(level, blockPos);
+    }
+
+    private boolean maybeEmployBat(ServerLevel level, BlockPos blockPos) {
+        if (batEmployCooldown > 0) {
+            batEmployCooldown--;
+        }
+        int interval = Config.Server.BAT_EMPLOY_INTERVAL.get();
+        if (batEmployCooldown > 0 || !CourierBat.isNight(level) || level.isRaining() || level.isThundering()
+              || !isAvailableForPickup() || getItem(SLOT_BAT_FOOD).isEmpty()
+              || level.getRandom().nextInt(Math.max(1, interval - batEmployAttempt++)) != 0) {
+            return false;
+        }
+
+        List<Bat> batsNearby = level.getEntitiesOfClass(Bat.class, new AABB(blockPos).inflate(32),
+              bat -> !bat.isDeadOrDying() && !bat.isRemoved());
+        CourierBat courierBat = null;
+        if (!batsNearby.isEmpty()) {
+            Bat wildBat = Util.getRandom(batsNearby, level.getRandom());
+            courierBat = wildBat.convertTo(Envelope.EntityTypes.COURIER_BAT.get(),
+                  net.minecraft.world.entity.ConversionParams.single(wildBat, true, true),
+                  EntitySpawnReason.CONVERSION,
+                  converted -> converted.setOrigin(CourierOrigin.regular(blockPos)));
+        }
+
+        if (courierBat == null && Config.Server.BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY.get()
+              && (Config.Server.BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING_RULE.get()
+              || level.getGameRules().get(GameRules.SPAWN_MOBS))) {
+            BlockPos spawnPos = Position.ascendTowards(level, blockPos, Optional.empty(),
+                  Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt());
+            courierBat = Envelope.EntityTypes.COURIER_BAT.get().create(level, EntitySpawnReason.MOB_SUMMONED);
+            if (courierBat == null) {
+                LOGGER.error("Could not create a Courier Bat for mailbox at {}.", blockPos);
+            } else {
+                courierBat.setPos(spawnPos.getX() + 0.5, spawnPos.getY() + 0.5, spawnPos.getZ() + 0.5);
+                courierBat.setOrigin(CourierOrigin.service());
+                courierBat.setSpawnPos(spawnPos);
+                courierBat.onAppeared(level);
+                if (!level.addFreshEntity(courierBat)) {
+                    LOGGER.warn("Courier Bat summon was rejected for mailbox at {}.", blockPos);
+                    courierBat = null;
+                }
+            }
+        }
+
+        if (courierBat != null) {
+            courierBat.getMailboxHandler().setTargetPos(blockPos);
+            batEmployCooldown = Config.Server.BAT_EMPLOY_COOLDOWN.get();
+            batEmployAttempt = 0;
+            return true;
+        }
+        return false;
+    }
+
+    private void triggerCourierAdvancementIfReady() {
+        if (courierAdvancementTriggered || !deliveredWithPigeon || !deliveredWithBat) {
+            return;
+        }
+        getOwnerPlayer().filter(ServerPlayer.class::isInstance).map(ServerPlayer.class::cast)
+              .ifPresent(player -> {
+                  Envelope.CriteriaTriggers.DELIVER_WITH_PIGEON_AND_BAT.get().trigger(player);
+                  courierAdvancementTriggered = true;
+                  setChanged();
+              });
     }
 
     protected void onLoaded() {
@@ -421,6 +522,11 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (address != null) output.putString("address", address.getString());
         if (owner != null) output.store("owner", UUIDUtil.CODEC, owner);
         if (!inboxId.equals(Util.NIL_UUID)) output.store("inbox_id", UUIDUtil.CODEC, inboxId);
+        if (deliveredWithPigeon) output.putBoolean("delivered_with_pigeon", true);
+        if (deliveredWithBat) output.putBoolean("delivered_with_bat", true);
+        if (courierAdvancementTriggered) output.putBoolean("courier_advancement_triggered", true);
+        if (batEmployCooldown > 0) output.putInt("bat_employ_cooldown", batEmployCooldown);
+        if (batEmployAttempt > 0) output.putInt("bat_employ_attempt", batEmployAttempt);
     }
 
     @Override
@@ -430,6 +536,11 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         setAddress(input.getString("address").map(BlockAddress::new).orElse(null));
         owner = input.read("owner", UUIDUtil.CODEC).orElse(null);
         inboxId = input.read("inbox_id", UUIDUtil.CODEC).orElseGet(UUID::randomUUID);
+        deliveredWithPigeon = input.getBooleanOr("delivered_with_pigeon", false);
+        deliveredWithBat = input.getBooleanOr("delivered_with_bat", false);
+        courierAdvancementTriggered = input.getBooleanOr("courier_advancement_triggered", false);
+        batEmployCooldown = input.getIntOr("bat_employ_cooldown", 0);
+        batEmployAttempt = input.getIntOr("bat_employ_attempt", 0);
     }
 
     // -- Util

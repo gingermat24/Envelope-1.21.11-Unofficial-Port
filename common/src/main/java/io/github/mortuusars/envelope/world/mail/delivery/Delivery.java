@@ -87,7 +87,11 @@ public class Delivery {
     }
 
     public void updateRoute(ServerLevel level) {
-        setRoute(DeliveryRoute.build(level, getSender(), getRecipient()));
+        updateRoute(level, io.github.mortuusars.envelope.Config.Server.DELIVERY_PIGEON_TRAVEL_SPEED.get());
+    }
+
+    public void updateRoute(ServerLevel level, double travelSpeed) {
+        setRoute(DeliveryRoute.build(level, getSender(), getRecipient(), travelSpeed));
     }
 
     public DeliveryPhase getPhase() {

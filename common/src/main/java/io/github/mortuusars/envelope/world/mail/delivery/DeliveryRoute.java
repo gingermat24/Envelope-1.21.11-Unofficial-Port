@@ -67,7 +67,7 @@ public class DeliveryRoute {
         this.recipientPos = recipientPos;
     }
 
-    public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient) {
+    public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient, double travelSpeed) {
         MailService mailService = MailService.of(level);
 
         AddressLocation senderLocation = mailService.getLocationOf(sender);
@@ -82,11 +82,15 @@ public class DeliveryRoute {
               recipientLocation,
               senderPos,
               senderLocation.ascendTowards(level, hubPos),
-              TravelDuration.basedOnDistance(senderLocation.getDistanceTo(level, hubPos)),
+              TravelDuration.basedOnDistance(senderLocation.getDistanceTo(level, hubPos), travelSpeed),
               hubPos,
-              TravelDuration.basedOnDistance(recipientLocation.getDistanceTo(level, hubPos)),
+              TravelDuration.basedOnDistance(recipientLocation.getDistanceTo(level, hubPos), travelSpeed),
               recipientLocation.ascendTowards(level, hubPos),
               recipientPos);
+    }
+
+    public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient) {
+        return build(level, sender, recipient, io.github.mortuusars.envelope.Config.Server.DELIVERY_PIGEON_TRAVEL_SPEED.get());
     }
 
     public static Optional<BlockPos> getHubPosition(AddressLocation senderLocation, AddressLocation recipientLocation) {

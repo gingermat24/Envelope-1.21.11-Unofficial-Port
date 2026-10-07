@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -70,6 +71,16 @@ public class MailboxHandler {
                 setTargetPos(null);
             }
             Bugger.PIGEON_MAILBOX_HANDLER.send(pigeon.getId(), this);
+        }
+    }
+
+    public void tick(CourierBat bat, Level level) {
+        if (locateCooldown > 0) {
+            locateCooldown--;
+        }
+        if (level instanceof ServerLevel && bat.tickCount % 20 == 0
+              && !isMailboxValid(level, bat.blockPosition())) {
+            setTargetPos(null);
         }
     }
 

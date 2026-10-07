@@ -37,9 +37,6 @@ public class ServiceAddresses {
               .collect(Collectors.toSet());
     }
 
-    public void tick() {
-    }
-
     // --
 
     public static void bootstrap(BootstrapContext<ServiceAddressDefinition> context) {

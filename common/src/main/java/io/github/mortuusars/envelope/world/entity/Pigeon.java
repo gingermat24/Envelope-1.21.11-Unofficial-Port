@@ -539,8 +539,8 @@ public class Pigeon extends Animal implements FlyingAnimal, PhysicalCourier {
     public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
         if (isDeadOrDying()) return false;
 
-        if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING.get()
-              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
+        if (getRandom().nextDouble() < Config.Server.DELIVERY_COURIER_DAMAGE_EVASION_CHANCE.get()
+              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_COURIER_DELIVERY_EVASION)) {
 
             serverLevel.sendParticles(ParticleTypes.POOF, position().x, position().y, position().z, 3, 0.3, 0.3, 0.3, 0);
             serverLevel.playSound(null, this, SoundEvents.ALLAY_THROW, SoundSource.NEUTRAL, 1,
@@ -762,6 +762,11 @@ public class Pigeon extends Animal implements FlyingAnimal, PhysicalCourier {
         return this;
     }
 
+    @Override
+    public boolean isTimeSwitchableCourier() {
+        return true;
+    }
+
     public Optional<Delivery> getCurrentDelivery() {
         return Optional.ofNullable(delivery);
     }
@@ -838,6 +843,8 @@ public class Pigeon extends Animal implements FlyingAnimal, PhysicalCourier {
 
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
+        playAmbientSound();
+
         if (!delivery.getMail().isEmpty()) {
             spawnAtLocation(level, delivery.getMail().copy());
             Pigeon.LOGGER.info("{} has dropped undelivered mail on the ground.", getName().getString());

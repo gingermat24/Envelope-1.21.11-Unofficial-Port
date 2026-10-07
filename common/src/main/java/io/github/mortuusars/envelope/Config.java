@@ -18,7 +18,6 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_CAT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
-        public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING;
         public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
         public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
         public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
@@ -51,9 +50,18 @@ public abstract class Config {
         // Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
-        public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
+        public static final ModConfigSpec.DoubleValue DELIVERY_PIGEON_TRAVEL_SPEED;
+        public static final ModConfigSpec.DoubleValue DELIVERY_BAT_TRAVEL_SPEED;
+        public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_DAMAGE_EVASION_CHANCE;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
-        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
+        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_IGNORES_DOMOBSPAWNING_RULE;
+
+        // Bat
+        public static final ModConfigSpec.BooleanValue BAT_EMPLOYED_AT_MAIL_SERVICE;
+        public static final ModConfigSpec.BooleanValue BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY;
+        public static final ModConfigSpec.BooleanValue BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING_RULE;
+        public static final ModConfigSpec.IntValue BAT_EMPLOY_COOLDOWN;
+        public static final ModConfigSpec.IntValue BAT_EMPLOY_INTERVAL;
 
         // Payback
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
@@ -63,6 +71,7 @@ public abstract class Config {
         // Service Addresses
         // Equine Assurance Bureau
         public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
+        public static final ModConfigSpec.BooleanValue SERVICE_MAIL_COURIER_DEATH_NOTICE_ENABLED;
 
         // Misc
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
@@ -104,10 +113,6 @@ public abstract class Config {
                 PIGEON_HUNTED_BY_FOX = builder
                       .comment("Fox will hunt and kill pigeons.", "Default: true")
                       .define("hunted_by_fox", true);
-
-                PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING = builder
-                      .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
-                      .defineInRange("damage_evasion_chance_while_delivering", 0.0, 0.0, 1.0);
 
                 PIGEON_EATS_SEEDS = builder
                       .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
@@ -209,16 +214,42 @@ public abstract class Config {
                 DELIVERY_ASCEND_DISTANCE = builder
                       .comment("Courier distance (in blocks) to travel while ascending from a delivery address.")
                       .defineInRange("ascend_distance", 24, 1, Integer.MAX_VALUE);
-                DELIVERY_COURIER_TRAVEL_SPEED = builder
-                      .comment("Courier speed (in blocks per second) while in traveling (background) phases.")
-                      .defineInRange("courier_travel_speed", 20.0, 0.01, 9999.0);
+                DELIVERY_PIGEON_TRAVEL_SPEED = builder
+                      .comment("Pigeon speed (in blocks per second) while in traveling (background) phases.")
+                      .defineInRange("pigeon_travel_speed", 25.0, 0.01, 9999.0);
+                DELIVERY_BAT_TRAVEL_SPEED = builder
+                      .comment("Bat speed (in blocks per second) while in traveling (background) phases.")
+                      .defineInRange("bat_travel_speed", 50.0, 0.01, 9999.0);
+                DELIVERY_COURIER_DAMAGE_EVASION_CHANCE = builder
+                      .comment("Chance for a courier to evade damage while delivering. '#envelope:bypasses_courier_delivery_evasion' damage types bypass this chance.")
+                      .defineInRange("courier_damage_evasion_chance", 0.0, 0.0, 1.0);
                 DELIVERY_TRAVEL_DURATION_DISTANCE_CAP = builder
                       .comment("Distance (in blocks) after which travel duration stops increasing and stays at maximum value.")
                       .defineInRange("travel_duration_distance_cap", 5000, 1, Integer.MAX_VALUE);
-                DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE = builder
-                      .comment("Delivering pigeons will not spawn when 'doMobSpawning' rule is set to 'false'.",
-                            "Default: false (spawn anyway)")
-                      .define("spawning_respects_domobspawning_rule", false);
+                DELIVERY_SPAWNING_IGNORES_DOMOBSPAWNING_RULE = builder
+                      .comment("Courier spawning ignores the 'doMobSpawning' game rule.",
+                            "Default: false")
+                      .define("spawning_ignores_domobspawning_rule", false);
+                builder.pop();
+            }
+
+            {
+                builder.push("bat");
+                BAT_EMPLOYED_AT_MAIL_SERVICE = builder
+                      .comment("The Mail Service employs Bats for deliveries at night.")
+                      .define("employed_at_mail_service", true);
+                BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY = builder
+                      .comment("A Bat is summoned for a mailbox delivery if no nearby Bat can be employed.")
+                      .define("summoned_to_mailbox", true);
+                BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING_RULE = builder
+                      .comment("Bats summoned by mailboxes ignore the doMobSpawning game rule.")
+                      .define("summoned_to_mailbox_ignores_domobspawning_rule", true);
+                BAT_EMPLOY_COOLDOWN = builder
+                      .comment("Ticks to wait after employing a Bat before the same mailbox tries again.")
+                      .defineInRange("employ_cooldown", 600, 1, Integer.MAX_VALUE);
+                BAT_EMPLOY_INTERVAL = builder
+                      .comment("Maximum ticks between randomized Bat employment attempts.")
+                      .defineInRange("employ_interval", 400, 1, Integer.MAX_VALUE);
                 builder.pop();
             }
 
@@ -238,6 +269,11 @@ public abstract class Config {
 
             {
                 builder.push("service_addresses");
+                builder.push("mail_service");
+                SERVICE_MAIL_COURIER_DEATH_NOTICE_ENABLED = builder
+                      .comment("The Mail Service sends a notice when a courier carrying mail dies.", "Default: true")
+                      .define("courier_death_notice", true);
+                builder.pop();
                 {
                     builder.push("equine_assurance_bureau");
                     SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder

@@ -58,7 +58,7 @@ public class MailboxMenu extends AbstractContainerMenu {
         this.blockEntity = be;
         setMail(mail);
 
-        addSlot(new Slot(be, MailboxBlockEntity.SLOT_FOOD, 201, 37) {
+        addSlot(new Slot(be, MailboxBlockEntity.SLOT_FOOD, 194, 21) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return be.canPlaceItem(MailboxBlockEntity.SLOT_FOOD, stack);
@@ -68,6 +68,12 @@ public class MailboxMenu extends AbstractContainerMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return be.canPlaceItem(MailboxBlockEntity.SLOT_MAIL, stack);
+            }
+        });
+        addSlot(new Slot(be, MailboxBlockEntity.SLOT_BAT_FOOD, 194, 53) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return be.canPlaceItem(MailboxBlockEntity.SLOT_BAT_FOOD, stack);
             }
         });
         addPlayerSlots(playerInventory, 140, 88);

@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
@@ -73,6 +74,30 @@ public final class PigeonNavigation {
 
     public static boolean isWithinReach(Pigeon pigeon, BlockPos localPos, double distance) {
         return Position.isWithinReach(pigeon.level(), localPos, pigeon.position(), pigeon.blockPosition(), distance);
+    }
+
+    public static boolean hasReachedTarget(Mob mob, BlockPos localPos, double distance) {
+        if (Position.isWithinReach(mob.level(), localPos, mob.position(), mob.blockPosition(), distance)) {
+            return true;
+        }
+
+        BlockPos navigationPos = Position.getNavigationPos(mob.level(), localPos);
+        PathNavigation navigation = mob.getNavigation();
+        @Nullable Path path = navigation.getPath();
+
+        if (path != null && path.canReach() && path.isDone() && path.getTarget().equals(navigationPos)) {
+            return true;
+        }
+
+        BlockPos navigationTarget = navigation.getTargetPos();
+        return !navigation.isInProgress()
+              && navigationTarget != null
+              && navigationTarget.equals(navigationPos)
+              && navigationTarget.closerThan(mob.blockPosition(), distance);
+    }
+
+    public static BlockPos getNavigationPos(Mob mob, BlockPos localPos) {
+        return Position.getNavigationPos(mob.level(), localPos);
     }
 
     public static BlockPos getNavigationPos(Pigeon pigeon, BlockPos localPos) {

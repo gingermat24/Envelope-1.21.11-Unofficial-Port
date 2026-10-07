@@ -108,7 +108,7 @@ public class PaybackDepartment {
 
     public int returnAllAwaitingAsTimedOut() {
         int count = 0;
-        for (PaybackSubject subject : getData().getPaybackPendingSubjects().values()) {
+        for (PaybackSubject subject : List.copyOf(getData().getPaybackPendingSubjects().values())) {
             returnSubjectToSender(subject, DeliveryRecord.Message.PAYBACK_EXPIRED);
             count++;
         }
