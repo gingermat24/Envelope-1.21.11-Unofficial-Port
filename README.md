@@ -110,7 +110,7 @@ This is an **unofficial port** and is not affiliated with or endorsed by the ori
 If you encounter an issue that is specific to the 1.21.11 port, please report it on this project's issue tracker.
 For issues with the original mod, please contact the original developers through the official project pages.
 
-If you want to contact me directly, you can reach me on Discord at **matteo_sb**.
+If you want to contact me directly, you can reach me on Discord at **matteo.sb**.
 
 ---
 
