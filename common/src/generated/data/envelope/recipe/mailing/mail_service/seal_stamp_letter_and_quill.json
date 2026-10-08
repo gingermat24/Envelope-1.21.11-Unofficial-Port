@@ -3,12 +3,8 @@
   "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
-    {
-      "item": "envelope:seal_stamp"
-    },
-    {
-      "item": "envelope:letter_and_quill"
-    }
+    "envelope:seal_stamp",
+    "envelope:letter_and_quill"
   ],
   "result": {
     "components": {

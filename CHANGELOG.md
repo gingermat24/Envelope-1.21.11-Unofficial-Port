@@ -25,6 +25,7 @@
 
 ### Fixed
 
+- Fixed the Mail Service recipes for the cube, letter-and-quill, and skull-and-bones Seal Stamps failing to load.
 - Fixed Soulbound Seal Stamp previews, including Sculk animation and Creative-inventory stamps defaulting to Sculk.
 - Restored native animated-sprite rendering for Sculk wax so its interpolation metadata is honored; Gold glint keeps its upstream animated sequence and intentional pauses.
 - Fixed Soulbound stamps obtained directly in Creative so they can seal mail without a crafting-added material component.

@@ -3,12 +3,8 @@
   "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
-    {
-      "item": "envelope:seal_stamp"
-    },
-    {
-      "item": "minecraft:grass_block"
-    }
+    "envelope:seal_stamp",
+    "minecraft:grass_block"
   ],
   "result": {
     "components": {
