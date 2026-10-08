@@ -1,1 +1,26 @@
-{"model":{"type":"minecraft:model","model":"envelope:item/seal_stamp"}}
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "envelope:seal_stamp_material",
+    "cases": [
+      {"when": "black", "model": {"type": "minecraft:model", "model": "envelope:item/black_seal_stamp"}},
+      {"when": "blue", "model": {"type": "minecraft:model", "model": "envelope:item/blue_seal_stamp"}},
+      {"when": "brown", "model": {"type": "minecraft:model", "model": "envelope:item/brown_seal_stamp"}},
+      {"when": "cyan", "model": {"type": "minecraft:model", "model": "envelope:item/cyan_seal_stamp"}},
+      {"when": "gray", "model": {"type": "minecraft:model", "model": "envelope:item/gray_seal_stamp"}},
+      {"when": "gold", "model": {"type": "minecraft:model", "model": "envelope:item/gold_seal_stamp"}},
+      {"when": "green", "model": {"type": "minecraft:model", "model": "envelope:item/green_seal_stamp"}},
+      {"when": "light_blue", "model": {"type": "minecraft:model", "model": "envelope:item/light_blue_seal_stamp"}},
+      {"when": "light_gray", "model": {"type": "minecraft:model", "model": "envelope:item/light_gray_seal_stamp"}},
+      {"when": "lime", "model": {"type": "minecraft:model", "model": "envelope:item/lime_seal_stamp"}},
+      {"when": "magenta", "model": {"type": "minecraft:model", "model": "envelope:item/magenta_seal_stamp"}},
+      {"when": "orange", "model": {"type": "minecraft:model", "model": "envelope:item/orange_seal_stamp"}},
+      {"when": "pink", "model": {"type": "minecraft:model", "model": "envelope:item/pink_seal_stamp"}},
+      {"when": "purple", "model": {"type": "minecraft:model", "model": "envelope:item/purple_seal_stamp"}},
+      {"when": "red", "model": {"type": "minecraft:model", "model": "envelope:item/red_seal_stamp"}},
+      {"when": "white", "model": {"type": "minecraft:model", "model": "envelope:item/white_seal_stamp"}},
+      {"when": "yellow", "model": {"type": "minecraft:model", "model": "envelope:item/yellow_seal_stamp"}}
+    ],
+    "fallback": {"type": "minecraft:model", "model": "envelope:item/seal_stamp"}
+  }
+}

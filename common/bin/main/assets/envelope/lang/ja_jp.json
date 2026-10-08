@@ -46,6 +46,7 @@
   "item.envelope.payback_tag": "引換札",
 
   "item.envelope.seal_stamp": "封蝋と印璽",
+  "item.envelope.soulbound_seal_stamp": "魂結びの封蝋スタンプ",
 
   "item.envelope.mailbox": "郵便箱",
 
@@ -84,6 +85,7 @@
   "error.envelope.address.not_enough_xp_levels": "経験値が足りません",
 
   "entity.envelope.pigeon": "鳩",
+  "entity.envelope.courier_bat": "配達コウモリ",
   "entity.envelope.charred_pigeon": "焦げた鳩",
 
   "gui.envelope.confirm": "完了",
@@ -110,6 +112,7 @@
   "gui.envelope.mail.sender": "差出人",
   "gui.envelope.mail.recipient": "受取人",
   "gui.envelope.mail.from": "送信元",
+  "gui.envelope.mail.to": "宛先：%s",
 
   "gui.envelope.delivery_log": "§7配達ログ",
   "gui.envelope.delivery_log.record.sent": " §7差出人：%s %s",
@@ -293,7 +296,14 @@
   "envelope.configuration.spawns_naturally": "自然にスポーン",
   "envelope.configuration.travel_duration_distance_cap": "移動時間の距離上限",
   "envelope.configuration.debug_mode": "デバッグモード",
-  "envelope.configuration.courier_travel_speed": "配達スピード",
+  "envelope.configuration.pigeon_travel_speed": "鳩の配達速度",
+  "envelope.configuration.bat_travel_speed": "コウモリの配達速度",
+  "envelope.configuration.bat": "配達コウモリ",
+  "envelope.configuration.employed_at_mail_service": "夜間に郵便サービスで雇用",
+  "envelope.configuration.summoned_to_mailbox": "近くにいない場合コウモリを召喚",
+  "envelope.configuration.summoned_to_mailbox_ignores_domobspawning_rule": "召喚はdoMobSpawningルールを無視",
+  "envelope.configuration.employ_cooldown": "郵便箱のコウモリ雇用クールダウン",
+  "envelope.configuration.employ_interval": "郵便箱のコウモリ確認間隔",
   "envelope.configuration.default_distance": "デフォルト距離",
   "envelope.configuration.pause": "一時停止",
   "envelope.configuration.integration": "統合",
@@ -310,7 +320,7 @@
   "envelope.configuration.waste_level_increase_chance": "フンをする確率の上昇幅",
   "envelope.configuration.payback_timeout_minutes": "引換期限（分）",
   "envelope.configuration.hunted_by_cat": "猫から攻撃を受ける",
-  "envelope.configuration.damage_evasion_chance_while_delivering": "配達中の攻撃回避確率",
+  "envelope.configuration.courier_damage_evasion_chance": "配達中の信使の攻撃回避確率",
   "envelope.configuration.letter": "手紙",
   "envelope.configuration.dispenser_waste_scooping": "ディスペンサーによるフンの回収",
   "envelope.configuration.pigeonhole": "鳩小屋",
@@ -318,7 +328,8 @@
   "envelope.configuration.package": "小包",
   "envelope.configuration.paper_box_return_chance": "ダンボール返送確率",
   "envelope.configuration.payback_box_return_chance": "引換箱返送確率",
-  "envelope.configuration.spawning_respects_domobspawning_rule": "スポーン条件が 'doMobSpawning' ルールに従う",
+  "envelope.configuration.spawning_ignores_domobspawning_rule": "スポーンが 'doMobSpawning' ルールを無視する",
+  "envelope.configuration.courier_death_notice": "信使死亡通知",
   "envelope.configuration.sneak_quick_unpack": "しゃがんで即時開封",
   "envelope.configuration.service_address_ingredient": "サービス住所の材料",
   "envelope.configuration.request_duration_medium": "引換期限 - 中",
@@ -373,6 +384,8 @@
   "advancement.envelope.soft_landing.description": "100ブロック以上の高さからダンボールの上に落下する",
   "advancement.envelope.system_failure.title": "システム障害",
   "advancement.envelope.system_failure.description": "崩落した郵便ハブに足を踏み入れる",
+  "advancement.envelope.the_pigeons_and_the_bats.title": "鳩とコウモリ",
+  "advancement.envelope.the_pigeons_and_the_bats.description": "郵便箱から両方の配達員で手紙を送る",
 
   "subtitles.envelope.block.pigeonhole.enter": "鳩が鳩小屋に入る",
   "subtitles.envelope.block.pigeonhole.exit": "鳩が鳩小屋から出る",

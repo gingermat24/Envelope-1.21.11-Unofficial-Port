@@ -20,6 +20,7 @@
   "mixins": [
     "charred_pigeon_water.ThrownPotionMixin",
     "dispenser_waste_scooping.DispenserBlockMixin",
+    "death.InventoryMixin",
     "equine_assurance_bureau.TameAnimalTriggerMixin",
     "event.ServerLevelMixin",
     "fox_tatter.FoxMixin",

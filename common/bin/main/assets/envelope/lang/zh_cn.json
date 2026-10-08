@@ -46,6 +46,7 @@
   "item.envelope.payback_tag": "回寄标签",
 
   "item.envelope.seal_stamp": "蜡封印章",
+  "item.envelope.soulbound_seal_stamp": "灵魂绑定蜡封印章",
 
   "item.envelope.mailbox": "邮箱",
 
@@ -84,6 +85,7 @@
   "error.envelope.address.not_enough_xp_levels": "经验等级不足",
 
   "entity.envelope.pigeon": "鸽子",
+  "entity.envelope.courier_bat": "信使蝙蝠",
   "entity.envelope.charred_pigeon": "焦黑鸽子",
 
   "gui.envelope.confirm": "确认",
@@ -110,6 +112,7 @@
   "gui.envelope.mail.sender": "发件人",
   "gui.envelope.mail.recipient": "收件人",
   "gui.envelope.mail.from": "来自",
+  "gui.envelope.mail.to": "收件人：%s",
 
   "gui.envelope.delivery_log": "§7投递日志",
   "gui.envelope.delivery_log.record.sent": " §7来自 %s %s",
@@ -293,7 +296,14 @@
   "envelope.configuration.spawns_naturally": "自然生成",
   "envelope.configuration.travel_duration_distance_cap": "旅行时间距离上限",
   "envelope.configuration.debug_mode": "调试模式",
-  "envelope.configuration.courier_travel_speed": "信使旅行速度",
+  "envelope.configuration.pigeon_travel_speed": "鸽子投递速度",
+  "envelope.configuration.bat_travel_speed": "蝙蝠投递速度",
+  "envelope.configuration.bat": "信使蝙蝠",
+  "envelope.configuration.employed_at_mail_service": "夜间由邮政服务雇用",
+  "envelope.configuration.summoned_to_mailbox": "附近没有蝙蝠时召唤",
+  "envelope.configuration.summoned_to_mailbox_ignores_domobspawning_rule": "召唤忽略doMobSpawning规则",
+  "envelope.configuration.employ_cooldown": "邮箱雇用蝙蝠冷却时间",
+  "envelope.configuration.employ_interval": "邮箱寻找蝙蝠间隔",
   "envelope.configuration.default_distance": "默认距离",
   "envelope.configuration.pause": "暂停",
   "envelope.configuration.integration": "整合",
@@ -310,7 +320,7 @@
   "envelope.configuration.waste_level_increase_chance": "废物增加概率",
   "envelope.configuration.payback_timeout_minutes": "回寄超时（分钟）",
   "envelope.configuration.hunted_by_cat": "会被猫猎杀",
-  "envelope.configuration.damage_evasion_chance_while_delivering": "投递时躲避伤害概率",
+  "envelope.configuration.courier_damage_evasion_chance": "信使投递时躲避伤害概率",
   "envelope.configuration.letter": "信件",
   "envelope.configuration.dispenser_waste_scooping": "发射器废物清理",
   "envelope.configuration.pigeonhole": "鸽舍",
@@ -318,7 +328,8 @@
   "envelope.configuration.package": "包裹",
   "envelope.configuration.paper_box_return_chance": "纸箱回收概率",
   "envelope.configuration.payback_box_return_chance": "回寄箱回收概率",
-  "envelope.configuration.spawning_respects_domobspawning_rule": "生成遵循'doMobSpawning'规则",
+  "envelope.configuration.spawning_ignores_domobspawning_rule": "生成忽略'doMobSpawning'规则",
+  "envelope.configuration.courier_death_notice": "信使死亡通知",
   "envelope.configuration.sneak_quick_unpack": "蹲下快速拆包",
   "envelope.configuration.service_address_ingredient": "邮政服务配方",
   "envelope.configuration.request_duration_medium": "请求时间 - 中等",
@@ -373,6 +384,8 @@
   "advancement.envelope.soft_landing.description": "从100格或更高的高度落到纸箱上",
   "advancement.envelope.system_failure.title": "系统瘫痪",
   "advancement.envelope.system_failure.description": "踏入废弃邮政枢纽",
+  "advancement.envelope.the_pigeons_and_the_bats.title": "鸽子与蝙蝠",
+  "advancement.envelope.the_pigeons_and_the_bats.description": "从同一个邮箱使用两种信使投递邮件",
 
   "subtitles.envelope.block.pigeonhole.enter": "鸽子：进入鸽舍",
   "subtitles.envelope.block.pigeonhole.exit": "鸽子：离开鸽舍",

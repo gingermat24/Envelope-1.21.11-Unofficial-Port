@@ -31,8 +31,8 @@
     "${mod_id}-common.mixins.json"
   ],
   "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
     "minecraft": ["1.21.11"],
-    "fabric": "*",
     "fabric-api": "*",
     "forgeconfigapiport": ">=21.0.0"
   },

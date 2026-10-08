@@ -46,6 +46,7 @@
   "item.envelope.payback_tag": "Метка обмена",
 
   "item.envelope.seal_stamp": "Штамп",
+  "item.envelope.soulbound_seal_stamp": "Штамп души",
 
   "item.envelope.mailbox": "Почтовый ящик",
 
@@ -84,6 +85,7 @@
   "error.envelope.address.not_enough_xp_levels": "Недостаточно уровней опыта",
 
   "entity.envelope.pigeon": "Голубь",
+  "entity.envelope.courier_bat": "Летучая мышь-курьер",
   "entity.envelope.charred_pigeon": "Обожжённый голубь",
 
   "gui.envelope.confirm": "Подтвердить",
@@ -110,6 +112,7 @@
   "gui.envelope.mail.sender": "Отправитель",
   "gui.envelope.mail.recipient": "Получатель",
   "gui.envelope.mail.from": "От",
+  "gui.envelope.mail.to": "Кому: %s",
 
   "gui.envelope.delivery_log": "§7Информация о доставке",
   "gui.envelope.delivery_log.record.sent": "Отправлено из %s %s",
@@ -292,7 +295,14 @@
   "envelope.configuration.spawns_naturally": "Естественное появление",
   "envelope.configuration.travel_duration_distance_cap": "Макс. дистанция длительности пути",
   "envelope.configuration.debug_mode": "Режим отладки",
-  "envelope.configuration.courier_travel_speed": "Скорость курьера",
+  "envelope.configuration.pigeon_travel_speed": "Скорость полёта голубя",
+  "envelope.configuration.bat_travel_speed": "Скорость полёта летучей мыши",
+  "envelope.configuration.bat": "Летучая мышь-курьер",
+  "envelope.configuration.employed_at_mail_service": "Ночная доставка почтовой службой",
+  "envelope.configuration.summoned_to_mailbox": "Призывать мышь, если поблизости нет",
+  "envelope.configuration.summoned_to_mailbox_ignores_domobspawning_rule": "Призыв игнорирует правило doMobSpawning",
+  "envelope.configuration.employ_cooldown": "Перезарядка найма мыши почтовым ящиком",
+  "envelope.configuration.employ_interval": "Интервал поиска мыши почтовым ящиком",
   "envelope.configuration.default_distance": "Дистанция по умолчанию",
   "envelope.configuration.pause": "Пауза",
   "envelope.configuration.integration": "Интеграция",
@@ -309,7 +319,7 @@
   "envelope.configuration.waste_level_increase_chance": "Шанс повышения уровня отходов",
   "envelope.configuration.payback_timeout_minutes": "Тайм-аут расплаты (минуты)",
   "envelope.configuration.hunted_by_cat": "Охота кошек",
-  "envelope.configuration.damage_evasion_chance_while_delivering": "Шанс уклонения от урона при доставке",
+  "envelope.configuration.courier_damage_evasion_chance": "Шанс уклонения курьера от урона",
   "envelope.configuration.letter": "Письмо",
   "envelope.configuration.dispenser_waste_scooping": "Выгребание отходов раздатчиком",
   "envelope.configuration.pigeonhole": "Голубятня",
@@ -317,7 +327,8 @@
   "envelope.configuration.package": "Посылка",
   "envelope.configuration.paper_box_return_chance": "Шанс возврата картонной коробки",
   "envelope.configuration.payback_box_return_chance": "Шанс возврата коробки расплаты",
-  "envelope.configuration.spawning_respects_domobspawning_rule": "Появление учитывает правило 'doMobSpawning'",
+  "envelope.configuration.spawning_ignores_domobspawning_rule": "Появление игнорирует правило 'doMobSpawning'",
+  "envelope.configuration.courier_death_notice": "Уведомление о гибели курьера",
   "envelope.configuration.sneak_quick_unpack": "Быстрая распаковка (присев)",
   "envelope.configuration.service_address_ingredient": "Ингредиент адреса службы",
   "envelope.configuration.request_duration_medium": "Длительность запроса — Средняя",
@@ -371,6 +382,8 @@
   "advancement.envelope.soft_landing.description": "Упадите на картонную коробку с высоты 100 или более блоков",
   "advancement.envelope.system_failure.title": "Отказ системы",
   "advancement.envelope.system_failure.description": "Ступите на разрушенный почтовый хаб",
+  "advancement.envelope.the_pigeons_and_the_bats.title": "Голуби и летучие мыши",
+  "advancement.envelope.the_pigeons_and_the_bats.description": "Отправьте письмо обоими видами курьеров из одного почтового ящика",
 
   "subtitles.envelope.block.pigeonhole.enter": "Голубь залетает в голубятню",
   "subtitles.envelope.block.pigeonhole.exit": "Голубь вылетает из голубятни",
