@@ -22,12 +22,16 @@
     <img src="https://img.shields.io/modrinth/dt/bINSbhYK?logo=modrinth&label=&suffix=%20&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c" alt="Modrinth downloads for Envelope">
   </a>
 
-<br><br>
+  <br><br>
 
   <h3>Unofficial Port</h3>
 
   <a href="https://modrinth.com/project/envelope-unofficial-port">
-    <img src="https://img.shields.io/badge/Modrinth-Unofficial%20Port-5ca424?logo=modrinth&logoColor=white" alt="Unofficial Port on Modrinth">
+    <img src="https://img.shields.io/modrinth/dt/envelope-unofficial-port?logo=modrinth&label=&suffix=%20&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c" alt="Modrinth downloads for Envelope [Unofficial Port]">
+  </a>
+
+  <a href="https://www.curseforge.com/minecraft/mc-mods/envelope-unofficial-port">
+    <img src="https://cf.way2muchnoise.eu/total_downloads_1733451.svg" alt="CurseForge downloads for Envelope [Unofficial Port]">
   </a>
 
   <br>
@@ -39,8 +43,6 @@
 <br><br>
 
 <b>Modrinth is the recommended source for the Unofficial Port mod, as releases are published there first and more frequently.</b>
-
-</b>Dowload from the link Above</b>
 
 </div>
 
@@ -74,7 +76,6 @@ This 0.3.0 release adapts selected features from Envelope 0.8.0 Snapshot 1 and S
 Some server settings changed in 0.3.0. Back up your existing Envelope server settings before updating, then review them afterward in case any need to be set again.
 
 The seal preview may continue to show a lock symbol after an administrator deactivates that lock. The item can still be opened according to the current lock status.
-
 
 ## Dependencies and compatibility
 
