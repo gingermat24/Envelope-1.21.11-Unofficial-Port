@@ -97,7 +97,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
                   new Seal(stampMaterial, existingSeal.impression(), existingSeal.signature(),
                         existingSeal.playerUuid(), existingSeal.lock()));
             slot.set(target);
-            player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+            player.playSound(Envelope.SoundEvents.SEAL_STAMP.get());
             return true;
         }
 
@@ -110,7 +110,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
             target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(),
                   existingSeal.signature(), existingSeal.playerUuid(), existingSeal.lock()));
             slot.set(target);
-            player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+            player.playSound(Envelope.SoundEvents.SEAL_STAMP.get());
             return true;
         }
 
@@ -127,7 +127,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
         Seal seal = createSeal(stack, player);
         ItemStack sealResult = sealable.seal(player.level(), target, seal);
         slot.set(sealResult);
-        player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+        player.playSound(Envelope.SoundEvents.SEAL_STAMP.get());
         if (!player.level().isClientSide()) {
             onSealApplied(stack, player, seal);
         }

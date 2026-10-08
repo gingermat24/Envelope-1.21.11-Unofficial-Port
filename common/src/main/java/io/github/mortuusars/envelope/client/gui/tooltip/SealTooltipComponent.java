@@ -22,7 +22,7 @@ public class SealTooltipComponent implements ClientTooltipComponent {
 
     @Override
     public int getHeight(Font font) {
-        return 32;
+        return seal.lock().isPresent() ? 33 : 32;
     }
 
     @Override

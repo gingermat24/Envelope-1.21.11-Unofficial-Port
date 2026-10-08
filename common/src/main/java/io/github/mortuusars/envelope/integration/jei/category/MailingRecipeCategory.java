@@ -88,15 +88,8 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
 
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
-        Component component = recipeHolder.value().getAddress()
-              .format()
-              .withIcon()
-              .toComponent();
-
-        builder.addText(component, getWidth(), 12)
-              .setPosition(0, 0)
-              .setTextAlignment(HorizontalAlignment.CENTER)
-              .setColor(0xFF808080);
+        builder.addWidget(new ServiceAddressRecipeWidget(
+              new ScreenRectangle(0, 0, getWidth(), 12), recipeHolder.value().getAddress()));
         if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
             builder.addGuiEventListener(new AddressUsesClickListener(recipeHolder.value().getAddress(), getWidth(), 12));
         }

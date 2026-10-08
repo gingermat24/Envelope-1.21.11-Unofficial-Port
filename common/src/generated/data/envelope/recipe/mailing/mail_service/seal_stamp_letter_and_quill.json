@@ -3,12 +3,16 @@
   "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
-    "envelope:seal_stamp",
-    "minecraft:skeleton_skull"
+    {
+      "item": "envelope:seal_stamp"
+    },
+    {
+      "item": "envelope:letter_and_quill"
+    }
   ],
   "result": {
     "components": {
-      "envelope:seal_stamp_die": "envelope:skeleton"
+      "envelope:seal_stamp_die": "envelope:letter_and_quill"
     },
     "count": 1,
     "id": "envelope:seal_stamp"

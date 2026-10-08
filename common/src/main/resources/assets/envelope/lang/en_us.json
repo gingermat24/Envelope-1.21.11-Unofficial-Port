@@ -47,6 +47,7 @@
 
   "item.envelope.seal_stamp": "Seal Stamp",
   "item.envelope.soulbound_seal_stamp": "Soulbound Seal Stamp",
+  "subtitles.envelope.seal_stamp": "Seal Stamp stamps",
   "seal_material.envelope.sculk": "Sculk",
   "tooltip.envelope.seal_stamp.color": "Seal color: %s",
   "seal_material.envelope.white": "White",

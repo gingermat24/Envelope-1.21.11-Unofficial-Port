@@ -13,8 +13,10 @@ import net.minecraft.util.Util;
 
 public class SealRenderer {
     public static final Identifier IRON_DIE_TEXTURE = Envelope.resource("textures/gui/sprites/seal/die/iron.png");
-    private static final Identifier NEUTRAL_WAX_SPRITE = Envelope.resource("seal/material/neutral_wax");
     private static final Identifier SCULK_SPRITE = Envelope.resource("seal/material/sculk");
+    private static final Identifier SEAL_GLINT_SPRITE = Envelope.resource("seal/glint");
+    private static final Identifier LOCK_SPRITE = Envelope.resource("seal/lock");
+    private static final Identifier LOCKED_OVERLAY_SPRITE = Envelope.resource("seal/locked_overlay");
     private static final int SCULK_FRAME_SIZE = 30;
     private static final int SCULK_FRAME_COUNT = 4;
     private static final long SCULK_FRAME_DURATION_MILLIS = 1000L;
@@ -44,6 +46,15 @@ public class SealRenderer {
         blitImpression(guiGraphics, impressionTexture, colors.shadow(), x, y + 1, 30);
         blitImpression(guiGraphics, impressionTexture, colors.highlight(), x, y - 1, 30);
         blitImpression(guiGraphics, impressionTexture, colors.base(), x, y, 30);
+
+        if (material.spriteId().equals(SCULK_SPRITE)) {
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SEAL_GLINT_SPRITE, x, y, 32, 32);
+        }
+
+        if (seal.lock().isPresent()) {
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LOCKED_OVERLAY_SPRITE, x - 2, y - 2, 34, 34);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LOCK_SPRITE, x - 2, y - 2, 34, 34);
+        }
     }
 
     public void renderDie(SealSymbol impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {
@@ -82,12 +93,7 @@ public class SealRenderer {
     }
 
     private void renderMaterial(SealMaterial material, GuiGraphics guiGraphics, int x, int y) {
-        if (material.spriteId().equals(NEUTRAL_WAX_SPRITE)) {
-            Identifier tintedTexture = TintedTextureCache.get(
-                  material.spriteTexture(), TintColor.of(material.modelTintColor()));
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, tintedTexture,
-                  x, y, 0, 0, 30, 30, 30, 30);
-        } else if (material.spriteId().equals(SCULK_SPRITE)) {
+        if (material.spriteId().equals(SCULK_SPRITE)) {
             int frame = (int) ((Util.getMillis() / SCULK_FRAME_DURATION_MILLIS) % SCULK_FRAME_COUNT);
             guiGraphics.blit(RenderPipelines.GUI_TEXTURED, material.spriteTexture(),
                   x, y, 0, frame * SCULK_FRAME_SIZE,

@@ -63,7 +63,7 @@ public final class TintedTextureCache {
             try {
                 for (int y = 0; y < source.getHeight(); y++) {
                     for (int x = 0; x < source.getWidth(); x++) {
-                        tinted.setPixel(x, y, tint.tint(source.getPixel(x, y)));
+                        tinted.setPixel(x, y, tint.tintPixel(source.getPixel(x, y)));
                     }
                 }
                 return new DynamicTexture(() -> "Seal tint " + sourceId, tinted);

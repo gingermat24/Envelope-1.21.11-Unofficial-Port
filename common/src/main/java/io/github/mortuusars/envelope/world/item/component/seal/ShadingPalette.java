@@ -30,8 +30,8 @@ public record ShadingPalette(TintColor base, TintColor highlight, TintColor shad
     public static final ShadingPalette IRON_DIE = new ShadingPalette(
             0xFF9A9CA1, 0xFFDFE0E3, 0xFF5D6068, 0xFFC4C5C8);
 
-    public int getBaseArgb()      { return base.tint(); }
-    public int getHighlightArgb() { return highlight.tint(); }
-    public int getShadowArgb()    { return shadow.tint(); }
-    public int getSideArgb()      { return side.tint(); }
+    public int getBaseArgb()      { return base.tintPixel(0xFF7F7F7F); }
+    public int getHighlightArgb() { return highlight.tintPixel(0xFF7F7F7F); }
+    public int getShadowArgb()    { return shadow.tintPixel(0xFF7F7F7F); }
+    public int getSideArgb()      { return side.tintPixel(0xFF7F7F7F); }
 }

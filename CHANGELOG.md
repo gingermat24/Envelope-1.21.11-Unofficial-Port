@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 - 07/10/2026
+## 0.3.0 - 08/10/2026
 
 - Ported the Courier Bat for night mail delivery; mailboxes can employ nearby vanilla Bats or summon one when none are available.
 - Added the Spider Eye Bat-food slot to mailboxes without moving the existing food and mail slot indices, preserving existing mailbox inventories.
@@ -23,6 +23,12 @@
 - Made courier appearance/disappearance particles visible at greater distances and play courier ambient sounds when deliveries finish.
 - Moved administrative send and broadcast commands to `/envelope mail send` and `/envelope mail broadcast`; mail sending accepts an optional `from <address>` sender and `to <address>` recipient override.
 - Added `/envelope debug terminate_all_deliveries`, with a separate `confirm` literal to prevent accidental termination.
+- Ported the `cube`, `letter_and_quill`, and `skull_and_bones` seal symbols and their Mail Service stamp recipes; the cube recipe requires a Grass Block. Legacy symbol registry entries remain for existing seals, while the obsolete skeleton-stamp recipe was removed.
+- Added original color-specific textures and item models for all 16 dyeable Seal Stamps, selected by the stamp's material component.
+- Added the original Seal Stamp sound to stamp application and ported the animated Soulbound glint plus lock overlays to seal previews.
+- Updated mailbox mail-type icons and added the original Halloween spider/web decoration for empty mailboxes.
+- Added a JEI crafting extension that previews the 16 dye-specific Seal Stamp results with their correct material components.
+- Deferred Cloud Depository and Letter Presetting. Every Compat remains unported because no compatible Fabric artifact for Minecraft 1.21.11 was available on Modrinth on 2026-10-08.
 - Fixed bulk-expiring pending payback mail by iterating over a snapshot while items are removed and returned.
 - Removed an unused service-address tick callback and obsolete experimental code from the debug command.
 - Renamed server configuration paths. Existing settings may be regenerated and need to be reapplied after updating.
@@ -39,10 +45,10 @@
 - Kept undyed stamps neutral and unable to seal mail; dyed stamps can recolor existing seals.
 - Dyeing a stamp preserves its die and other components; mail-service stamp recipes carry forward the selected wax.
 - Restored the 53 letter, number, and emblem impression textures with their grayscale detail; material backgrounds remain separate.
-- Reworked stamp-preview tinting to apply the original per-channel palette multipliers to source pixels, using a bounded cache of generated textures that is cleared on client resource reload.
-- Added hue-matched shading palettes for chromatic dye materials and colored dyed-stamp previews with the selected wax; undyed previews retain the iron die.
-- Corrected seal-material data for the added dye colors and updated the red-wax and gold material values.
-- Uses dedicated wax textures for red, gold, orange, blue, and pink materials; other dyed materials tint the neutral-wax texture. (others will be added in the next update).
+- Ported the upstream per-channel seal-shading palette values for every wax color and matched its multiplier conversion from the [1.21.1-dev source revision](https://github.com/mortuusars/Envelope/commit/cb8c3d1fec89b626794c0d4c2a51317c33b5c481).
+- Ported the original background sprite setup: each colored wax seal now uses its own source sprite instead of recoloring one neutral background; seal materials select that sprite through their `sprite` field.
+- Adapted the upstream stamp-preview shading to Minecraft 1.21.11's GUI draw pipeline by applying the same channel multipliers to source pixels through a bounded, reload-aware generated-texture cache.
+- Kept the existing seal-material registry IDs so worlds and saved item components continue resolving their materials.
 - Restored adult and baby model scaling for both pigeon variants.
 - Corrected Letter and Quill layout: writing-area clipping, wrapping for over-width characters, and 50%-opacity selection highlights.
 - Corrected delivered-letter parchment and tattered-overlay sampling for 256x256 textures, and clipped displayed text to its writing area.

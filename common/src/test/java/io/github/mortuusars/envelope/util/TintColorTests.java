@@ -24,7 +24,14 @@ class TintColorTests {
     void tintAppliesMultipliersPerSourcePixelWithoutClampingBrightChannelsEarly() {
         TintColor tint = TintColor.of(0xFFA73A34);
 
-        assertEquals(0xFFA73A34, tint.tint(0xFF7F7F7F));
-        assertEquals(0xFFFF7468, tint.tint(0xFFFFFFFF));
+        assertEquals(0xFFA73A34, tint.tintPixel(0xFF7F7F7F));
+        assertEquals(0xFFFF7468, tint.tintPixel(0xFFFFFFFF));
+    }
+
+    @Test
+    void tintUsesOriginalMultiplierTruncation() {
+        TintColor tint = TintColor.of(0xFFA73A34);
+
+        assertEquals(0xFF842E29, tint.tint(0xFF656565));
     }
 }

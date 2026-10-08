@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCateg
 import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.extensions.LetterCloningRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.extensions.PaybackTagApplicationRecipeExtension;
+import io.github.mortuusars.envelope.integration.jei.extensions.SealStampDyeingRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientHelper;
 import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientRenderer;
 import io.github.mortuusars.envelope.integration.jei.util.InHandRecipeTransferInfo;
@@ -20,6 +21,7 @@ import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRe
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -27,6 +29,7 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.registration.*;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.runtime.IJeiRuntime;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -71,6 +74,14 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .createFocus(RecipeIngredientRole.INPUT, SERVICE_ADDRESS_INGREDIENT, address);
         runtime.getRecipesGui().show(focus);
         return true;
+    }
+
+    public static void addServiceAddressTooltip(ITooltipBuilder tooltip, ServiceAddress address) {
+        tooltip.add(address.format().withIcon().toComponent());
+        if (runtime != null && Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
+            runtime.getIngredientManager().createTypedIngredient(SERVICE_ADDRESS_INGREDIENT, address, false)
+              .ifPresent(tooltip::setIngredient);
+        }
     }
 
     @Override
@@ -132,6 +143,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
         registration.getCraftingCategory().addExtension(LetterCloningRecipe.class, new LetterCloningRecipeExtension());
         registration.getCraftingCategory().addExtension(AddressTagApplicationRecipe.class, new AddressTagApplicationRecipeExtension());
         registration.getCraftingCategory().addExtension(PaybackTagApplicationRecipe.class, new PaybackTagApplicationRecipeExtension());
+        registration.getCraftingCategory().addExtension(SealStampDyeRecipe.class, new SealStampDyeingRecipeExtension());
     }
 
     @Override
