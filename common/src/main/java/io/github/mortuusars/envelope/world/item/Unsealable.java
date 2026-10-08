@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -40,7 +41,7 @@ public interface Unsealable {
     }
 
     default int getUnsealingDuration(ItemStack stack, LivingEntity entity) {
-        return 20;
+        return Config.Server.SEAL_REMOVE_DURATION.get();
     }
 
     default boolean canUnseal(ItemStack stack, Player player) {

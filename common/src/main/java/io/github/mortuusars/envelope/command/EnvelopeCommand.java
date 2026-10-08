@@ -69,11 +69,16 @@ public class EnvelopeCommand {
 
     private static int createSealLock(CommandContext<CommandSourceStack> context, String owner) {
         SealLock lock;
-        try {
-            lock = SealLock.create(owner);
-        } catch (IllegalArgumentException exception) {
-            context.getSource().sendFailure(Component.literal(exception.getMessage()));
-            return 0;
+        Optional<SealLock> existingLock = SealLock.parse(owner).result();
+        if (existingLock.isPresent()) {
+            lock = existingLock.get();
+        } else {
+            try {
+                lock = SealLock.create(owner);
+            } catch (IllegalArgumentException exception) {
+                context.getSource().sendFailure(Component.literal(exception.getMessage()));
+                return 0;
+            }
         }
 
         if (!lock.lock(context.getSource().getLevel())) {
@@ -81,7 +86,8 @@ public class EnvelopeCommand {
             return 0;
         }
 
-        context.getSource().sendSuccess(() -> Component.literal("Created seal lock: ")
+        String action = existingLock.isPresent() ? "Activated seal lock: " : "Created seal lock: ";
+        context.getSource().sendSuccess(() -> Component.literal(action)
               .append(Component.literal(lock.toString()).withStyle(Style.EMPTY
                     .withClickEvent(new ClickEvent.CopyToClipboard(lock.toString())))), true);
         return 1;

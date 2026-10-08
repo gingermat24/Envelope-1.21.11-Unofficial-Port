@@ -61,6 +61,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
     private @Nullable Delivery delivery;
     private @Nullable CourierOrigin origin;
     private @Nullable BlockPos spawnPos;
+    private int deliveries;
 
     public CourierBat(EntityType<? extends CourierBat> entityType, Level level) {
         super(entityType, level);
@@ -275,7 +276,8 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
     }
 
     public boolean canStartDelivery() {
-        return isNight(level()) && !level().isRaining() && !level().isThundering();
+        return isNight(level()) && !level().isRaining() && !level().isThundering()
+              && deliveries < Config.Server.BAT_MAX_DELIVERIES.get();
     }
 
     public static boolean isNight(Level level) {
@@ -380,6 +382,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
         playAmbientSound();
+        deliveries++;
         if (!delivery.getMail().isEmpty()) {
             spawnAtLocation(level, delivery.getMail().copy());
             delivery.setMail(ItemStack.EMPTY);
@@ -407,6 +410,9 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         if (spawnPos != null) {
             output.store("SpawnPos", BlockPos.CODEC, spawnPos);
         }
+        if (deliveries > 0) {
+            output.putInt("Deliveries", deliveries);
+        }
     }
 
     @Override
@@ -416,6 +422,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         setDelivery(input.read("Delivery", Delivery.CODEC).orElse(null));
         setOrigin(input.read("Origin", CourierOrigin.CODEC).orElse(null));
         spawnPos = input.read("SpawnPos", BlockPos.CODEC).orElse(null);
+        deliveries = input.getInt("Deliveries").orElse(0);
         entityData.set(DATA_DELIVERING, delivery != null);
         entityData.set(DATA_HAS_MAIL, delivery != null && !delivery.getMail().isEmpty());
     }

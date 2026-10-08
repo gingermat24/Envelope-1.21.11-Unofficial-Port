@@ -52,6 +52,7 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
         public static final ModConfigSpec.DoubleValue DELIVERY_PIGEON_TRAVEL_SPEED;
         public static final ModConfigSpec.DoubleValue DELIVERY_BAT_TRAVEL_SPEED;
+        public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_DAMAGE_EVASION_CHANCE;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_IGNORES_DOMOBSPAWNING_RULE;
@@ -62,6 +63,14 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING_RULE;
         public static final ModConfigSpec.IntValue BAT_EMPLOY_COOLDOWN;
         public static final ModConfigSpec.IntValue BAT_EMPLOY_INTERVAL;
+        public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
+
+        // Seal
+        public static final ModConfigSpec.IntValue SEAL_REMOVE_DURATION;
+        public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_ENABLED;
+        public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_CONSUMABLE;
+        public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_CREATES_LOCK;
+        public static final ModConfigSpec.BooleanValue LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING;
 
         // Payback
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
@@ -220,6 +229,9 @@ public abstract class Config {
                 DELIVERY_BAT_TRAVEL_SPEED = builder
                       .comment("Bat speed (in blocks per second) while in traveling (background) phases.")
                       .defineInRange("bat_travel_speed", 50.0, 0.01, 9999.0);
+                DELIVERY_PHASE_DURATION_MODIFIER = builder
+                      .comment("Global multiplier for delivery phase durations.")
+                      .defineInRange("phase_duration_modifier", 1.0, 0.0, 999.0);
                 DELIVERY_COURIER_DAMAGE_EVASION_CHANCE = builder
                       .comment("Chance for a courier to evade damage while delivering. '#envelope:bypasses_courier_delivery_evasion' damage types bypass this chance.")
                       .defineInRange("courier_damage_evasion_chance", 0.0, 0.0, 1.0);
@@ -250,6 +262,29 @@ public abstract class Config {
                 BAT_EMPLOY_INTERVAL = builder
                       .comment("Maximum ticks between randomized Bat employment attempts.")
                       .defineInRange("employ_interval", 400, 1, Integer.MAX_VALUE);
+                BAT_MAX_DELIVERIES = builder
+                      .comment("Maximum number of deliveries a single Bat can complete before leaving.")
+                      .defineInRange("max_deliveries", 3, 1, 999);
+                builder.pop();
+            }
+
+            {
+                builder.push("seal");
+                SEAL_REMOVE_DURATION = builder
+                      .comment("Ticks required to remove a seal from an item.")
+                      .defineInRange("seal_remove_duration", 10, 0, 9999);
+                SOULBOUND_SEAL_STAMP_ENABLED = builder
+                      .comment("Whether the Soulbound Seal Stamp can be used and crafted.")
+                      .define("soulbound_seal_stamp_enabled", true);
+                SOULBOUND_SEAL_STAMP_CONSUMABLE = builder
+                      .comment("Whether the Soulbound Seal Stamp loses a use each time it seals an item.")
+                      .define("soulbound_seal_stamp_consumable", true);
+                SOULBOUND_SEAL_STAMP_CREATES_LOCK = builder
+                      .comment("Whether the Soulbound Seal Stamp creates an active lock on sealed items.")
+                      .define("soulbound_seal_stamp_creates_lock", true);
+                LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING = builder
+                      .comment("Whether the owner of a locked seal can remove it without unlocking it first.")
+                      .define("locked_seal_owner_can_remove_without_unlocking", true);
                 builder.pop();
             }
 

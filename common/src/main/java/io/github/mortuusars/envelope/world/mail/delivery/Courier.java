@@ -91,7 +91,7 @@ public interface Courier {
     }
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
-        return switch (phase) {
+        int baseDuration = switch (phase) {
             case STARTED, FINISHED -> 5;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 100;
             case TRAVELING_FROM_SENDER_TO_HUB, TRAVELING_FROM_HUB_TO_SENDER -> delivery.getRoute().getSenderToHubDuration().ticks();
@@ -100,6 +100,7 @@ public interface Courier {
             case DISPATCHING_DELIVERY, DISPATCHING_RETURN -> 20;
             case HANDLING_DELIVERY, HANDLING_RETURN -> 10;
         };
+        return Math.max(1, (int) (baseDuration * Config.Server.DELIVERY_PHASE_DURATION_MODIFIER.get()));
     }
 
     default void phaseStarted(ServerLevel level, Delivery delivery) {

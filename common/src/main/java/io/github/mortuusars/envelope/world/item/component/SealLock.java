@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.level.saveddata.SealLocks;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -63,7 +64,8 @@ public record SealLock(String owner, UUID id) {
     }
 
     public boolean isLockedFor(Player player) {
-        return !isOwnedBy(player) && isLocked(player.level());
+        return isLocked(player.level())
+              && !(Config.Server.LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING.get() && isOwnedBy(player));
     }
 
     public boolean lock(Level level) {

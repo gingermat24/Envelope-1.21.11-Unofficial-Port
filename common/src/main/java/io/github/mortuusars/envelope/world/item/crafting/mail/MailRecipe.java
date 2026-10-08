@@ -16,10 +16,17 @@ import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeBookCategories;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.level.Level;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 public interface MailRecipe extends Recipe<MailRecipeInput> {
     ServiceAddress getAddress();
+
+    default Optional<Component> getInfo() {
+        return Optional.empty();
+    }
 
     @Override
     default @NotNull RecipeType<? extends Recipe<MailRecipeInput>> getType() {

@@ -47,7 +47,7 @@ public class SealRenderer {
         blitImpression(guiGraphics, impressionTexture, colors.highlight(), x, y - 1, 30);
         blitImpression(guiGraphics, impressionTexture, colors.base(), x, y, 30);
 
-        if (material.spriteId().equals(SCULK_SPRITE)) {
+        if (material.hasGlint()) {
             guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SEAL_GLINT_SPRITE, x, y, 32, 32);
         }
 

@@ -25,16 +25,18 @@ public final class SealMaterial {
           Identifier.CODEC.optionalFieldOf("texture")
                 .forGetter(material -> Optional.empty()),
           EnvelopeCodecs.HEX_COLOR.fieldOf("model_tint_color").forGetter(SealMaterial::modelTintColor),
-          ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette)
-    ).apply(i, (sprite, texture, modelTintColor, impressionPalette) ->
+          ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette),
+          Codec.BOOL.optionalFieldOf("has_glint", false).forGetter(SealMaterial::hasGlint)
+    ).apply(i, (sprite, texture, modelTintColor, impressionPalette, hasGlint) ->
           new SealMaterial(sprite.or(() -> texture)
                 .orElseThrow(() -> new IllegalArgumentException("Seal material requires a 'sprite' field.")),
-                modelTintColor, impressionPalette)));
+                modelTintColor, impressionPalette, hasGlint)));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealMaterial> DIRECT_STREAM_CODEC = StreamCodec.composite(
           Identifier.STREAM_CODEC, SealMaterial::spriteId,
           ByteBufCodecs.INT, SealMaterial::modelTintColor,
           ShadingPalette.STREAM_CODEC, SealMaterial::impressionPalette,
+          ByteBufCodecs.BOOL, SealMaterial::hasGlint,
           SealMaterial::new
     );
 
@@ -52,12 +54,18 @@ public final class SealMaterial {
     private final Identifier spriteTexture;
     private final int modelTintColor;
     private final ShadingPalette impressionPalette;
+    private final boolean hasGlint;
 
     public SealMaterial(Identifier sprite, int modelTintColor, ShadingPalette impressionPalette) {
+        this(sprite, modelTintColor, impressionPalette, false);
+    }
+
+    public SealMaterial(Identifier sprite, int modelTintColor, ShadingPalette impressionPalette, boolean hasGlint) {
         this.spriteId = sprite;
         this.spriteTexture = sprite.withPath(path -> "textures/gui/sprites/" + path + ".png");
         this.modelTintColor = modelTintColor;
         this.impressionPalette = impressionPalette;
+        this.hasGlint = hasGlint;
     }
 
     public Identifier spriteId() {
@@ -84,6 +92,10 @@ public final class SealMaterial {
         return impressionPalette;
     }
 
+    public boolean hasGlint() {
+        return hasGlint;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -91,7 +103,8 @@ public final class SealMaterial {
         var that = (SealMaterial) obj;
         return Objects.equals(this.spriteId, that.spriteId) &&
               this.modelTintColor == that.modelTintColor &&
-              Objects.equals(this.impressionPalette, that.impressionPalette);
+              Objects.equals(this.impressionPalette, that.impressionPalette) &&
+              this.hasGlint == that.hasGlint;
     }
 
     @Override
@@ -99,7 +112,8 @@ public final class SealMaterial {
         int i = 1;
         i = 31 * i + this.spriteId.hashCode();
         i = 31 * i + this.modelTintColor;
-        return 31 * i + this.impressionPalette.hashCode();
+        i = 31 * i + this.impressionPalette.hashCode();
+        return 31 * i + Boolean.hashCode(this.hasGlint);
     }
 
     @Override
@@ -107,7 +121,8 @@ public final class SealMaterial {
         return "SealMaterial[" +
               "sprite=" + spriteId + ", " +
               "modelTintColor=" + modelTintColor + ", " +
-              "impressionPalette=" + impressionPalette + ']';
+              "impressionPalette=" + impressionPalette + ", " +
+              "hasGlint=" + hasGlint + ']';
     }
 
     // --
@@ -131,7 +146,7 @@ public final class SealMaterial {
         context.register(GOLD, new SealMaterial(
               keyToSprite.apply(GOLD),
               0xFFFFB347,
-              new ShadingPalette(0xFFD79736, 0xFFFFEAAD, 0xFF75340B, 0xFFB56D24)));
+              new ShadingPalette(0xFFD79736, 0xFFFFEAAD, 0xFF75340B, 0xFFB56D24), true));
         context.register(SCULK, new SealMaterial(
               keyToSprite.apply(SCULK),
               0xFF19C8D2,

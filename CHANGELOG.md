@@ -2,38 +2,36 @@
 
 ## 0.3.0 - 08/10/2026
 
-- Ported the Courier Bat for night mail delivery; mailboxes can employ nearby vanilla Bats or summon one when none are available.
-- Added the Spider Eye Bat-food slot to mailboxes without moving the existing food and mail slot indices, preserving existing mailbox inventories.
-- Mail Service deliveries use Bats at night, and background couriers switch between Bat and Pigeon at the virtual mail hub when the time of day changes.
-- Added separate Pigeon and Bat background travel speeds (25 and 50 blocks per second by default) and the "The Pigeons and the Bats" advancement.
-- Added Bat entity registration, courier AI, delivery visuals, backpack texture, and Bat settings for mailbox employment and spawning.
-- Added the Soulbound Seal Stamp, crafted from a Seal Stamp and Echo Shard. It has eight uses and returns as the original stamp with its wax and die preserved.
-- Fixed the Soulbound stamp preview: animated Sculk now cycles through its four frames at the configured one-second frame duration, and stamps obtained in Creative default to the Sculk seal preview.
-- Fixed Soulbound Seal Stamps obtained directly from Creative being rejected when sealing unsealed mail: they now use their intrinsic Sculk material even without a crafting-added material component.
-- Added persistent seal locks. Soulbound seals prevent other players from opening the item until the sealer dies, and the sealed item is kept through death and transferred into the sealer's respawned inventory.
-- Added `/envelope seal_lock create|unlock|list` for managing locks; an active lock must also be assigned in the seal component to protect an item.
-- Added the original recipient to delivered-mail tooltips and made service addresses clickable in JEI mailing recipes to show usages.
-- Migrated seal art into `textures/gui/sprites/seal`, enabled animated seal sprites, and changed seal material/symbol data to the `sprite` field while retaining support for legacy `texture` data.
-- Fixed Soulbound Seal startup crashes by matching both the owner and receiver types of Minecraft 1.21.11's `NonNullList.set` call in its death-protection mixin.
-- Implemented the Courier Bat, Soulbound Seal, and related features described in the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637); see [README credits](README.md#credits).
-- Updated pigeon background delivery speed from 20 to 25 blocks per second.
-- Added a unified courier damage-evasion setting and renamed the corresponding damage-type tag.
-- Replaced the courier `doMobSpawning` setting with `spawning_ignores_domobspawning_rule`; its default preserves the prior behavior of respecting the game rule.
-- Added a server setting to disable Mail Service notices when a courier dies.
-- Made courier appearance/disappearance particles visible at greater distances and play courier ambient sounds when deliveries finish.
-- Moved administrative send and broadcast commands to `/envelope mail send` and `/envelope mail broadcast`; mail sending accepts an optional `from <address>` sender and `to <address>` recipient override.
-- Added `/envelope debug terminate_all_deliveries`, with a separate `confirm` literal to prevent accidental termination.
-- Ported the `cube`, `letter_and_quill`, and `skull_and_bones` seal symbols and their Mail Service stamp recipes; the cube recipe requires a Grass Block. Legacy symbol registry entries remain for existing seals, while the obsolete skeleton-stamp recipe was removed.
-- Added original color-specific textures and item models for all 16 dyeable Seal Stamps, selected by the stamp's material component.
-- Added the original Seal Stamp sound to stamp application and ported the animated Soulbound glint plus lock overlays to seal previews.
-- Updated mailbox mail-type icons and added the original Halloween spider/web decoration for empty mailboxes.
-- Added a JEI crafting extension that previews the 16 dye-specific Seal Stamp results with their correct material components.
-- Deferred Cloud Depository and Letter Presetting. Every Compat remains unported because no compatible Fabric artifact for Minecraft 1.21.11 was available on Modrinth on 2026-10-08.
-- Fixed bulk-expiring pending payback mail by iterating over a snapshot while items are removed and returned.
-- Removed an unused service-address tick callback and obsolete experimental code from the debug command.
-- Renamed server configuration paths. Existing settings may be regenerated and need to be reapplied after updating.
-- Adapted selected delivery and command changes from the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637).
-- Reviewed and linked the community proposals in `COMMUNITY_SUGGESTIONS.md`, including upstream ideas for tag copying, return-to-sender, feather alternatives, Create automation, and mail-in rebates.
+### Added
+
+- Added the Courier Bat for night deliveries. Mailboxes can employ nearby Bats or summon one when needed; Mail Service deliveries use Bats at night. A Bat switches between courier roles at the virtual hub if the time changes during a delivery.
+- Added a Spider Eye food slot for Bats, Bat courier visuals and sounds, and the "The Pigeons and the Bats" advancement. Each Bat can complete up to three deliveries; its delivery count is saved.
+- Added the Soulbound Seal Stamp, crafted by combining a Seal Stamp with an Echo Shard. It has eight uses and returns as the original stamp with its wax and die preserved.
+- Added persistent seal locks and `/envelope seal_lock create|unlock|list`. Locks can be used by Soulbound Seals or assigned to other seals for custom uses; `create` accepts either an owner name or an existing `owner#uuid` lock ID.
+- Added all 16 colored Seal Stamp designs and separate Gold Stamp artwork. Added the `cube`, `letter_and_quill`, and `skull_and_bones` designs and their Mail Service recipes; the cube recipe requires a Grass Block.
+- Added JEI notes for broadcast and payback-cancellation recipes, clickable service addresses, and previews for the dye-specific Seal Stamp recipes.
+- Added the original recipient to delivered-mail tooltips and the original Halloween spiderweb decoration to empty mailboxes.
+
+### Changed
+
+- Replaced the port's initial custom seal-coloring approach with the original colored wax backgrounds, impression palettes, and stamp artwork from upstream.
+- Increased background Pigeon travel speed from 20 to 25 blocks per second; Bat speed defaults to 50 blocks per second.
+- Added server settings for Bat delivery limits, Soulbound Stamp availability/uses/locks, seal removal time, delivery phase duration, and Mail Service courier-death notices. Unified courier damage evasion and replaced the old courier spawning-rule option. **Review the regenerated server configuration after updating; renamed settings may need to be reapplied.**
+- Moved send and broadcast commands under `/envelope mail`; sending supports optional sender and recipient addresses. Added `/envelope debug terminate_all_deliveries confirm` with explicit confirmation.
+- Moved seal artwork to animated GUI sprites and changed seal material/symbol definitions to use sprite references. Legacy texture fields remain readable. Seal data can now include an optional lock.
+- Added material-specific seal glint (Gold) and animated Sculk wax, the original stamp sound, and lock overlays. The preview lock symbol reflects lock data on the item and may remain visible after an administrator deactivates the lock.
+- Increased the visibility distance of courier arrival/departure particles and made couriers play their ambient sound when a delivery finishes.
+- Removed the Slimeball requirement from the Automated Supply Service Letter and Writable Book recipes. The Seal Stamp recipe now uses honeycomb, planks, and an iron ingot.
+
+### Fixed
+
+- Fixed Soulbound Seal Stamp previews, including Sculk animation and Creative-inventory stamps defaulting to Sculk.
+- Fixed Soulbound stamps obtained directly in Creative so they can seal mail without a crafting-added material component.
+- Fixed the Soulbound Seal death-protection mixin for the target game's inventory list method signature.
+- Fixed bulk-expiring payback mail by returning items from a snapshot while removing expired entries.
+- Removed an unused service-address tick callback.
+
+This release adapts selected features from the original creators' [Envelope 0.8.0 Snapshot 1 and Snapshot 2](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637). See [Credits](README.md#credits) for the original project and creators.
 
 ## 0.2.1 - 05/10/2026
 

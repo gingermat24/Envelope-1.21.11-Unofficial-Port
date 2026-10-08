@@ -90,6 +90,8 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addWidget(new ServiceAddressRecipeWidget(
               new ScreenRectangle(0, 0, getWidth(), 12), recipeHolder.value().getAddress()));
+        recipeHolder.value().getInfo().ifPresent(info ->
+              builder.addWidget(new MailingRecipeInfoWidget(126, 20, info)));
         if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
             builder.addGuiEventListener(new AddressUsesClickListener(recipeHolder.value().getAddress(), getWidth(), 12));
         }

@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
@@ -38,6 +39,8 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
     private final ItemStack result = Mail.createLetter(Component.empty())
           .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
           .get();
+    private final Optional<Component> info = Optional.of(
+          Component.translatable("recipe.envelope.mailing.mail_service.letter_broadcasting.info"));
 
     public MailLetterBroadcastingRecipe(ServiceAddress address, NonNullList<Ingredient> ingredients) {
         super(address);
@@ -57,6 +60,11 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
     @Override
     public boolean isOneCraftPerDelivery() {
         return true; // Prevent spamming and spawning tons of couriers
+    }
+
+    @Override
+    public Optional<Component> getInfo() {
+        return info;
     }
 
     @Override

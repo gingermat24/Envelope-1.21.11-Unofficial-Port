@@ -390,6 +390,9 @@
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
   "envelope.jei.category.mailing": "Mailing",
+  "envelope.jei.info": "Info",
+  "recipe.envelope.mailing.mail_service.letter_broadcasting.info": "Sends copies of the letter to all players who have a default mailbox",
+  "recipe.envelope.mailing.mail_service.payback_cancelling.info": "Cancels and returns the last mail with payback request",
 
   "envelope.empty_tag": "Empty Tag",
 

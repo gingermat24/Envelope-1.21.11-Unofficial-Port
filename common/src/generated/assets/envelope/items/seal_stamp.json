@@ -8,6 +8,7 @@
       {"when": "brown", "model": {"type": "minecraft:model", "model": "envelope:item/brown_seal_stamp"}},
       {"when": "cyan", "model": {"type": "minecraft:model", "model": "envelope:item/cyan_seal_stamp"}},
       {"when": "gray", "model": {"type": "minecraft:model", "model": "envelope:item/gray_seal_stamp"}},
+      {"when": "gold", "model": {"type": "minecraft:model", "model": "envelope:item/gold_seal_stamp"}},
       {"when": "green", "model": {"type": "minecraft:model", "model": "envelope:item/green_seal_stamp"}},
       {"when": "light_blue", "model": {"type": "minecraft:model", "model": "envelope:item/light_blue_seal_stamp"}},
       {"when": "light_gray", "model": {"type": "minecraft:model", "model": "envelope:item/light_gray_seal_stamp"}},

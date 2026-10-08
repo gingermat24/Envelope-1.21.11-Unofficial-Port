@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.SealLock;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -9,6 +10,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
@@ -16,6 +18,12 @@ import java.util.Optional;
 public class SoulboundSealStampItem extends SealStampItem {
     public SoulboundSealStampItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public boolean isEnabled(FeatureFlagSet enabledFeatures) {
+        return super.isEnabled(enabledFeatures)
+              && (!Config.Server.SPEC.isLoaded() || Config.Server.SOULBOUND_SEAL_STAMP_ENABLED.get());
     }
 
     @Override
@@ -29,8 +37,11 @@ public class SoulboundSealStampItem extends SealStampItem {
     @Override
     public Seal createSeal(ItemStack stack, Player player) {
         Holder<SealMaterial> sculk = SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.SCULK);
+        Optional<SealLock> lock = Config.Server.SOULBOUND_SEAL_STAMP_CREATES_LOCK.get()
+              ? Optional.of(SealLock.create(player.getScoreboardName()))
+              : Optional.empty();
         return new Seal(sculk, getDieOrDefault(stack, player.registryAccess(), player), player.getName(),
-              Optional.of(player.getUUID()), Optional.of(SealLock.create(player.getScoreboardName())));
+              Optional.of(player.getUUID()), lock);
     }
 
     @Override
@@ -45,7 +56,13 @@ public class SoulboundSealStampItem extends SealStampItem {
 
     @Override
     protected void onSealApplied(ItemStack stampStack, Player player, Seal seal) {
-        seal.lock().ifPresent(lock -> lock.lock(player.level()));
+        if (Config.Server.SOULBOUND_SEAL_STAMP_CREATES_LOCK.get()) {
+            seal.lock().ifPresent(lock -> lock.lock(player.level()));
+        }
+
+        if (!Config.Server.SOULBOUND_SEAL_STAMP_CONSUMABLE.get()) {
+            return;
+        }
 
         Holder<SealMaterial> originalMaterial =
               stampStack.get(Envelope.DataComponents.SOULBOUND_STAMP_ORIGINAL_MATERIAL);
