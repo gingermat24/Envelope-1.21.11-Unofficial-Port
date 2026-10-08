@@ -26,6 +26,7 @@
 ### Fixed
 
 - Fixed Soulbound Seal Stamp previews, including Sculk animation and Creative-inventory stamps defaulting to Sculk.
+- Restored native animated-sprite rendering for Sculk wax so its interpolation metadata is honored; Gold glint keeps its upstream animated sequence and intentional pauses.
 - Fixed Soulbound stamps obtained directly in Creative so they can seal mail without a crafting-added material component.
 - Fixed the Soulbound Seal death-protection mixin for the target game's inventory list method signature.
 - Fixed bulk-expiring payback mail by returning items from a snapshot while removing expired entries.

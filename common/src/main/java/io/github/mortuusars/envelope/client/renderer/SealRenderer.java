@@ -9,17 +9,12 @@ import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 
 public class SealRenderer {
     public static final Identifier IRON_DIE_TEXTURE = Envelope.resource("textures/gui/sprites/seal/die/iron.png");
-    private static final Identifier SCULK_SPRITE = Envelope.resource("seal/material/sculk");
     private static final Identifier SEAL_GLINT_SPRITE = Envelope.resource("seal/glint");
     private static final Identifier LOCK_SPRITE = Envelope.resource("seal/lock");
     private static final Identifier LOCKED_OVERLAY_SPRITE = Envelope.resource("seal/locked_overlay");
-    private static final int SCULK_FRAME_SIZE = 30;
-    private static final int SCULK_FRAME_COUNT = 4;
-    private static final long SCULK_FRAME_DURATION_MILLIS = 1000L;
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
         SealMaterial material = seal.material().value();
@@ -93,15 +88,7 @@ public class SealRenderer {
     }
 
     private void renderMaterial(SealMaterial material, GuiGraphics guiGraphics, int x, int y) {
-        if (material.spriteId().equals(SCULK_SPRITE)) {
-            int frame = (int) ((Util.getMillis() / SCULK_FRAME_DURATION_MILLIS) % SCULK_FRAME_COUNT);
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, material.spriteTexture(),
-                  x, y, 0, frame * SCULK_FRAME_SIZE,
-                  SCULK_FRAME_SIZE, SCULK_FRAME_SIZE,
-                  SCULK_FRAME_SIZE, SCULK_FRAME_SIZE * SCULK_FRAME_COUNT);
-        } else {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, material.spriteId(), x, y, 30, 30);
-        }
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, material.spriteId(), x, y, 30, 30);
     }
 
     private void blitImpression(GuiGraphics guiGraphics, Identifier source, TintColor tint, int x, int y, int textureWidth) {
