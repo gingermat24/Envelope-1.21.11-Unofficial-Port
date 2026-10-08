@@ -103,8 +103,6 @@ Please support the original project and its creators:
 * [Join their Discord](https://discord.com/invite/FzHKGDW2et)
 * [Original Wiki](https://moddedmc.wiki/en/project/envelope/latest)
 
-The Snapshot 2 notes are a feature reference, not a source for image files. The Soulbound stamp texture, Sculk seal sprite, and Sculk animation metadata in this port were verified byte-for-byte against the corresponding files in the original mod's public [`1.21.1-dev` branch](https://github.com/mortuusars/Envelope/tree/1.21.1-dev).
-
 ## Disclaimer
 
 This is an **unofficial port** and is not affiliated with or endorsed by the original Envelope developers unless explicitly stated otherwise.
