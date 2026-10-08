@@ -44,6 +44,7 @@
   "item.envelope.payback_tag": "Etiqueta de Pagamento",
 
   "item.envelope.seal_stamp": "Carimbo de Selo",
+  "item.envelope.soulbound_seal_stamp": "Carimbo de Selo Vinculado à Alma",
 
   "item.envelope.mailbox": "Caixa Postal",
 
@@ -105,6 +106,7 @@
   "gui.envelope.mail.sender": "Remetente",
   "gui.envelope.mail.recipient": "Destinatário",
   "gui.envelope.mail.from": "De",
+  "gui.envelope.mail.to": "Para: %s",
 
   "gui.envelope.delivery_log": "§7Registro de Entrega",
   "gui.envelope.delivery_log.record.sent": " §7Enviado de %s %s",

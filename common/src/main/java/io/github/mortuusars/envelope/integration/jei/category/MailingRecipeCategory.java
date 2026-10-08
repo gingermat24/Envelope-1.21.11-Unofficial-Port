@@ -1,12 +1,15 @@
 package io.github.mortuusars.envelope.integration.jei.category;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
 import io.github.mortuusars.envelope.world.item.Unsealable;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
+import mezz.jei.api.gui.inputs.IJeiGuiEventListener;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -17,6 +20,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.AbstractRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -40,10 +44,12 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               .addItemLike(Envelope.Items.PAPER_BOX.get())
               .addItemLike(Envelope.Items.PACKAGE.get());
 
-        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
-              .addIngredient(EnvelopeJeiPlugin.SERVICE_ADDRESS_INGREDIENT, recipe.getAddress());
-        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-              .addIngredient(EnvelopeJeiPlugin.SERVICE_ADDRESS_INGREDIENT, recipe.getAddress());
+        if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
+            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
+                  .addIngredient(EnvelopeJeiPlugin.SERVICE_ADDRESS_INGREDIENT, recipe.getAddress());
+            builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
+                  .addIngredient(EnvelopeJeiPlugin.SERVICE_ADDRESS_INGREDIENT, recipe.getAddress());
+        }
 
         for (int row = 0; row < 2; row++) {
             for (int column = 0; column < 3; column++) {
@@ -91,7 +97,26 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               .setPosition(0, 0)
               .setTextAlignment(HorizontalAlignment.CENTER)
               .setColor(0xFF808080);
+        if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
+            builder.addGuiEventListener(new AddressUsesClickListener(recipeHolder.value().getAddress(), getWidth(), 12));
+        }
 
         builder.addRecipeArrow().setPosition(90, 32);
+    }
+
+    private record AddressUsesClickListener(ServiceAddress address, int width, int height)
+          implements IJeiGuiEventListener {
+        @Override
+        public ScreenRectangle getArea() {
+            return new ScreenRectangle(0, 0, width, height);
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (button != 0 || mouseX < 0 || mouseX >= width || mouseY < 0 || mouseY >= height) {
+                return false;
+            }
+            return EnvelopeJeiPlugin.showAddressUsages(address);
+        }
     }
 }

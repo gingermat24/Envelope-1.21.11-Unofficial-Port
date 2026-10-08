@@ -25,6 +25,8 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.registration.*;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -37,6 +39,7 @@ import java.util.stream.Stream;
 @JeiPlugin
 public class EnvelopeJeiPlugin implements IModPlugin {
     private static final Identifier ID = Envelope.resource("jei_plugin");
+    private static IJeiRuntime runtime;
 
     public static final IIngredientType<ServiceAddress> SERVICE_ADDRESS_INGREDIENT = new IIngredientType<>() {
         @Override
@@ -48,6 +51,26 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     @Override
     public @NotNull Identifier getPluginUid() {
         return ID;
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        runtime = jeiRuntime;
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        runtime = null;
+    }
+
+    public static boolean showAddressUsages(ServiceAddress address) {
+        if (runtime == null) {
+            return false;
+        }
+        var focus = runtime.getJeiHelpers().getFocusFactory()
+              .createFocus(RecipeIngredientRole.INPUT, SERVICE_ADDRESS_INGREDIENT, address);
+        runtime.getRecipesGui().show(focus);
+        return true;
     }
 
     @Override

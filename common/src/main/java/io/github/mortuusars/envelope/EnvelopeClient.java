@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -48,7 +49,7 @@ public class EnvelopeClient {
                 case PaybackRequest paybackRequest -> new PaybackRequestTooltipComponent(paybackRequest);
                 case Seal seal -> new SealTooltipComponent(seal);
                 case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die ->
-                      new SealDieTooltipComponent(die.impression(), die.material());
+                      new SealDieTooltipComponent(die.impression(), die.material(), die.soulbound());
                 case CompositeTooltip composite -> new CompositeTooltipComponent(
                       composite.components().stream().map(ClientTooltipComponent::create).toList()
                 );
@@ -83,6 +84,10 @@ public class EnvelopeClient {
                           .append(sender.format().asNeutral().toComponent()));
                 }
             });
+
+            DeliveryInfo.of(stack).originalRecipient().ifPresent(recipient ->
+                  consumer.accept(Component.translatable("gui.envelope.mail.to",
+                        recipient.format().asRecipient().toComponent()).withStyle(ChatFormatting.GRAY)));
 
             if (tooltipFlag.isAdvanced()) {
                 Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {

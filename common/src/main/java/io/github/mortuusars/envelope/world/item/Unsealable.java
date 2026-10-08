@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -42,7 +43,16 @@ public interface Unsealable {
         return 20;
     }
 
+    default boolean canUnseal(ItemStack stack, Player player) {
+        Seal seal = stack.get(Envelope.DataComponents.SEAL);
+        return seal == null || seal.lock().map(lock -> !lock.isLockedFor(player)).orElse(true);
+    }
+
     default ItemStack unseal(ItemStack stack, Level level, @Nullable LivingEntity entity) {
+        if (entity instanceof Player player && !canUnseal(stack, player)) {
+            return stack;
+        }
+
         ItemStack unsealedStack = stack.transmuteCopy(getUnsealedItem());
         unsealedStack.remove(Envelope.DataComponents.SEAL);
 

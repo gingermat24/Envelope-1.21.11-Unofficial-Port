@@ -46,6 +46,7 @@
   "item.envelope.payback_tag": "回寄标签",
 
   "item.envelope.seal_stamp": "蜡封印章",
+  "item.envelope.soulbound_seal_stamp": "灵魂绑定蜡封印章",
 
   "item.envelope.mailbox": "邮箱",
 
@@ -111,6 +112,7 @@
   "gui.envelope.mail.sender": "发件人",
   "gui.envelope.mail.recipient": "收件人",
   "gui.envelope.mail.from": "来自",
+  "gui.envelope.mail.to": "收件人：%s",
 
   "gui.envelope.delivery_log": "§7投递日志",
   "gui.envelope.delivery_log.record.sent": " §7来自 %s %s",

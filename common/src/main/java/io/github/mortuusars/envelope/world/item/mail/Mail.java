@@ -168,6 +168,11 @@ public final class Mail {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 
         if (!isReturned(mail)) {
+            Address recipient = getRecipient(mail).orElse(null);
+            DeliveryInfo deliveryInfo = DeliveryInfo.of(mail);
+            if (recipient != null && deliveryInfo.originalRecipient().isEmpty()) {
+                deliveryInfo.mutable().originalRecipient(recipient).immutableApplyTo(mail);
+            }
             mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
             mail.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
         }

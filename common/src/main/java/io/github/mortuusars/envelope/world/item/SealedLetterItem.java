@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,8 +44,13 @@ public class SealedLetterItem extends Item implements Unsealable {
 
     @Override
     public @NotNull InteractionResult use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!canUnseal(stack, player)) {
+            player.playSound(SoundEvents.COMPARATOR_CLICK);
+            return InteractionResult.FAIL;
+        }
         player.startUsingItem(hand);
-        return ItemUseResult.success(player.getItemInHand(hand));
+        return ItemUseResult.success(stack);
     }
 
     @Override

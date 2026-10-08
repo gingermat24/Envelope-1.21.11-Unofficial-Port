@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.Envelope;
@@ -14,6 +15,8 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
+import io.github.mortuusars.envelope.world.item.component.SealLock;
+import io.github.mortuusars.envelope.world.level.saveddata.SealLocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -45,7 +48,81 @@ public class EnvelopeCommand {
                           .then(Commands.argument("address", AddressArgument.block())
                                 .suggests(AddressSuggestions.block())
                                 .executes(c -> mailboxPosition(c, AddressArgument.getBlock(c, "address"))))))
+              .then(sealLockCommands())
               .then(EnvelopeDebugCommand.commands()));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> sealLockCommands() {
+        return Commands.literal("seal_lock")
+              .then(Commands.literal("create")
+                    .then(Commands.argument("owner", StringArgumentType.word())
+                          .executes(context -> createSealLock(context,
+                                StringArgumentType.getString(context, "owner")))))
+              .then(Commands.literal("unlock")
+                    .then(Commands.argument("lock", StringArgumentType.word())
+                          .executes(EnvelopeCommand::unlockSealLock))
+                    .then(Commands.literal("owner")
+                          .then(Commands.argument("owner", StringArgumentType.word())
+                                .executes(EnvelopeCommand::unlockOwnerSealLocks))))
+              .then(Commands.literal("list").executes(EnvelopeCommand::listSealLocks));
+    }
+
+    private static int createSealLock(CommandContext<CommandSourceStack> context, String owner) {
+        SealLock lock;
+        try {
+            lock = SealLock.create(owner);
+        } catch (IllegalArgumentException exception) {
+            context.getSource().sendFailure(Component.literal(exception.getMessage()));
+            return 0;
+        }
+
+        if (!lock.lock(context.getSource().getLevel())) {
+            context.getSource().sendFailure(Component.literal("Could not create seal lock."));
+            return 0;
+        }
+
+        context.getSource().sendSuccess(() -> Component.literal("Created seal lock: ")
+              .append(Component.literal(lock.toString()).withStyle(Style.EMPTY
+                    .withClickEvent(new ClickEvent.CopyToClipboard(lock.toString())))), true);
+        return 1;
+    }
+
+    private static int unlockSealLock(CommandContext<CommandSourceStack> context) {
+        String value = StringArgumentType.getString(context, "lock");
+        Optional<SealLock> lock = SealLock.parse(value).result();
+        if (lock.isEmpty()) {
+            context.getSource().sendFailure(Component.literal("Invalid seal lock. Expected 'owner#uuid'."));
+            return 0;
+        }
+
+        if (!lock.get().unlock(context.getSource().getLevel())) {
+            context.getSource().sendFailure(Component.literal("Seal lock is not currently locked: " + value));
+            return 0;
+        }
+
+        context.getSource().sendSuccess(() -> Component.literal("Unlocked seal lock: " + value), true);
+        return 1;
+    }
+
+    private static int unlockOwnerSealLocks(CommandContext<CommandSourceStack> context) {
+        String owner = StringArgumentType.getString(context, "owner");
+        if (!SealLock.unlockAllFrom(owner, context.getSource().getLevel())) {
+            context.getSource().sendFailure(Component.literal("No active seal locks found for " + owner + "."));
+            return 0;
+        }
+        context.getSource().sendSuccess(() -> Component.literal("Unlocked all seal locks for " + owner + "."), true);
+        return 1;
+    }
+
+    private static int listSealLocks(CommandContext<CommandSourceStack> context) {
+        List<SealLock> locks = SealLocks.get(context.getSource().getLevel()).getLocks().stream()
+              .sorted(Comparator.comparing(SealLock::toString))
+              .toList();
+        context.getSource().sendSuccess(() -> Component.literal("Active seal locks (" + locks.size() + "):"), false);
+        for (SealLock lock : locks) {
+            context.getSource().sendSuccess(() -> Component.literal("- " + lock), false);
+        }
+        return locks.size();
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> mailCommands(CommandBuildContext context) {

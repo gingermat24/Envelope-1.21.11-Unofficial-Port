@@ -7,7 +7,15 @@
 - Mail Service deliveries use Bats at night, and background couriers switch between Bat and Pigeon at the virtual mail hub when the time of day changes.
 - Added separate Pigeon and Bat background travel speeds (25 and 50 blocks per second by default) and the "The Pigeons and the Bats" advancement.
 - Added Bat entity registration, courier AI, delivery visuals, backpack texture, and Bat settings for mailbox employment and spawning.
-- Adapted the Bat feature and related assets from the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637). Soulbound Seal/lock features remain outside this release.
+- Added the Soulbound Seal Stamp, crafted from a Seal Stamp and Echo Shard. It has eight uses and returns as the original stamp with its wax and die preserved.
+- Fixed the Soulbound stamp preview: animated Sculk now cycles through its four frames at the configured one-second frame duration, and stamps obtained in Creative default to the Sculk seal preview.
+- Fixed Soulbound Seal Stamps obtained directly from Creative being rejected when sealing unsealed mail: they now use their intrinsic Sculk material even without a crafting-added material component.
+- Added persistent seal locks. Soulbound seals prevent other players from opening the item until the sealer dies, and the sealed item is kept through death and transferred into the sealer's respawned inventory.
+- Added `/envelope seal_lock create|unlock|list` for managing locks; an active lock must also be assigned in the seal component to protect an item.
+- Added the original recipient to delivered-mail tooltips and made service addresses clickable in JEI mailing recipes to show usages.
+- Migrated seal art into `textures/gui/sprites/seal`, enabled animated seal sprites, and changed seal material/symbol data to the `sprite` field while retaining support for legacy `texture` data.
+- Fixed Soulbound Seal startup crashes by matching both the owner and receiver types of Minecraft 1.21.11's `NonNullList.set` call in its death-protection mixin.
+- Implemented the Courier Bat, Soulbound Seal, and related features described in the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637); see [README credits](README.md#credits).
 - Updated pigeon background delivery speed from 20 to 25 blocks per second.
 - Added a unified courier damage-evasion setting and renamed the corresponding damage-type tag.
 - Replaced the courier `doMobSpawning` setting with `spawning_ignores_domobspawning_rule`; its default preserves the prior behavior of respecting the game rule.
@@ -19,6 +27,7 @@
 - Removed an unused service-address tick callback and obsolete experimental code from the debug command.
 - Renamed server configuration paths. Existing settings may be regenerated and need to be reapplied after updating.
 - Adapted selected delivery and command changes from the original creators' [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637).
+- Reviewed and linked the community proposals in `COMMUNITY_SUGGESTIONS.md`, including upstream ideas for tag copying, return-to-sender, feather alternatives, Create automation, and mail-in rebates.
 
 ## 0.2.1 - 05/10/2026
 

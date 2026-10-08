@@ -67,11 +67,16 @@ Changes added in this port:
 * **Recipe updates:** removed the Slimeball from the Automated Supply Service Letter and Writable Book recipes, and revised the Seal Stamp recipe to use honeycomb, planks, and an iron ingot.
 * **Courier delivery updates:** pigeon background travel speed now defaults to 25 blocks per second; courier damage evasion, spawning-rule behavior, and Mail Service courier-death notices have dedicated server settings. Couriers play their ambient sound when completing a delivery, and their appear/disappear particles are visible at greater distances.
 * **Mail commands:** administrative send and broadcast commands are grouped under `/envelope mail`; send supports an explicit `to <address>` recipient override and optional `from <address>` sender. `/envelope debug terminate_all_deliveries confirm` provides an explicit confirmation step before stopping deliveries.
+* **Soulbound Seals:** combine a Seal Stamp with an Echo Shard to make an 8-use Soulbound Seal Stamp. Its seals lock mail to the sealer, prevent other players from opening it while the sealer lives, and keep the sealed item through the sealer's death; the stamp returns to its original type and wax when depleted. The four-frame Sculk preview animates at its configured frame rate, and stamps obtained directly in Creative can seal unsealed mail without a crafting-added material component. The death-protection hook targets Minecraft 1.21.11's inventory list implementation.
+* **Seal locks:** `/envelope seal_lock create|unlock|list` manages persistent locks for Soulbound Seals and other custom uses. A lock must also be stored in the seal component to apply to an item.
+* **Mail and JEI:** delivered mail remembers its original recipient for the `To:` tooltip, and service addresses in JEI's mailing recipes are clickable to show recipe usages.
 * **Maintenance fixes:** bulk-expiring payback mail now safely returns all pending items; removed obsolete no-op service ticking and disabled experimental debug-command code.
 
-This is a partial adaptation of the upstream 0.8.0 notes (snapshot 1 and 2). Version 0.3.0 adds the Courier Bat's night deliveries, Spider Eye mailbox slot, night-time service dispatch, bat-speed routing, day/night courier changes at the mail hub, and The Pigeons and the Bats advancement.
+This 0.3.0 release adapts selected features from upstream Envelope 0.8.0 Snapshot 1 and Snapshot 2. The seal artwork is moved to GUI sprites to support animation; existing `texture` data fields remain readable for compatibility with older saved data.
 
 Some server configuration paths were renamed in 0.3.0. Back up and review the existing Envelope server config after updating; renamed settings may be regenerated with defaults and need to be reapplied.
+
+Future ideas and their current scope recommendations are listed in [COMMUNITY_SUGGESTIONS.md](COMMUNITY_SUGGESTIONS.md). Upstream issue links there refer to community proposals for the original mod, not requests made specifically to this port.
 
 ## Dependencies and compatibility
 
@@ -96,12 +101,16 @@ The original creators retain credit for the original code, textures, models, ima
 
 Please support the original project and its creators:
 
+* [Original Envelope source code](https://github.com/mortuusars/Envelope) (GPL-3.0)
 * [Original Envelope on Modrinth](https://modrinth.com/mod/envelope)
 * [Original Envelope on CurseForge](https://curseforge.com/minecraft/mc-mods/envelope)
+* [Envelope 0.8.0 Snapshot 2 notes](https://www.patreon.com/mortuusars/posts/envelope-0-8-0-2-171460637)
 * [Support the creators on Patreon](https://www.patreon.com/mortuusars?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
 * [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=YTSFJQ8XTXZBW)
 * [Join their Discord](https://discord.com/invite/FzHKGDW2et)
 * [Original Wiki](https://moddedmc.wiki/en/project/envelope/latest)
+
+The Snapshot 2 notes are a feature reference, not a source for image files. The Soulbound stamp texture, Sculk seal sprite, and Sculk animation metadata in this port were verified byte-for-byte against the corresponding files in the original mod's public [`1.21.1-dev` branch](https://github.com/mortuusars/Envelope/tree/1.21.1-dev).
 
 ## Disclaimer
 

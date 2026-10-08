@@ -8,5 +8,10 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import java.util.Optional;
 
 public record SealDieTooltipComponent(Optional<Holder<SealSymbol>> impression,
-                                      Optional<Holder<SealMaterial>> material) implements TooltipComponent {
+                                      Optional<Holder<SealMaterial>> material,
+                                      boolean soulbound) implements TooltipComponent {
+    public SealDieTooltipComponent(Optional<Holder<SealSymbol>> impression,
+                                   Optional<Holder<SealMaterial>> material) {
+        this(impression, material, false);
+    }
 }

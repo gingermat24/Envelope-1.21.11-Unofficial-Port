@@ -23,11 +23,15 @@
 
     public final class SealSymbol {
         public static final Codec<SealSymbol> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
-            Identifier.CODEC.fieldOf("texture").forGetter(SealSymbol::textureId)
-        ).apply(i, SealSymbol::new));
+            Identifier.CODEC.optionalFieldOf("sprite")
+                  .forGetter(symbol -> Optional.of(symbol.spriteId())),
+            Identifier.CODEC.optionalFieldOf("texture")
+                  .forGetter(symbol -> Optional.empty())
+        ).apply(i, (sprite, texture) -> new SealSymbol(sprite.or(() -> texture)
+              .orElseThrow(() -> new IllegalArgumentException("Seal symbol requires a 'sprite' field.")))));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, SealSymbol> DIRECT_STREAM_CODEC = StreamCodec.composite(
-            Identifier.STREAM_CODEC, SealSymbol::textureId,
+            Identifier.STREAM_CODEC, SealSymbol::spriteId,
             SealSymbol::new
         );
 
@@ -72,20 +76,28 @@
 
         // --
 
-        private final Identifier texture;
-        private final Identifier textureFull;
+        private final Identifier sprite;
+        private final Identifier spriteTexture;
 
-        public SealSymbol(Identifier texture) {
-            this.texture = texture;
-            this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
+        public SealSymbol(Identifier sprite) {
+            this.sprite = sprite;
+            this.spriteTexture = sprite.withPath(path -> "textures/gui/sprites/" + path + ".png");
+        }
+
+        public Identifier spriteId() {
+            return sprite;
+        }
+
+        public Identifier spriteTexture() {
+            return spriteTexture;
         }
 
         public Identifier textureId() {
-            return texture;
+            return sprite;
         }
 
         public Identifier texture() {
-            return textureFull;
+            return spriteTexture;
         }
 
         public static ResourceKey<SealSymbol> firstCharOrDefault(String string) {
@@ -134,11 +146,11 @@
         }
 
         public static void bootstrap(BootstrapContext<SealSymbol> context) {
-            Function<ResourceKey<SealSymbol>, Identifier> keyToTexture = key ->
+            Function<ResourceKey<SealSymbol>, Identifier> keyToSprite = key ->
                 key.identifier().withPath(path -> "seal/symbol/" + path);
 
-            NUMBERS.values().forEach(key -> context.register(key, new SealSymbol(keyToTexture.apply(key))));
-            LETTERS.values().forEach(key -> context.register(key, new SealSymbol(keyToTexture.apply(key))));
-            EMBLEMS.values().forEach(key -> context.register(key, new SealSymbol(keyToTexture.apply(key))));
+            NUMBERS.values().forEach(key -> context.register(key, new SealSymbol(keyToSprite.apply(key))));
+            LETTERS.values().forEach(key -> context.register(key, new SealSymbol(keyToSprite.apply(key))));
+            EMBLEMS.values().forEach(key -> context.register(key, new SealSymbol(keyToSprite.apply(key))));
         }
     }

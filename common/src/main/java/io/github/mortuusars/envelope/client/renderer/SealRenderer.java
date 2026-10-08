@@ -9,19 +9,23 @@ import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 
 public class SealRenderer {
-    public static final Identifier IRON_DIE_TEXTURE = Envelope.resource("textures/seal/die/iron.png");
-    private static final Identifier NEUTRAL_WAX_TEXTURE = Envelope.resource("seal/material/neutral_wax");
+    public static final Identifier IRON_DIE_TEXTURE = Envelope.resource("textures/gui/sprites/seal/die/iron.png");
+    private static final Identifier NEUTRAL_WAX_SPRITE = Envelope.resource("seal/material/neutral_wax");
+    private static final Identifier SCULK_SPRITE = Envelope.resource("seal/material/sculk");
+    private static final int SCULK_FRAME_SIZE = 30;
+    private static final int SCULK_FRAME_COUNT = 4;
+    private static final long SCULK_FRAME_DURATION_MILLIS = 1000L;
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
         SealMaterial material = seal.material().value();
         ShadingPalette colors = material.impressionPalette();
 
-        Identifier materialTexture = getMaterialTexture(material);
-        Identifier impressionTexture = seal.impression().value().texture();
+        Identifier impressionTexture = seal.impression().value().spriteTexture();
 
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, materialTexture, x, y, 0, 0, 30, 30, 30, 30);
+        renderMaterial(material, guiGraphics, x, y);
 
         blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y + 2, 30);
         blitImpression(guiGraphics, impressionTexture, colors.side(), x, y + 2, 30);
@@ -47,15 +51,19 @@ public class SealRenderer {
     }
 
     public void renderDie(SealSymbol impression, SealMaterial material, GuiGraphics guiGraphics, int x, int y) {
-        renderDie(impression, getMaterialTexture(material), material.impressionPalette(), guiGraphics, x, y);
+        renderMaterial(material, guiGraphics, x, y);
+        renderDieImpression(impression, material.impressionPalette(), guiGraphics, x, y);
     }
 
     private void renderDie(SealSymbol impression, Identifier backgroundTexture, ShadingPalette colors,
                            GuiGraphics guiGraphics, int x, int y) {
-        Identifier impressionTexture = impression.texture();
-
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, x, y, 0, 0, 30, 30, 30, 30);
+        renderDieImpression(impression, colors, guiGraphics, x, y);
+    }
 
+    private void renderDieImpression(SealSymbol impression, ShadingPalette colors,
+                                    GuiGraphics guiGraphics, int x, int y) {
+        Identifier impressionTexture = impression.spriteTexture();
         blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y + 1, -30);
         blitImpression(guiGraphics, impressionTexture, colors.side(), x, y + 1, -30);
         blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y + 1, -30);
@@ -73,12 +81,21 @@ public class SealRenderer {
         blitImpression(guiGraphics, impressionTexture, colors.base(), x, y, -30);
     }
 
-    private Identifier getMaterialTexture(SealMaterial material) {
-        Identifier texture = material.texture();
-        if (material.textureId().equals(NEUTRAL_WAX_TEXTURE)) {
-            return TintedTextureCache.get(texture, TintColor.of(material.modelTintColor()));
+    private void renderMaterial(SealMaterial material, GuiGraphics guiGraphics, int x, int y) {
+        if (material.spriteId().equals(NEUTRAL_WAX_SPRITE)) {
+            Identifier tintedTexture = TintedTextureCache.get(
+                  material.spriteTexture(), TintColor.of(material.modelTintColor()));
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, tintedTexture,
+                  x, y, 0, 0, 30, 30, 30, 30);
+        } else if (material.spriteId().equals(SCULK_SPRITE)) {
+            int frame = (int) ((Util.getMillis() / SCULK_FRAME_DURATION_MILLIS) % SCULK_FRAME_COUNT);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, material.spriteTexture(),
+                  x, y, 0, frame * SCULK_FRAME_SIZE,
+                  SCULK_FRAME_SIZE, SCULK_FRAME_SIZE,
+                  SCULK_FRAME_SIZE, SCULK_FRAME_SIZE * SCULK_FRAME_COUNT);
+        } else {
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, material.spriteId(), x, y, 30, 30);
         }
-        return texture;
     }
 
     private void blitImpression(GuiGraphics guiGraphics, Identifier source, TintColor tint, int x, int y, int textureWidth) {

@@ -46,6 +46,7 @@
   "item.envelope.payback_tag": "Метка обмена",
 
   "item.envelope.seal_stamp": "Штамп",
+  "item.envelope.soulbound_seal_stamp": "Штамп души",
 
   "item.envelope.mailbox": "Почтовый ящик",
 
@@ -111,6 +112,7 @@
   "gui.envelope.mail.sender": "Отправитель",
   "gui.envelope.mail.recipient": "Получатель",
   "gui.envelope.mail.from": "От",
+  "gui.envelope.mail.to": "Кому: %s",
 
   "gui.envelope.delivery_log": "§7Информация о доставке",
   "gui.envelope.delivery_log.record.sent": "Отправлено из %s %s",

@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.block.dispenser.PlaceBlockDispenseIte
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.item.component.SealLock;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -42,6 +43,10 @@ public class CommonEvents {
     }
 
     public static void livingDeath(LivingEntity entity, DamageSource source) {
+        if (entity instanceof ServerPlayer player) {
+            SealLock.unlockAllFrom(player.getScoreboardName(), player.level());
+        }
+
         if (entity.getRandom().nextDouble() < Config.Server.ARCHIMEDES_CHANCE.get()
               && entity.level().dimension() == Level.OVERWORLD
               && source.getEntity() instanceof ServerPlayer player

@@ -1,7 +1,9 @@
 # Community Suggestions
 
-Reviewed on 2026-10-04. This file keeps community ideas and their current decisions
+Reviewed on 2026-10-07. This file keeps community ideas and their current decisions
 for future updates. Decisions are scope recommendations, not promises or release dates.
+Some ideas below link to open suggestions on the original project's tracker; they are
+not requests received specifically by this unofficial port.
 
 ## Tag copying recipe
 
@@ -11,6 +13,7 @@ for future updates. Decisions are scope recommendations, not promises or release
   and one blank Address Tag, then returns two Address Tags carrying that same address.
 - This is useful for bulk mail preparation and avoids repeatedly opening the address
   selection interface.
+- This was also proposed in [upstream issue #40](https://github.com/mortuusars/Envelope/issues/40).
 - A custom recipe is needed to copy the configured data component. A normal shapeless
   recipe would not preserve the address from an arbitrary input tag.
 - The current Payback Tag stores a `PaybackRequest`, not an address. Do not make it
@@ -30,6 +33,8 @@ for future updates. Decisions are scope recommendations, not promises or release
 - The Postbox, collection activation, mailbox input changes, and package/lost-mail
   outcomes are a broad redesign of delivery and mailbox behavior. Treat those as
   separate proposals rather than prerequisites for basic return addressing.
+- A broader version of this proposal is discussed in
+  [upstream issue #38](https://github.com/mortuusars/Envelope/issues/38).
 - Do not delete undeliverable letters or silently replace existing mailbox defaults
   as part of a first implementation. Any defaults change needs a separate compatibility
   and gameplay review.
@@ -48,6 +53,30 @@ Mail Service datapack recipes.**
 - A dedicated reusable coupon/postcard system, randomized reward selection, and
   validation of written instructions would need additional design. Start with the
   existing recipe system and only add mechanics that datapack recipes cannot express.
+- The mail-in rebate concept was proposed in
+  [upstream issue #30](https://github.com/mortuusars/Envelope/issues/30).
+
+## Feather alternatives
+
+**Decision: MAYBE for feathers from pigeonhole cleaning; LATER for a refillable pen.**
+
+- The upstream community raised the feather cost and animal-farming concern in
+  [issue #32](https://github.com/mortuusars/Envelope/issues/32).
+- A small, bounded feather drop from cleaning pigeonholes is the lower-scope option;
+  verify it does not make pigeonhole byproducts excessive.
+- A reusable pen needs an ink resource, refill interaction, recipe, and clear
+  compatibility with writing and crafting. It is a larger feature and should be
+  designed separately.
+
+## Create automation support
+
+**Decision: MAYBE, behind an optional integration and with no hard Create dependency.**
+
+- [Upstream issue #34](https://github.com/mortuusars/Envelope/issues/34) asks for
+  easier Create-based insertion and extraction from mailboxes.
+- First confirm which slots and interactions should be automated and whether ordinary
+  inventory automation already covers the use case. If an integration is warranted,
+  test mailbox behavior with Create both installed and absent.
 
 ## "Amazon" / mail-order shopping
 
@@ -178,6 +207,7 @@ Postal markings/cancellation stamps
 More curated datapack Mail Services
 Mailbox shared access
 Tier A — Very good additions
+Pigeonhole feather alternative
 Stamps/postage
 Urgent mail
 Fragile/Confidential markings
@@ -185,6 +215,7 @@ Mailbox notification sound
 Cartographer's Bureau
 Scribe's Guild
 Better pigeon-home preference/training
+Optional Create automation integration
 Tier B — Later
 Return-to-sender
 Payback Tag copying

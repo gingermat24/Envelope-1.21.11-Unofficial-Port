@@ -284,6 +284,9 @@ public class Envelope {
               () -> new AddressTagItem(itemProperties("address_tag", new Item.Properties())));
         public static final Supplier<SealStampItem> SEAL_STAMP = Register.item("seal_stamp",
               () -> new SealStampItem(itemProperties("seal_stamp", new Item.Properties().stacksTo(1))));
+        public static final Supplier<SoulboundSealStampItem> SOULBOUND_SEAL_STAMP = Register.item("soulbound_seal_stamp",
+              () -> new SoulboundSealStampItem(itemProperties("soulbound_seal_stamp",
+                    new Item.Properties().stacksTo(1).durability(8))));
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(itemProperties("pigeon_spawn_egg", new Item.Properties().spawnEgg(EntityTypes.PIGEON.get()))));
@@ -359,6 +362,9 @@ public class Envelope {
               b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<Holder<SealMaterial>> SEAL_STAMP_MATERIAL = Register.dataComponentType("seal_stamp_material",
               b -> b.persistent(SealMaterial.CODEC).networkSynchronized(SealMaterial.STREAM_CODEC).cacheEncoding());
+        public static final DataComponentType<Holder<SealMaterial>> SOULBOUND_STAMP_ORIGINAL_MATERIAL =
+              Register.dataComponentType("soulbound_stamp_original_material", b ->
+                    b.persistent(SealMaterial.CODEC).networkSynchronized(SealMaterial.STREAM_CODEC).cacheEncoding());
         @Deprecated(forRemoval = true)
         public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
               b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
@@ -456,6 +462,8 @@ public class Envelope {
               "crafting_special_payback_tag_application", () -> new CustomRecipe.Serializer<>(PaybackTagApplicationRecipe::new));
         public static final Supplier<RecipeSerializer<SealStampDyeRecipe>> SEAL_STAMP_DYE = Register.recipeSerializer(
               "crafting_seal_stamp_dye", SealStampDyeRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<SoulboundSealStampRecipe>> SOULBOUND_SEAL_STAMP =
+              Register.recipeSerializer("crafting_soulbound_seal_stamp", SoulboundSealStampRecipe.Serializer::new);
 
         public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer(
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));

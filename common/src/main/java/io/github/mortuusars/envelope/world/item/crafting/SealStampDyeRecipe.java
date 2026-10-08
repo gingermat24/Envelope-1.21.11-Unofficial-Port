@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.SealStampItem;
+import io.github.mortuusars.envelope.world.item.SoulboundSealStampItem;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -37,7 +38,7 @@ public class SealStampDyeRecipe extends CustomRecipe {
                 continue;
             }
 
-            if (stack.getItem() instanceof SealStampItem) {
+            if (stack.getItem() instanceof SealStampItem && !(stack.getItem() instanceof SoulboundSealStampItem)) {
                 if (++stampCount > 1) {
                     return false;
                 }
@@ -56,7 +57,7 @@ public class SealStampDyeRecipe extends CustomRecipe {
     @Override
     public @NotNull ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         for (ItemStack stack : input.items()) {
-            if (stack.getItem() instanceof SealStampItem) {
+            if (stack.getItem() instanceof SealStampItem && !(stack.getItem() instanceof SoulboundSealStampItem)) {
                 ItemStack result = stack.copyWithCount(1);
                 result.set(Envelope.DataComponents.SEAL_STAMP_MATERIAL, resultMaterial);
                 return result;

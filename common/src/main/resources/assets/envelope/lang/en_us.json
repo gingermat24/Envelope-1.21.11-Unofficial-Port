@@ -46,6 +46,8 @@
   "item.envelope.payback_tag": "Payback Tag",
 
   "item.envelope.seal_stamp": "Seal Stamp",
+  "item.envelope.soulbound_seal_stamp": "Soulbound Seal Stamp",
+  "seal_material.envelope.sculk": "Sculk",
   "tooltip.envelope.seal_stamp.color": "Seal color: %s",
   "seal_material.envelope.white": "White",
   "seal_material.envelope.orange": "Orange",
@@ -144,6 +146,7 @@
   "gui.envelope.mail.sender": "Sender",
   "gui.envelope.mail.recipient": "Recipient",
   "gui.envelope.mail.from": "From",
+  "gui.envelope.mail.to": "To: %s",
 
   "gui.envelope.delivery_log": "§7Delivery Log",
   "gui.envelope.delivery_log.record.sent": " §7Sent from %s %s",

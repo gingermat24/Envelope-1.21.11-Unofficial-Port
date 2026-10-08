@@ -46,6 +46,7 @@
   "item.envelope.payback_tag": "引換札",
 
   "item.envelope.seal_stamp": "封蝋と印璽",
+  "item.envelope.soulbound_seal_stamp": "魂結びの封蝋スタンプ",
 
   "item.envelope.mailbox": "郵便箱",
 
@@ -111,6 +112,7 @@
   "gui.envelope.mail.sender": "差出人",
   "gui.envelope.mail.recipient": "受取人",
   "gui.envelope.mail.from": "送信元",
+  "gui.envelope.mail.to": "宛先：%s",
 
   "gui.envelope.delivery_log": "§7配達ログ",
   "gui.envelope.delivery_log.record.sent": " §7差出人：%s %s",

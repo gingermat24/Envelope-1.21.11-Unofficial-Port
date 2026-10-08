@@ -86,10 +86,16 @@ public class SealStampItem extends Item implements ApplicatorItem {
         ItemStack target = slot.getItem();
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
-        @Nullable Holder<SealMaterial> stampMaterial = stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL);
-        if (existingSeal != null && stampMaterial != null) {
+        @Nullable Holder<SealMaterial> stampMaterial = getStampMaterial(stack, player);
+        if (existingSeal != null && existingSeal.lock().map(lock -> lock.isLockedFor(player)).orElse(false)) {
+            player.playSound(SoundEvents.COMPARATOR_CLICK);
+            return true;
+        }
+
+        if (existingSeal != null && stampMaterial != null && canRecolorExistingSeal(stack, player)) {
             target.set(Envelope.DataComponents.SEAL,
-                  new Seal(stampMaterial, existingSeal.impression(), existingSeal.signature(), existingSeal.playerUuid()));
+                  new Seal(stampMaterial, existingSeal.impression(), existingSeal.signature(),
+                        existingSeal.playerUuid(), existingSeal.lock()));
             slot.set(target);
             player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
             return true;
@@ -102,7 +108,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
             Holder<SealMaterial> material = SealMaterial.getOrThrow(player.registryAccess(), newMaterial);
 
             target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(),
-                  existingSeal.signature(), existingSeal.playerUuid()));
+                  existingSeal.signature(), existingSeal.playerUuid(), existingSeal.lock()));
             slot.set(target);
             player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
             return true;
@@ -118,9 +124,13 @@ public class SealStampItem extends Item implements ApplicatorItem {
             return true;
         }
 
-        ItemStack sealResult = sealable.seal(player.level(), target, createSeal(stack, player));
+        Seal seal = createSeal(stack, player);
+        ItemStack sealResult = sealable.seal(player.level(), target, seal);
         slot.set(sealResult);
         player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+        if (!player.level().isClientSide()) {
+            onSealApplied(stack, player, seal);
+        }
 
         player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
 
@@ -128,16 +138,28 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     public Seal createSeal(ItemStack stack, Player player) {
+        @Nullable Holder<SealMaterial> stampMaterial = getStampMaterial(stack, player);
         return new Seal(
-              stack.getOrDefault(Envelope.DataComponents.SEAL_STAMP_MATERIAL,
-                    SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX)),
+              stampMaterial != null ? stampMaterial
+                    : SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX),
               getDieOrDefault(stack, player.registryAccess(), player),
               player.getName(),
               Optional.of(player.getUUID()));
     }
 
+    protected @Nullable Holder<SealMaterial> getStampMaterial(ItemStack stack, Player player) {
+        return stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL);
+    }
+
+    protected boolean canRecolorExistingSeal(ItemStack stack, Player player) {
+        return true;
+    }
+
     protected boolean canApplyGold(ItemStack stack, Player player) {
         //TODO: patreon supporters
         return false;
+    }
+
+    protected void onSealApplied(ItemStack stampStack, Player player, Seal seal) {
     }
 }
