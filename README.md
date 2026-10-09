@@ -4,7 +4,7 @@
 
   <img src="https://img.shields.io/badge/Fabric-1.21.11-e04e14" alt="Fabric 1.21.11">
 
-  <br>
+   <br>
 
   <h2>Envelope [Unofficial Port]</h2>
   <h4><i>Letters, Packages, Deliveries and more...</i></h4>
@@ -24,21 +24,17 @@
 
   <br><br>
 
-  <h3>Unofficial Port</h3>
-
-  <a href="https://modrinth.com/project/envelope-unofficial-port">
-    <img src="https://img.shields.io/modrinth/dt/envelope-unofficial-port?logo=modrinth&label=&suffix=%20&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c" alt="Modrinth downloads for Envelope [Unofficial Port]">
-  </a>
-
-  <a href="https://www.curseforge.com/minecraft/mc-mods/envelope-unofficial-port">
-    <img src="https://cf.way2muchnoise.eu/total_downloads_1733451.svg" alt="CurseForge downloads for Envelope [Unofficial Port]">
-  </a>
-
-  <br>
-
-  <a href="https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port">
-    <img src="https://img.shields.io/badge/GitHub-Source-181717?logo=github&logoColor=white" alt="GitHub source code">
-  </a>
+<h3>Unofficial Port</h3>
+<a href="https://modrinth.com/project/envelope-unofficial-port">
+  <img src="https://img.shields.io/modrinth/dt/envelope-unofficial-port?logo=modrinth&label=&suffix=%20&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c" alt="Modrinth downloads for Envelope [Unofficial Port]">
+</a>
+<a href="https://www.curseforge.com/minecraft/mc-mods/envelope-unofficial-port">
+  <img src="https://cf.way2muchnoise.eu/1733451.svg" alt="CurseForge downloads for Envelope [Unofficial Port]">
+</a>
+<br>
+<a href="https://github.com/gingermat24/Envelope-1.21.11-Unofficial-Port">
+  <img src="https://img.shields.io/badge/GitHub-Source-181717?logo=github&logoColor=white" alt="GitHub source code">
+</a>
 
 <br><br>
 
