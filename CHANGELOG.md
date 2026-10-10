@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.1 - 10/10/2026
+
+### Changed
+
+- Added compatibility for the optional JEI integration with JEI 27.3.0.10 and newer; tested with 27.3.0.10, 27.3.0.13, and 27.44.0.105.
+
+### Technical
+
+- Updated the Gradle wrapper, Architectury Loom and plugin, Shadow, Mod Publish, and Wiki Toolkit to current stable releases.
+- Verified target-specific dependency pins against current repositories: Fabric Loader 0.19.5, Fabric API 0.141.6+1.21.11, Forge Config API Port 21.11.1, and JEI 27.44.0.105.
+
 ## 0.3.0 - 08/10/2026
 
 ### Added

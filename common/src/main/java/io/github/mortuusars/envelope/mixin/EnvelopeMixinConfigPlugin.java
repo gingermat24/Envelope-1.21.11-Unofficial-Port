@@ -23,10 +23,32 @@ public class EnvelopeMixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".mixin.jei.")) {
-            return FabricLoader.getInstance().isModLoaded("jei");
+            if (!FabricLoader.getInstance().isModLoaded("jei")) {
+                return false;
+            }
+
+            if (mixinClassName.endsWith(".BasicRecipeTransferHandlerLegacyMixin")) {
+                return !hasJeiTransferContext();
+            }
+
+            if (mixinClassName.endsWith(".BasicRecipeTransferHandlerMixin")) {
+                return hasJeiTransferContext();
+            }
+
+            return true;
         }
 
         return true;
+    }
+
+    private static boolean hasJeiTransferContext() {
+        try {
+            Class.forName("mezz.jei.api.recipe.transfer.IRecipeTransferContext", false,
+                    EnvelopeMixinConfigPlugin.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
     }
 
     @Override

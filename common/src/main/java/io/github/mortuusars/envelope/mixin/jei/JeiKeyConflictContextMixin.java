@@ -1,27 +1,22 @@
 package io.github.mortuusars.envelope.mixin.jei;
 
 import io.github.mortuusars.envelope.integration.jei.JeiCompatibleScreen;
-import mezz.jei.api.gui.handlers.IGuiProperties;
-import mezz.jei.common.input.IInternalKeyMappings;
-import mezz.jei.common.input.IUserInputHandler;
-import mezz.jei.common.input.UserInput;
-import mezz.jei.gui.input.handlers.GlobalInputHandler;
-import net.minecraft.client.gui.screens.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
-@Mixin(GlobalInputHandler.class)
+@Mixin(targets = "mezz.jei.gui.input.handlers.GlobalInputHandler", remap = false)
 public class JeiKeyConflictContextMixin {
     /**
      * Fixes keys such as Ctrl+O used in formatting.
      */
     @Inject(method = "handleUserInput", at = @At("HEAD"), cancellable = true)
-    private void onHandleUserInput(Screen screen, IGuiProperties guiProperties, UserInput input, IInternalKeyMappings keyBindings,
-                                   CallbackInfoReturnable<Optional<IUserInputHandler>> cir) {
+    private void onHandleUserInput(@Coerce Object screen, @Coerce Object guiProperties, @Coerce Object input, @Coerce Object keyBindings,
+                                   CallbackInfoReturnable<Optional<?>> cir) {
         if (screen instanceof JeiCompatibleScreen resolverScreen && resolverScreen.shouldBlockJeiInput()) {
             cir.setReturnValue(Optional.empty());
         }

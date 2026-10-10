@@ -33,11 +33,6 @@ public class ServiceAddressRecipeWidget implements IRecipeWidget {
     }
 
     @Override
-    public ScreenRectangle getScreenRectangle() {
-        return area;
-    }
-
-    @Override
     public void drawWidget(GuiGraphics guiGraphics, double mouseX, double mouseY) {
         int x = area.width() / 2 - textWidth / 2;
         int y = 0;

@@ -31,11 +31,6 @@ public class MailingRecipeInfoWidget implements IRecipeWidget {
     }
 
     @Override
-    public ScreenRectangle getScreenRectangle() {
-        return area;
-    }
-
-    @Override
     public void drawWidget(GuiGraphics guiGraphics, double mouseX, double mouseY) {
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
               0, 0, 0, 0, ICON_SIZE, ICON_SIZE, TEXTURE_SIZE, TEXTURE_SIZE);

@@ -1,9 +1,9 @@
 plugins {
-    id 'dev.architectury.loom' version '1.13.469' apply false
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'com.gradleup.shadow' version '8.3.6' apply false
-    id "me.modmuss50.mod-publish-plugin" version "2.0.0"
-    id 'org.moddedmc.wiki.toolkit' version '0.4.1'
+    id 'dev.architectury.loom' version '1.17.493' apply false
+    id 'architectury-plugin' version '3.5.170'
+    id 'com.gradleup.shadow' version '9.6.1' apply false
+    id "me.modmuss50.mod-publish-plugin" version '2.2.1'
+    id 'org.moddedmc.wiki.toolkit' version '0.5.0'
 }
 
 architectury {
@@ -135,6 +135,8 @@ subprojects {
                 mod_page                     : mod_page,
                 mod_github                   : mod_github,
                 fabric_loader_version        : fabric_loader_version,
+                jei_version                  : jei_version,
+                jei_min_version              : jei_min_version,
                 mod_license                  : mod_license,
                 maven_group                  : maven_group
         ]
@@ -224,8 +226,7 @@ publishMods {
     }
 
     var forceDryRun = false
-    dryRun = forceDryRun
-            || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+    dryRun = forceDryRun || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
     def cfOptions = curseforgeOptions {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")

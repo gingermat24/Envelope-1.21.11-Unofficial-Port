@@ -67,7 +67,7 @@ Changes added in this port:
 * **Mail and recipe viewer:** delivered mail shows its original recipient. JEI displays helpful notes for certain mailing recipes and lets you click service addresses to find related recipes. Mailboxes also have seasonal spiderweb decorations on Halloween.
 * **Other fixes:** improved handling of returned payback mail and cleaned up unused internal code.
 
-This 0.3.0 release adapts selected features from Envelope 0.8.0 Snapshot 1 and Snapshot 2. Some newer features are not included: Cloud Depository and Letter Presetting are intentionally saved for later, and the optional Every Compat integration is unavailable for this Minecraft version.
+This 0.3.1 release adapts selected features from Envelope 0.8.0 Snapshot 1 and Snapshot 2. Some newer features are not included: Cloud Depository and Letter Presetting are intentionally saved for later, and the optional Every Compat integration is unavailable for this Minecraft version.
 
 Some server settings changed in 0.3.0. Back up your existing Envelope server settings before updating, then review them afterward in case any need to be set again.
 
@@ -77,10 +77,10 @@ The seal preview may continue to show a lock symbol after an administrator deact
 
 For Minecraft 1.21.11, install Fabric Loader and the following required mods:
 
-* [Fabric API](https://modrinth.com/mod/fabric-api)
-* [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
+* [Fabric API](https://modrinth.com/mod/fabric-api) 0.141.6+1.21.11
+* [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port) 21.11.1
 
-[JEI](https://modrinth.com/mod/jei) is optional and adds recipe-viewer integration. It is not required on a server for the core mod.
+[JEI](https://modrinth.com/mod/jei) is optional and adds recipe-viewer integration. JEI 27.3.0.10 is the minimum supported version; compatibility has been tested with 27.3.0.10, 27.3.0.13, and 27.44.0.105 for Fabric 1.21.11. JEI is not required on a server for the core mod.
 
 No incompatible mods are currently declared. This does not guarantee compatibility with every mod combination; known conflicts should be reported in the issue tracker.
 

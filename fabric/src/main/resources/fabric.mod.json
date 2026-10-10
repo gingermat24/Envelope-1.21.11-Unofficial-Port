@@ -36,6 +36,9 @@
     "fabric-api": "*",
     "forgeconfigapiport": ">=21.0.0"
   },
+  "suggests": {
+    "jei": ">=${jei_min_version}"
+  },
   "custom": {
     "modmenu": {
       "links": {
