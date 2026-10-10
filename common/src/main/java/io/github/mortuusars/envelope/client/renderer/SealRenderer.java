@@ -22,33 +22,33 @@ public class SealRenderer {
 
         Identifier impressionTexture = seal.impression().value().spriteTexture();
 
-        renderMaterial(material, guiGraphics, x, y);
+        renderMaterial(material, guiGraphics, x, y, 32);
 
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y + 2, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y + 2, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y + 2, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y + 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y + 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y + 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y - 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y - 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y - 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y - 2, 30);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y + 2, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y + 2, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y + 2, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y + 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y + 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y + 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x + 1, y - 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y - 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x - 1, y - 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.side(), x, y - 2, 32);
 
-        blitImpression(guiGraphics, impressionTexture, colors.shadow(), x, y + 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.highlight(), x, y - 1, 30);
-        blitImpression(guiGraphics, impressionTexture, colors.base(), x, y, 30);
+        blitImpression(guiGraphics, impressionTexture, colors.shadow(), x, y + 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.highlight(), x, y - 1, 32);
+        blitImpression(guiGraphics, impressionTexture, colors.base(), x, y, 32);
 
         if (material.hasGlint()) {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SEAL_GLINT_SPRITE, x, y, 32, 32);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SEAL_GLINT_SPRITE, x + 1, y + 1, 32, 32);
         }
 
         if (seal.lock().isPresent()) {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LOCKED_OVERLAY_SPRITE, x - 2, y - 2, 34, 34);
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LOCK_SPRITE, x - 2, y - 2, 34, 34);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LOCKED_OVERLAY_SPRITE, x - 1, y - 1, 34, 34);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LOCK_SPRITE, x - 1, y - 1, 34, 34);
         }
     }
 
@@ -57,7 +57,7 @@ public class SealRenderer {
     }
 
     public void renderDie(SealSymbol impression, SealMaterial material, GuiGraphics guiGraphics, int x, int y) {
-        renderMaterial(material, guiGraphics, x, y);
+        renderMaterial(material, guiGraphics, x, y, 30);
         renderDieImpression(impression, material.impressionPalette(), guiGraphics, x, y);
     }
 
@@ -87,12 +87,14 @@ public class SealRenderer {
         blitImpression(guiGraphics, impressionTexture, colors.base(), x, y, -30);
     }
 
-    private void renderMaterial(SealMaterial material, GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, material.spriteId(), x, y, 30, 30);
+    private void renderMaterial(SealMaterial material, GuiGraphics guiGraphics, int x, int y, int size) {
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, material.spriteId(), x, y, size, size);
     }
 
     private void blitImpression(GuiGraphics guiGraphics, Identifier source, TintColor tint, int x, int y, int textureWidth) {
         Identifier tintedTexture = TintedTextureCache.get(source, tint);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, tintedTexture, x, y, 0, 0, 30, 30, textureWidth, 30, 0xFFFFFFFF);
+        int size = Math.abs(textureWidth);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, tintedTexture, x, y, 0, 0, size, size,
+              textureWidth, size, 0xFFFFFFFF);
     }
 }

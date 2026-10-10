@@ -6,6 +6,8 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -226,6 +228,21 @@ public class PigeonholeBlock extends BaseEntityBlock {
                       ? net.minecraft.world.entity.EquipmentSlot.MAINHAND
                       : net.minecraft.world.entity.EquipmentSlot.OFFHAND);
                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
+
+                Direction facing = state.getValue(FACING);
+                int stepX = facing.getStepX();
+                int stepY = facing.getStepY();
+                int stepZ = facing.getStepZ();
+                double offset = 0.2;
+                double x = pos.getX() + 0.5
+                      + (stepX == 0 ? net.minecraft.util.Mth.nextDouble(serverLevel.random, -0.25, 0.25) : stepX * (0.5 + offset));
+                double y = pos.getY() + 0.5
+                      + (stepY == 0 ? net.minecraft.util.Mth.nextDouble(serverLevel.random, -0.25, 0.25) : stepY * (0.5 + offset))
+                      - offset;
+                double z = pos.getZ() + 0.5
+                      + (stepZ == 0 ? net.minecraft.util.Mth.nextDouble(serverLevel.random, -0.25, 0.25) : stepZ * (0.5 + offset));
+                serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIORITE.defaultBlockState()),
+                      x, y, z, 6, 0.1, 0.1, 0.1, 0);
             }
 
             level.playSound(player, pos, Envelope.SoundEvents.PIGEONHOLE_SCOOP.get(), SoundSource.BLOCKS,

@@ -54,10 +54,13 @@ public class LetterBlock extends Block implements EntityBlock {
 
     public LetterBlock(Properties properties) {
         super(properties);
-        registerDefaultState(getStateDefinition().any()
+        BlockState defaultState = getStateDefinition().any()
               .setValue(FACING, Direction.NORTH)
-              .setValue(TATTERED, false)
-              .setValue(HAS_CONTENT, true));
+              .setValue(HAS_CONTENT, true);
+        if (defaultState.hasProperty(TATTERED)) {
+            defaultState = defaultState.setValue(TATTERED, false);
+        }
+        registerDefaultState(defaultState);
     }
 
     @Override
@@ -68,7 +71,10 @@ public class LetterBlock extends Block implements EntityBlock {
     @Override
     protected @NotNull ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
-        if (state.getValue(TATTERED)) stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+        if (this instanceof TatteredLetterBlock || state.hasProperty(TATTERED) && state.getValue(TATTERED)) {
+            stack = stack.transmuteCopy(Envelope.Items.TATTERED_LETTER.get());
+            stack.remove(Envelope.DataComponents.LETTER_TATTERED);
+        }
         return stack;
     }
 
@@ -87,13 +93,19 @@ public class LetterBlock extends Block implements EntityBlock {
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = context.getClickedFace();
-        return facing.getAxis().isHorizontal()
-              ? getStateDefinition().any()
+        if (!facing.getAxis().isHorizontal()) {
+            return null;
+        }
+
+        BlockState state = getStateDefinition().any()
               .setValue(FACING, facing)
-              .setValue(TATTERED, context.getItemInHand().get(Envelope.DataComponents.LETTER_TATTERED) != null)
               .setValue(HAS_CONTENT, !context.getItemInHand()
-                    .getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).isEmpty())
-              : null;
+                    .getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).isEmpty());
+        if (state.hasProperty(TATTERED)) {
+            state = state.setValue(TATTERED,
+                  context.getItemInHand().has(Envelope.DataComponents.LETTER_TATTERED));
+        }
+        return state;
     }
 
     @Override

@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.0 - 10/10/2026
+
+### Added
+
+- Added separate **Tattered Letter** and **Sealed Tattered Letter** item types, with a dedicated tattered-letter block. Foxes now convert eligible letters to these item types.
+- Kept compatibility with tattered letters and placed letters saved by 0.3.1; the old component and blockstate representation remains readable.
+- Pigeonhole waste now has a 50% chance to drop a Feather, and scooping it emits debris particles.
+
+### Changed
+
+- Updated seal preview rendering, lock/glint positioning, and signature sizing for the refreshed upstream sprites.
+- Ported the upstream seal-tint refinements, including animated Gold and active-lock highlights on item seals. Block seal tints remain static because block tinting is sampled rather than animated.
+- Refreshed upstream item and courier textures and updated sealed-letter and sealed-package texture references.
+- Synchronized seal-lock state to clients on login and whenever locks change, keeping item previews consistent with server state.
+- Adjusted seal material tint values for red, yellow, lime, and Sculk.
+
+### Fixed
+
+- Soulbound Seal Stamps used in Creative mode no longer create persistent locks and now explain why in the action bar.
+
+This Update adapts selected changes from the original creators' [`1.21.1-dev` branch](https://github.com/mortuusars/Envelope/tree/1.21.1-dev), including commits [`7b1e32c`](https://github.com/mortuusars/Envelope/commit/7b1e32cfe792c67128c7feadddd19f60d3bb7f8a), [`dbca63c`](https://github.com/mortuusars/Envelope/commit/dbca63c0417a7c2b7d506eefa85836bb4ae13f23), [`83b88d4`](https://github.com/mortuusars/Envelope/commit/83b88d41460f3f584a1c32bd50a40822dd50d508), [`7083e1b`](https://github.com/mortuusars/Envelope/commit/7083e1b96c12dc4c5cedd8b18f4967b4682fa716), [`45fd6da`](https://github.com/mortuusars/Envelope/commit/45fd6daf3d7afc846f66c5100aa1f5a6cd31f0a1), [`fcbe2db`](https://github.com/mortuusars/Envelope/commit/fcbe2dbe24d5f1573cf8c7420e7ea1d13c6e43a8), [`e8e24c5`](https://github.com/mortuusars/Envelope/commit/e8e24c5870c0eeb288b656e80d507f2ed04db46e), and [`cc6c50a`](https://github.com/mortuusars/Envelope/commit/cc6c50a819e96e1c18424408808a275630edc285).
+
 ## 0.3.1 - 10/10/2026
 
 ### Changed

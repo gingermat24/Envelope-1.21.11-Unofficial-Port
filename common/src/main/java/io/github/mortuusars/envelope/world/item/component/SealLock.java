@@ -60,7 +60,10 @@ public record SealLock(String owner, UUID id) {
     }
 
     public boolean isLocked(Level level) {
-        return level instanceof ServerLevel serverLevel && SealLocks.get(serverLevel).isLocked(this);
+        if (level instanceof ServerLevel serverLevel) {
+            return SealLocks.get(serverLevel).isLocked(this);
+        }
+        return SealLocks.isClientLocked(this);
     }
 
     public boolean isLockedFor(Player player) {

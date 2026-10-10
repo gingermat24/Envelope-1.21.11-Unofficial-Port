@@ -6,7 +6,9 @@ import io.github.mortuusars.envelope.world.item.component.SealLock;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -36,6 +38,12 @@ public class SoulboundSealStampItem extends SealStampItem {
 
     @Override
     public Seal createSeal(ItemStack stack, Player player) {
+        if (player.isCreative()) {
+            player.displayClientMessage(Component.translatable("item.envelope.soulbound_seal_stamp.error.in_creative_mode")
+                  .withStyle(ChatFormatting.RED), true);
+            return super.createSeal(stack, player);
+        }
+
         Holder<SealMaterial> sculk = SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.SCULK);
         Optional<SealLock> lock = Config.Server.SOULBOUND_SEAL_STAMP_CREATES_LOCK.get()
               ? Optional.of(SealLock.create(player.getScoreboardName()))

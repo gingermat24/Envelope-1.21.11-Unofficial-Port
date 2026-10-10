@@ -19,6 +19,7 @@ public class S2CPackets {
                 new CustomPacketPayload.TypeAndCodec<>(OpenAddressTagScreenS2CP.TYPE, OpenAddressTagScreenS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenMailboxAddressTagScreenS2CP.TYPE, OpenMailboxAddressTagScreenS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenMailboxPlacingScreenS2CP.TYPE, OpenMailboxPlacingScreenS2CP.STREAM_CODEC),
+                new CustomPacketPayload.TypeAndCodec<>(SyncSealLocksS2CP.TYPE, SyncSealLocksS2CP.STREAM_CODEC),
 
                 new CustomPacketPayload.TypeAndCodec<>(BuggerDataS2CP.TYPE, BuggerDataS2CP.STREAM_CODEC)
         );

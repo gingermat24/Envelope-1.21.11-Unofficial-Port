@@ -46,9 +46,9 @@
 
 ## About
 
-**Envelope [Unofficial Port]** is an unofficial Fabric port of [Envelope](https://modrinth.com/mod/envelope) for **Minecraft 1.21.11**.
+**Envelope [Unofficial Port]** is an unofficial port of the original mod's Fabric **1.21.1** codebase to Fabric **Minecraft 1.21.11**.
 
-The original mod was not available for this Minecraft version, so I ported it to 1.21.11 to make it usable on newer Fabric installations.
+The original project targets Fabric 1.21.1. This project adapts that codebase and later upstream changes for Fabric 1.21.11.
 
 This project is **not the original Envelope mod**. It is a community-made port intended to bring the original mod to a newer Minecraft version.
 
@@ -63,15 +63,10 @@ Changes added in this port:
 * **Updated recipes:** the Automated Supply Service Letter and Writable Book no longer require a Slimeball. The Seal Stamp recipe now uses honeycomb, planks, and an iron ingot.
 * **Courier improvements:** long-distance Pigeon deliveries are faster, and Bats can deliver mail at night at twice the Pigeon speed. Each Bat completes at most three deliveries before leaving. Couriers play a sound when they finish, and their arrival and departure particles can be seen from farther away. Server options let you adjust delivery timing, courier damage protection, spawning behavior, and Mail Service notices when a courier dies.
 * **Soulbound Seals:** combine a Seal Stamp with an Echo Shard to make an 8-use Soulbound Seal Stamp. By default, it prevents other players from opening the sealed item while its owner is alive and keeps the item safe when that owner dies. When used up, the stamp returns to its original type and wax. Server options let you disable the stamp, its durability, or its locking effect, and adjust how long it takes to remove a seal.
-* **Seal locks:** administrators can use `/envelope seal_lock create`, `/envelope seal_lock unlock`, and `/envelope seal_lock list` to manage locks. Locks can also be assigned to seals for quests or other custom uses. An existing lock can be reactivated by providing its ID; by default, owners can remove their own locks.
+* **Tattered letters:** tattered letters and their sealed forms now have separate item identities and a dedicated placed block. Tattered letters saved by 0.3.1 remain supported through the legacy component and blockstate.
+* **Seal locks:** administrators can use `/envelope seal_lock create`, `/envelope seal_lock unlock`, and `/envelope seal_lock list` to manage locks. Locks can also be assigned to seals for quests or other custom uses. An existing lock can be reactivated by providing its ID; by default, owners can remove their own locks. Clients now receive lock-state updates so seal previews reflect administrative changes.
 * **Mail and recipe viewer:** delivered mail shows its original recipient. JEI displays helpful notes for certain mailing recipes and lets you click service addresses to find related recipes. Mailboxes also have seasonal spiderweb decorations on Halloween.
 * **Other fixes:** improved handling of returned payback mail and cleaned up unused internal code.
-
-This 0.3.1 release adapts selected features from Envelope 0.8.0 Snapshot 1 and Snapshot 2. Some newer features are not included: Cloud Depository and Letter Presetting are intentionally saved for later, and the optional Every Compat integration is unavailable for this Minecraft version.
-
-Some server settings changed in 0.3.0. Back up your existing Envelope server settings before updating, then review them afterward in case any need to be set again.
-
-The seal preview may continue to show a lock symbol after an administrator deactivates that lock. The item can still be opened according to the current lock status.
 
 ## Dependencies and compatibility
 

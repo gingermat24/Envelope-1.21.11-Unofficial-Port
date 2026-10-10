@@ -141,7 +141,7 @@ public final class SealMaterial {
 
         context.register(RED_WAX, new SealMaterial(
               keyToSprite.apply(RED_WAX),
-              0xFFCC4E47,
+              0xFFEB5A4C,
               new ShadingPalette(0xFFA73A34, 0xFFF18E78, 0xFF660C0A, 0xFF8A2622)));
         context.register(GOLD, new SealMaterial(
               keyToSprite.apply(GOLD),
@@ -149,7 +149,7 @@ public final class SealMaterial {
               new ShadingPalette(0xFFD79736, 0xFFFFEAAD, 0xFF75340B, 0xFFB56D24), true));
         context.register(SCULK, new SealMaterial(
               keyToSprite.apply(SCULK),
-              0xFF19C8D2,
+              0xFF256067,
               new ShadingPalette(0xFF14AAB5, 0xFF72F7F7, 0xFF075A67, 0xFF0B858D)));
     }
 }

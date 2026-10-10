@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
+import io.github.mortuusars.envelope.world.level.saveddata.SealLocks;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -74,6 +75,8 @@ public class EnvelopeFabric implements ModInitializer {
             event.accept(Envelope.Items.LETTER_AND_QUILL.get());
             event.accept(Envelope.Items.LETTER.get());
             event.accept(Envelope.Items.SEALED_LETTER.get());
+            event.accept(Envelope.Items.TATTERED_LETTER.get());
+            event.accept(Envelope.Items.SEALED_TATTERED_LETTER.get());
             event.accept(Envelope.Items.PACKAGE.get());
             event.accept(Envelope.Items.SEALED_PACKAGE.get());
             event.accept(Envelope.Items.ADDRESS_TAG.get());
@@ -97,6 +100,8 @@ public class EnvelopeFabric implements ModInitializer {
                             output.accept(Envelope.Items.LETTER_AND_QUILL.get());
                             output.accept(Envelope.Items.LETTER.get());
                             output.accept(Envelope.Items.SEALED_LETTER.get());
+                            output.accept(Envelope.Items.TATTERED_LETTER.get());
+                            output.accept(Envelope.Items.SEALED_TATTERED_LETTER.get());
                             output.accept(Envelope.Items.PAPER_BOX.get());
                             output.accept(Envelope.Items.PACKAGE.get());
                             output.accept(Envelope.Items.SEALED_PACKAGE.get());
@@ -126,6 +131,7 @@ public class EnvelopeFabric implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerEvents.playerLogin(handler.getPlayer());
+            SealLocks.get(server.overworld()).syncToClient(handler.getPlayer());
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -148,6 +154,7 @@ public class EnvelopeFabric implements ModInitializer {
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PAPER_BOX.get(), 50, 15);
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 50, 15);
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.LETTER.get(), 200, 10);
+        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.TATTERED_LETTER.get(), 200, 10);
         Envelope.Blocks.PIGEONHOLES.forEach((id, block) -> {
             FlammableBlockRegistry.getDefaultInstance().add(block.get(), 20, 15);
         });

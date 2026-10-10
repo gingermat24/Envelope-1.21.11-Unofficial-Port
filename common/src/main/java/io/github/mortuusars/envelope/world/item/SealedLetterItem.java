@@ -16,15 +16,19 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SealedLetterItem extends Item implements Unsealable {
-    public SealedLetterItem(Properties properties) {
+    private final Supplier<? extends Item> baseItem;
+
+    public SealedLetterItem(Supplier<? extends Item> baseItem, Properties properties) {
         super(Unsealable.withUnsealingConsumable(properties));
+        this.baseItem = baseItem;
     }
 
     @Override
     public ItemLike getUnsealedItem() {
-        return Envelope.Items.LETTER.get();
+        return baseItem.get();
     }
 
     @Override
@@ -56,5 +60,21 @@ public class SealedLetterItem extends Item implements Unsealable {
     @Override
     public @NotNull ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         return unseal(stack, level, entity);
+    }
+
+    @Override
+    public ItemStack unseal(ItemStack stack, Level level, @org.jetbrains.annotations.Nullable LivingEntity entity) {
+        if (stack.has(Envelope.DataComponents.LETTER_TATTERED)) {
+            if (entity instanceof Player player && !canUnseal(stack, player)) {
+                return stack;
+            }
+
+            ItemStack unsealedStack = stack.transmuteCopy(Envelope.Items.TATTERED_LETTER.get());
+            unsealedStack.remove(Envelope.DataComponents.SEAL);
+            unsealedStack.remove(Envelope.DataComponents.LETTER_TATTERED);
+            onUnsealed(stack, unsealedStack, level, entity);
+            return unsealedStack;
+        }
+        return Unsealable.super.unseal(stack, level, entity);
     }
 }

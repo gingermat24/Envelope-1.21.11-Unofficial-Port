@@ -16,6 +16,19 @@
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    },
+    "get_tattered_letter_type": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "envelope:tattered_letter",
+              "envelope:sealed_tattered_letter"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "display": {
@@ -23,11 +36,8 @@
       "translate": "advancement.envelope.foxtile_environment.description"
     },
     "icon": {
-      "components": {
-        "envelope:letter_tattered": {}
-      },
       "count": 1,
-      "id": "envelope:letter"
+      "id": "envelope:tattered_letter"
     },
     "title": {
       "translate": "advancement.envelope.foxtile_environment.title"
@@ -35,7 +45,8 @@
   },
   "requirements": [
     [
-      "get_tattered_letter"
+      "get_tattered_letter",
+      "get_tattered_letter_type"
     ]
   ],
   "sends_telemetry_event": true

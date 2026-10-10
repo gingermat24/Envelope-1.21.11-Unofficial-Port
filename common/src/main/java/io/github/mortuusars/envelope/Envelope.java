@@ -172,6 +172,14 @@ public class Envelope {
                     .instabreak()
                     .noCollision()
                     .noOcclusion())));
+        public static final Supplier<TatteredLetterBlock> TATTERED_LETTER = Register.block("tattered_letter",
+              () -> new TatteredLetterBlock(blockProperties("tattered_letter", BlockBehaviour.Properties.of()
+                    .pushReaction(PushReaction.DESTROY)
+                    .sound(SoundTypes.PAPER)
+                    .ignitedByLava()
+                    .instabreak()
+                    .noCollision()
+                    .noOcclusion())));
 
         private static BlockBehaviour.Properties blockProperties(String id, BlockBehaviour.Properties properties) {
             return properties.setId(ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, Envelope.resource(id)));
@@ -206,7 +214,7 @@ public class Envelope {
 
         public static final Supplier<BlockEntityType<LetterBlockEntity>> LETTER =
               Register.blockEntityType("letter", () -> Register.newBlockEntityType(
-                    LetterBlockEntity::new, Blocks.LETTER.get()));
+                    LetterBlockEntity::new, Blocks.LETTER.get(), Blocks.TATTERED_LETTER.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
             return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
@@ -263,8 +271,14 @@ public class Envelope {
               () -> new LetterAndQuillItem(itemProperties("letter_and_quill", new Item.Properties().stacksTo(1))));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
               () -> new LetterItem(Blocks.LETTER.get(), itemProperties("letter", new Item.Properties())));
+        public static final Supplier<TatteredLetterItem> TATTERED_LETTER = Register.item("tattered_letter",
+              () -> new TatteredLetterItem(Blocks.TATTERED_LETTER.get(),
+                    itemProperties("tattered_letter", new Item.Properties())));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
-              () -> new SealedLetterItem(itemProperties("sealed_letter", new Item.Properties())));
+              () -> new SealedLetterItem(LETTER, itemProperties("sealed_letter", new Item.Properties())));
+        public static final Supplier<SealedLetterItem> SEALED_TATTERED_LETTER = Register.item("sealed_tattered_letter",
+              () -> new SealedLetterItem(TATTERED_LETTER,
+                    itemProperties("sealed_tattered_letter", new Item.Properties())));
 
         public static final Supplier<PaperBoxItem> PAPER_BOX = Register.item("paper_box",
               () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), itemProperties("paper_box", new Item.Properties().stacksTo(16))));

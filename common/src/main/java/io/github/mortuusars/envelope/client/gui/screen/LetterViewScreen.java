@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.LetterViewScreenClosedS2CP;
 import io.github.mortuusars.envelope.util.ItemAndStack;
 import io.github.mortuusars.envelope.world.item.LetterItem;
+import io.github.mortuusars.envelope.world.item.TatteredLetterItem;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -50,7 +51,8 @@ public class LetterViewScreen extends Screen {
         super(Component.empty());
         this.letter = new ItemAndStack<>(letter);
         this.hand = hand;
-        this.isTattered = letter.has(Envelope.DataComponents.LETTER_TATTERED);
+        this.isTattered = letter.getItem() instanceof TatteredLetterItem
+              || letter.has(Envelope.DataComponents.LETTER_TATTERED);
     }
 
     @Override

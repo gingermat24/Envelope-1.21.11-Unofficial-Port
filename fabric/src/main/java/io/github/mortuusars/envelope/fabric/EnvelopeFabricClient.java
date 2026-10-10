@@ -18,7 +18,9 @@ import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpack
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPacketHandler;
 import io.github.mortuusars.envelope.world.item.Sealable;
+import io.github.mortuusars.envelope.world.level.saveddata.SealLocks;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -57,6 +59,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(BatBackpackLayer.MODEL_LAYER, BatBackpackModel::createLayerDefinition);
 
         BlockRenderLayerMap.putBlock(Envelope.Blocks.LETTER.get(), ChunkSectionLayer.CUTOUT);
+        BlockRenderLayerMap.putBlock(Envelope.Blocks.TATTERED_LETTER.get(), ChunkSectionLayer.CUTOUT);
 
         ColorProviderRegistry.BLOCK.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
 
@@ -68,6 +71,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);
 
         FabricS2CPacketHandler.register();
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> SealLocks.clearClientLocks());
     }
 
     private static void registerSealTintCacheReloader() {
